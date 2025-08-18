@@ -2,7 +2,7 @@
 #include <string>
 #include <cmath>
 #include<iomanip>
-#include<fstream>fvs
+#include<fstream>
 #include<cctype>
 using namespace std;
 struct User {
@@ -581,4 +581,5 @@ void clamper() {
 	}
 
 }
+
 
