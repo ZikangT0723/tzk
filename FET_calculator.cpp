@@ -12,7 +12,7 @@ struct User {
 	int score;
 };
 bool hostLogin();//Daniel
-void hostMenu();//Daniel
+bool hostMenu();//Daniel
 void cal(int);
 void note();
 int quiz();
@@ -33,6 +33,7 @@ const int num = 100;
 int main() {
 	int opt, userindex = -1;
 	int choice;
+	bool Return;
 	do
 	{
 		cout << "=================================\n";
@@ -56,8 +57,9 @@ int main() {
 		{
 			if (hostLogin())
 				hostMenu();
+			Return = hostMenu();
 			else
-				choice = 999; //can declacre a bool also
+				Return = true; //can declacre a bool also
 			break;
 		}
 		case 2:
@@ -71,7 +73,7 @@ int main() {
 			break;
 		}
 		}
-	} while (choice == 999);
+	} while (Return);
 
 	//havent done yet by zikang
 	User stu[num] = {};
@@ -89,7 +91,7 @@ int main() {
 	//user menu (Daniel's comment)
 	do {
 		cout << "Choose the action you want to proceed: \n1. note \n2. quiz \n3. stimulator \n4. userlist \n5. end:" << endl;
-		cout<< "Enter your choice (i.e. 1, 2, 3, 4, 5 out):";
+		cout << "Enter your choice (i.e. 1, 2, 3, 4, 5 out):";
 		cin >> opt;
 		menu(opt, stu, userindex);
 	} while (opt != 4);
@@ -135,13 +137,30 @@ bool hostLogin() {
 	return false;
 }
 //Daniel
-void hostMenu()
+bool hostMenu()
 {
+	int choice;
 	cout << "\n--- Host Menu ---\n";
 	cout << "1. Show Student Result\n";
 	cout << "2. User List\n";
 	cout << "3. Edit / Delete Comments\n";
 	cout << "0. Logout\n";
+	cout << "Enter your choice (0~3): ";
+	cin >> choice;
+	switch(choice)
+	{
+	case 1:
+	{
+		cout << "1";
+		return false;
+		break;
+	}
+	case 0:
+	{
+		cout <<"Exitting ...."
+		return true;
+		break;
+	}
 }
 
 void menu(int opt, User stu[], int userindex) {
