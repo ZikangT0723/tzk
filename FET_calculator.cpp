@@ -154,7 +154,7 @@ void menu(int opt, User stu[], int userindex) {
 
 		//stu[userindex].score = quiz();
 		b = quiz();
-		cout << "Score updated:" << b << endl;
+		cout << "Score updated:" << b-1 << endl;
 		break;
 	case 3:
 		do {
