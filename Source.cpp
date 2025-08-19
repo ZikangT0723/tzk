@@ -18,7 +18,7 @@ void note();
 int quiz();
 void getinfo(User&);
 void userlist(User*);
-void menu(int, User[], int);
+void menu(User[], int);
 int findslot(User[]);
 int check(float*, int&);
 float fun1();
@@ -35,7 +35,7 @@ const int num = 100;
 
 
 int main() {
-	int opt, userindex = -1;
+	int  userindex = -1;
 	int choice;
 	do
 	{
@@ -91,12 +91,9 @@ int main() {
 
 	userlist(stu);
 	//user menu (Daniel's comment)
-	do {
-		cout << "Choose the action you want to proceed: \n1. note \n2. quiz \n3. stimulator \n4. userlist \n5. end:" << endl;
-		cout << "Enter your choice (i.e. 1, 2, 3, 4, 5 out):";
-		cin >> opt;
-		menu(opt, stu, userindex);
-	} while (opt != 4);
+	
+	menu(stu, userindex);
+	
 
 	return 0;
 }
@@ -148,8 +145,12 @@ void hostMenu()
 	cout << "0. Logout\n";
 }
 
-void menu(int opt, User stu[], int userindex) {
-	int a, b;
+void menu( User stu[], int userindex) {
+	int a, b,opt;
+	do {
+		cout << "Choose the action you want to proceed: \n1. note \n2. quiz \n3. stimulator \n4. userlist \n5. end:" << endl;
+		cout << "Enter your choice (i.e. 1, 2, 3, 4, 5 out):";
+		cin >> opt;
 	switch (opt) {
 	case 1:
 		note();
@@ -178,6 +179,7 @@ void menu(int opt, User stu[], int userindex) {
 	default:
 		cout << "Invalid input try to choose again.(1,2,3,4)" << endl;
 	}
+	} while (opt != 4); 
 }
 int quiz() {
 	int b, points;
@@ -192,16 +194,15 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a); 
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					fun1();
 				}
-				//insert your calculator here
-			} while (a == 'Y' || a == 'y');
+			} while (a == 'Y');
 			cout << "Enter the answer:";//add this two line if your question need answer more than 1
 			cin >> answer[0];           //add this two line if your question need answer more than 1, answer[i+1]
 			break;
@@ -224,15 +225,15 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					clamper();
 				}
-			} while (a == 'Y' || a == 'y');
+			} while (a == 'Y');
 			cout << "Enter the answer of Vout(+ve):";
 			cin >> answer[1];
 			cout << "Enter the answer of Vout(-ve):";
@@ -257,15 +258,15 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					clamper();
 				}
-			} while (a == 'Y' || a == 'y');
+			} while (a == 'Y');
 			cout << "Enter the answer of Vout(+ve):";
 			cin >> answer[3];
 			cout << "Enter the answer of Vout(-ve):";
@@ -276,15 +277,15 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					fun1();
 				}
-			} while (a == 'Y' || a == 'y');
+			} while (a == 'Y');
 			cout << "Enter the answer:";
 			cin >> answer[5];
 			break;
@@ -293,15 +294,15 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					fun1();
 				}
-			} while (a == 'Y' || a == 'y');
+			} while (a == 'Y');
 			cout << "Enter the answer:";
 			cin >> answer[6];
 			break;
@@ -310,15 +311,15 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					fun1();
 				}
-			} while (a == 'Y' || a == 'y');
+			} while (a == 'Y');
 			cout << "Enter the answer:";
 			cin >> answer[7];
 			break;
@@ -327,15 +328,15 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					fun1();
 				}
-			} while (a == 'Y' || a == 'y');
+			} while (a == 'Y');
 			cout << "Enter the answer:";
 			cin >> answer[8];
 			break;
