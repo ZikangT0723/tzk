@@ -10,9 +10,11 @@ struct User {
 	string Name;
 	int ID;
 	int score;
-};
+
+
 bool hostLogin();//Daniel
 bool hostMenu();//Daniel
+
 void cal(int);
 void note();
 int quiz();
@@ -28,7 +30,7 @@ void clamper();
 void jfet(); //Daniel
 void mosfet(); //Daniel
 const int num = 100;
-
+//try using push in github
 
 int main() {
 	int opt, userindex = -1;
