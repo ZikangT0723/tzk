@@ -23,7 +23,7 @@ float fun2();
 float fun3();
 void clamper();
 const int num = 100;
-
+//try using push in github
 
 int main() {
 	int opt,userindex=-1;
