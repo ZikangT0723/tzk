@@ -4,6 +4,7 @@
 #include<iomanip>
 #include<fstream>
 #include<cctype>
+//this comment is teach us how to use github
 using namespace std;
 struct User {
 	string Name;
