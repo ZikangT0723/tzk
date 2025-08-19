@@ -148,7 +148,7 @@ void hostMenu()
 void menu( User stu[], int userindex) {
 	int a, b,opt;
 	do {
-		cout << "Choose the action you want to proceed: \n1. note \n2. quiz \n3. stimulator \n4. userlist \n5. end:" << endl;
+		cout << "Choose the action you want to proceed: \n1. note \n2. quiz \n3. simulator \n4. userlist \n5. end:" << endl;
 		cout << "Enter your choice (i.e. 1, 2, 3, 4, 5 out):";
 		cin >> opt;
 	switch (opt) {
@@ -163,10 +163,10 @@ void menu( User stu[], int userindex) {
 		break;
 	case 3:
 		do {
-			cout << "Select the type of stimulator(\n1.belum ada,\n2.clamper,\n3.belum siap, \n4. empty "
+			cout << "Select the type of simulator(\n1.belum ada,\n2.clamper,\n3.belum siap, \n4. empty "
 				<< "\n5.JFET(Self bias) \n6.MOSFET(voltage divider bias) \n* Enter '-999' to return):";
 			cin >> a;
-			cal(a); //select stimulator in menu
+			cal(a); //select simulator in menu
 		} while (a != -999);
 		break;
 	case 4:
@@ -192,7 +192,7 @@ int quiz() {
 		case 1:
 			cout << "1";//insert your question here
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a); 
 
@@ -223,7 +223,7 @@ int quiz() {
 			cout << "   -----------------------------------------o -\n";
 			cout << "                     Figure 2\n";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -256,7 +256,7 @@ int quiz() {
 			cout << "   -----------------------------------------o -\n";
 			cout << "                     Figure 3\n";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -275,7 +275,7 @@ int quiz() {
 		case 4:
 			cout << "4";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -292,7 +292,7 @@ int quiz() {
 		case 5:
 			cout << "5";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -309,7 +309,7 @@ int quiz() {
 		case 6:
 			cout << "6";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -326,7 +326,7 @@ int quiz() {
 		case 7:
 			cout << "Qustion 7 Drain current calculation from datasheet";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -360,7 +360,7 @@ int quiz() {
 			cout << " in the circuit shown above." << endl << endl;
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -396,7 +396,7 @@ int quiz() {
 			cout << " in the E-MOSFET circuit shown above. Given that the particular MOSFET has" << endl;
 			cout << " the theshold voltage Vgs_th = 2V and the parameter devices K = 50 mA/V^2 ." << endl << endl;
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -437,7 +437,7 @@ int quiz() {
 
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -479,7 +479,7 @@ int quiz() {
 			cout << "Determine the closed-loop voltage gain,Acl and the input impedance of the amplifier.\n";
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -521,7 +521,7 @@ int quiz() {
 			cout << "Determine the input and output impedances of the amplifier.\n";
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
