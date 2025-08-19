@@ -32,7 +32,7 @@ void non_inverting();
 void voltageFollower();
 void invertingAmplifier();
 const int num = 100;
-
+//commit
 
 int main() {
 	int  userindex = -1;
