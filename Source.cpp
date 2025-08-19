@@ -8,7 +8,7 @@
 using namespace std;
 struct User {
 	string Name;
-	int ID;
+	int ID;//Teng
 	int score;
 };
 bool hostLogin();//Daniel
