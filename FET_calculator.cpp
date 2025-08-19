@@ -10,6 +10,8 @@ struct User {
 	int ID;
 	int score;
 };
+bool hostLogin();//Daniel
+void hostMenu();//Daniel
 void cal(int);
 void note();
 int quiz();
@@ -29,8 +31,48 @@ const int num = 100;
 
 int main() {
 	int opt, userindex = -1;
+	int choice;
+	do
+	{
+		cout << "=================================\n";
+		cout << "   WELCOME TO BASIC ELECTRONIC   \n";
+		cout << "=================================\n";
+		cout << "Please select mode:\n";
+		cout << "1. Host Mode\n";
+		cout << "2. User Mode\n";
+		cout << "0. Exit\n";
+		cout << "Choice (0~2): ";
+		cin >> choice;
+		while (choice != 0 && choice != 1 && choice != 2)
+		{
+			cout << "Invalid input please enter 0 to 2." << endl;
+			cout << "Enter your choice: ";
+			cin >> choice;
+		}
+		switch (choice)
+		{
+		case 1:
+		{
+			if (hostLogin())
+				hostMenu();
+			else
+				choice = 999; //can declacre a bool also
+			break;
+		}
+		case 2:
+		{
+			cout << "userMenu"; //zk code
+			break;
+		}
+		case 0:
+		{
+			cout << "Exitting program...";
+			break;
+		}
+		}
+	} while (choice == 999);
 
-	cout << "Welcome to Basic Electronic." << endl;
+	//havent done yet by zikang
 	User stu[num] = {};
 	stu[1].Name = "Teng Zi Kang";
 	stu[1].ID = 2404458;
@@ -43,7 +85,7 @@ int main() {
 
 
 	userlist(stu);
-
+	//user menu (Daniel's comment)
 	do {
 		cout << "Choose the action you want to proceed: \n1. note \n2. quiz \n3. stimulator \n4. userlist \n5. end:" << endl;
 		cout<< "Enter your choice (i.e. 1, 2, 3, 4, 5 out):";
@@ -53,6 +95,54 @@ int main() {
 
 	return 0;
 }
+//Daniel
+bool hostLogin() {
+	string hostID, hostPass;
+	const string correctID = "admin";
+	const string correctPass = "123456";
+
+	int attempts = 0, maxAttempts = 3;
+
+	cout << "\n--- Host Login ---\n";
+	cout << "(Type 999 as Host ID to return to Login Surface)\n\n";
+
+	while (attempts < maxAttempts) {
+		cout << "Enter Host ID: ";
+		cin >> hostID;
+
+		// Option to return to login surface
+		if (hostID == "999") {
+			cout << "\nReturning to Login Surface...\n";
+			return false; // exit without counting as failed attempt
+		}
+
+		cout << "Enter Password: ";
+		cin >> hostPass;
+
+		if (hostID == correctID && hostPass == correctPass) {
+			cout << "\nLogin Successful!\n";
+			return true;
+		}
+		else {
+			attempts++;
+			cout << "\nInvalid ID or Password. Attempts left: "
+				<< (maxAttempts - attempts) << "\n";
+		}
+	}
+
+	cout << "\nToo many failed attempts. Returning to Login Surface...\n";
+	return false;
+}
+//Daniel
+void hostMenu()
+{
+	cout << "\n--- Host Menu ---\n";
+	cout << "1. Show Student Result\n";
+	cout << "2. User List\n";
+	cout << "3. Edit / Delete Comments\n";
+	cout << "0. Logout\n";
+}
+
 void menu(int opt, User stu[], int userindex) {
 	int a, b;
 	switch (opt) {
