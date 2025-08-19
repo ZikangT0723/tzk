@@ -10,7 +10,7 @@ struct User {
 	string Name;
 	int ID;//Teng
 	int score;
-};
+};//hello
 bool hostLogin();//Daniel
 void hostMenu();//Daniel
 void cal(int);
