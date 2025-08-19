@@ -9,7 +9,7 @@ struct User {
 	string Name;
 	int ID;
 	int score;
-};
+};//hi//hihihihihi
 void cal(int);
 void note();
 int quiz();
