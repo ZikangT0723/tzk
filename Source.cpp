@@ -33,7 +33,7 @@ void voltageFollower();
 void invertingAmplifier();
 const int num = 100;
 //commit
-
+//try commit then push
 int main() {
 	int  userindex = -1;
 	int choice;
