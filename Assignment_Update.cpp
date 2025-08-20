@@ -14,9 +14,12 @@ void cal(int);
 void note();
 int quiz();
 void getinfo(User&);
-void userlist(User*);
-void menu(int, User[], int);
+void userlist(User*, int);
+void loaduserdata(User*);
+bool checkopenfile(fstream&, string);
+void menu(User[], int);
 int findslot(User[]);
+void savefile(User*, string, int);
 int check(float*, int&);
 float fun1();
 float fun2();
@@ -83,23 +86,28 @@ int main() {
 	} while (Return);
 //By zikang
 	User stu[num] = {};
-	stu[1].Name = "Teng Zi Kang";
-	stu[1].ID = 2404458;
-	stu[1].score = 5;
+
 	fstream list;
 	list.open("Userlist", ios::app);
 	list.close();
+	if (!checkopenfile(list, "Userlist")) {
+		return 1; // Exit if file cannot be opened
+	}
+	loaduserdata(stu);
+
 	userindex = findslot(stu);
-	getinfo(stu[userindex]);
+	if (userindex != -1) {
+		getinfo(stu[userindex]);
+	}
+	else {
+		cout << "The userlist is full." << endl;
+	}
 
+	userlist(stu, userindex);
 
-	userlist(stu);
-
-	do {
-		cout << "Choose the action you want to proceed 1. note, 2. quiz, 3. stimulator, 4. userlist, 5. end:(i.e. 1,2,3,4,5 out)";
-		cin >> opt;
-		menu(opt, stu, userindex);
-	} while (opt != 4);
+	
+	menu(stu, userindex);
+	
 
 	return 0;
 }
@@ -172,35 +180,44 @@ bool hostMenu()
 }
 
 
-void menu(int opt, User stu[], int userindex) {
-	int a, b;
-	switch (opt) {
-	case 1:
-		note();
-		break;
-	case 2:
+void menu( User stu[], int userindex) {
 
-		//stu[userindex].score = quiz();
-		b = quiz();
-		cout << "Score updated:" << b << endl;
-		break;
-	case 3:
-		do {
-			cout << "Select the type of simulator(1.,2.clamper,3.,4.,5,JFET,6,MOSFET,\n7. non_inverting 8.Voltage_follower.9.Inverting_amplifier 0.return):";
-			cin >> a;
-			cal(a); //select stimular in menu
-		} while (a != 4);
-		break;
-	case 4:
-		userlist(stu);
-		break;
-	case 5:
-		cout << "Programme end." << endl;
-
-		break;
-	default:
-		cout << "Invalid input try to choose again.(1,2,3,4)" << endl;
+	int a, b,opt;
+	if (userindex < 0 || userindex >= num) {
+		cout << "ERROR! Invalid user index!" << endl;
+		return;
 	}
+	do {
+		cout << "Choose the action you want to proceed 1. note, 2. quiz, 3. stimulator, 4. userlist, 5. end:(i.e. 1,2,3,4,5 out)";
+		cin >> opt;
+		switch (opt) {
+		case 1:
+			note();
+			break;
+		case 2:
+
+			stu[userindex].score = quiz();
+
+			cout << "Score updated:" << stu[userindex].score << endl;
+			break;
+		case 3:
+			do {
+				cout << "Select the type of stimulator(1.,2.clamper,3., 4.return):";
+				cin >> a;
+				cal(a); //select stimular in menu
+			} while (a != 4);
+			break;
+		case 4:
+			userlist(stu, userindex);
+			break;
+		case 5:
+			cout << "Programme end." << endl;
+
+			break;
+		default:
+			cout << "Invalid input try to choose again.(1,2,3,4)" << endl;
+		}
+	} while (opt != 5);
 }
 int quiz() {
 	int b, points;
@@ -215,16 +232,16 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a); 
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N' ) {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					fun1();
 				}
-				//insert your calculator here
-			} while (a == 'Y' || a == 'y');
+				
+			} while (a == 'Y');
 			cout << "Enter the answer:";//add this two line if your question need answer more than 1
 			cin >> answer[0];           //add this two line if your question need answer more than 1, answer[i+1]
 			break;
@@ -247,15 +264,16 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					clamper();
 				}
-			} while (a == 'Y' || a == 'y');
+
+			} while (a == 'Y');
 			cout << "Enter the answer of Vout(+ve):";
 			cin >> answer[1];
 			cout << "Enter the answer of Vout(-ve):";
@@ -280,15 +298,16 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					clamper();
 				}
-			} while (a == 'Y' || a == 'y');
+
+			} while (a == 'Y');
 			cout << "Enter the answer of Vout(+ve):";
 			cin >> answer[3];
 			cout << "Enter the answer of Vout(-ve):";
@@ -299,15 +318,16 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					fun1();
 				}
-			} while (a == 'Y' || a == 'y');
+
+			} while (a == 'Y');
 			cout << "Enter the answer:";
 			cin >> answer[5];
 			break;
@@ -316,15 +336,16 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					fun1();
 				}
-			} while (a == 'Y' || a == 'y');
+
+			} while (a == 'Y');
 			cout << "Enter the answer:";
 			cin >> answer[6];
 			break;
@@ -333,15 +354,16 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					fun1();
 				}
-			} while (a == 'Y' || a == 'y');
+
+			} while (a == 'Y');
 			cout << "Enter the answer:";
 			cin >> answer[7];
 			break;
@@ -350,15 +372,16 @@ int quiz() {
 			do {
 				cout << "\nDo you want to use a stimulator?(Y/N):";
 				cin >> a;
+				a = toupper(a);
 
-
-				while (a != 'Y' && a != 'y' && a != 'N' && a != 'n') {
+				while (a != 'Y' && a != 'N') {
 					cout << "INPUT ERROR, input (Y/N)." << endl;
 				}
-				if (a == 'Y' || a == 'y') {
+				if (a == 'Y') {
 					fun1();
 				}
-			} while (a == 'Y' || a == 'y');
+
+			} while (a == 'Y');
 			cout << "Enter the answer:";
 			cin >> answer[8];
 			break;
@@ -744,20 +767,57 @@ void cal(int a) {
 	}
 
 }
-void getinfo(User& r) {
-	cout << "Enter your name:";
-	cin.ignore();//ignore \n from menu.
-	getline(cin, r.Name);
-	cout << "Enter your student ID:";
-	cin >> r.ID;
-	r.score = 0;
+bool checkopenfile(fstream& file, string name) {
+	file.open(name, ios::in | ios::out | ios::app);
+	if (file.is_open()) {
+		cout << "File opened successfully: " << name << endl;
+		return true;
+	}
+	else {
+		cout << "Error opening file: " << name << endl;
+		return false;
+	}
 
 }
-void userlist(User p[]) {
-	for (int i = 0; i < 10; i++) {
-		cout << p[i].Name << endl;
-		cout << p[i].ID << endl;
-		cout << p[i].score << endl;
+
+void loaduserdata(User* stu) {
+	fstream list = fstream("Userlist", ios::in);
+	if (!list.is_open()) {
+		cout << "Error opening user list file." << endl;
+		return;
+	}
+	string line;
+	for (int i = 0; i < num; i++) {
+		if (getline(list, line)) {
+			if (line.empty()) continue; // Skip empty lines
+			stu[i].Name = line;
+			if (getline(list, line)) {
+				stu[i].ID = stoi(line);
+			}
+			if (getline(list, line)) {
+				stu[i].score = stoi(line);
+			}
+		}
+		else {
+			break; // Stop if no more lines to read
+		}
+	}
+	list.close();
+}
+
+void getinfo(User& stu) {
+	cout << "Enter your name:";
+	getline(cin, stu.Name);
+	cout << "Enter your student ID:";
+	cin >> stu.ID;
+	stu.score = 0;
+
+}
+void userlist(User stu[], int index) {
+	for (int i = 0; i <= index; i++) {
+		cout << "Name: " << left << setw(20) << stu[i].Name <<
+			" | Student ID: " << setw(7) << stu[i].ID <<
+			" | Score: " << stu[i].score << endl;
 
 	}
 }
@@ -767,10 +827,21 @@ int findslot(User stu[]) {
 		if (stu[i].ID == 0) {
 			return i;
 		}
-		else {
-			return -1;
-		}
 	}
+	return -1;
+}
+
+void savefile(User* stu, string name, int index) {
+	fstream list = fstream("Userlist", ios::out | ios::app);
+	if (!list.is_open()) {
+		cout << "Error opening file for saving: " << name << endl;
+		return;
+	}
+	list << stu[index].Name << endl;
+	list << stu[index].ID << endl;
+	list << stu[index].score << endl;
+	list.close();
+	cout << "User data saved successfully." << endl;
 }
 
 int check(float* a, int& points) {
