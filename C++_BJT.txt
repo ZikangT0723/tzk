@@ -1,0 +1,705 @@
+#include <iostream>
+#include <cctype>
+#include <iomanip>
+#include <cmath>
+using namespace std;
+
+void notes_BJT();
+void quiz_BJT();
+
+int main()
+{
+	int BJT_choice;
+
+	cout << "Here is Chapter 2: Bipolar Junction Transistors (BJT) for Basic Electronics. 0.0\n\n";
+
+	do //if BJT_choice not equal to 3, this program will repeat again
+	{
+		cout << "Enter your choice: 1 to view BJT notes, 2 to answer the BJT quiz, 3 for quit:";
+		cin >> BJT_choice;
+
+		if (BJT_choice == 1)
+
+		{
+			notes_BJT();
+		}
+
+		else if (BJT_choice == 2)
+		{
+			quiz_BJT();
+		}
+
+		else
+			cout << "Invalid input! Please enter 1, 2 or 3!\n\n";
+
+	} while (BJT_choice != 3);
+
+
+	return 0;
+}
+
+void notes_BJT()
+{
+	char study_analysis, dc_bias;
+
+	cout << "Bipolar Junction Transistor (BJT) is 3 terminal device whose output current, voltage and power are controlled by its input current.\n";
+	cout << "It is current-controlled device.\n";
+	cout << "The main applications are amplifier and switch.\n\n";
+
+	cout << "There are two types of BJTs:\n\n";
+
+	cout << "Type 1: PNP BJT (arrow points inward).\n";
+	cout << "                        |\n";
+	cout << "                        |\n";
+	cout << "                    Collector\n";
+	cout << "                        |\n";
+	cout << "                        |\n";
+	cout << "                     |\n";
+	cout << "     -----Base-------<|\n"; // PNP emitter arrow points in
+	cout << "                     |\n";
+	cout << "                        |\n";
+	cout << "                        |\n";
+	cout << "                    Emitter\n";
+	cout << "                        |\n";
+	cout << "                        |\n\n";
+	cout << "The above figure shows a PNP Bipolar Junction Transistor (BJT).\n\n";
+
+	cout << "Type 2: NPN BJT (arrow points outward).\n";
+	cout << "                        |\n";
+	cout << "                        |\n";
+	cout << "                    Collector\n";
+	cout << "                        |\n";
+	cout << "                        |\n";
+	cout << "                     |\n";
+	cout << "     -----Base-------|>\n";// NPN emitter arrow points out
+	cout << "                     |\n";
+	cout << "                        |\n";
+	cout << "                        |\n";
+	cout << "                    Emitter\n";
+	cout << "                        |\n";
+	cout << "                        |\n\n";
+	cout << "The above figure shows an NPN Bipolar Junction Transistor (BJT).\n\n";
+
+	cout << "PNP BJTs are commonly used for calculations and related practical applications.\n\n";
+
+
+	cout << "Note 1: In a BJT, VBE = 0.7V is because the base - emitter junction of the transistor is forward biased.\n";
+	cout << "The 0.7 V is required to overcome the potential barrier(depletion region) of the PN junction.\n\n";
+
+	cout << "Note 2: In a BJT, the emitter current is given by IE = IC + IB.\n";
+	cout << "Since the base current IB is very small compared to the collector current IC(due to the large current gain beta), it is often neglected.\n";
+	cout << "Therefore, IC is assumed to be approximately equal to IE.\n\n\n";
+
+	do //if study_analysis not equal to 'Q', it will run this part again
+	{
+		cout << "Enter your choice of study (A for AC analysis, D for DC analysis, Q for quit):";
+		cin >> study_analysis;
+		study_analysis = toupper(study_analysis);
+		cout << endl;
+
+		if (study_analysis == 'A')
+		{
+			cout << "To analyze the ac operation of the amplifier in common emitter, we develop an ac equivalent circuit by using the following rules: \n";
+			cout << "1) Short all capacitors because we assume that their reactance XC = 0 at the signal frequency.\n";
+			cout << "2) Replace all dc sources with a ground symbol.\n\n";
+
+			cout << "There are 4 cases of Common-Emitter (CE) Amplifier.\n\n";
+
+			cout << "Case 1: \n";
+
+			cout << "                                         VCC\n";
+			cout << "                                          |\n";
+			cout << "                        ------------------|\n";
+			cout << "                        |                 RC\n";
+			cout << "                        |                 |\n";
+			cout << "                        R1                |-------C3---o---Vout\n";
+			cout << "                        |                /\n";
+			cout << "                        |              |\n";
+			cout << "      Vin ---o---C1-----| -------------|\n";
+			cout << "                        |              |\n";
+			cout << "                        |                \\\n";
+			cout << "                        R2                   |\n";
+			cout << "                        |                    |\n";
+			cout << "                        |                   RE1\n";
+			cout << "                        |                    |\n";
+			cout << "                        |                    |--------\n";
+			cout << "                        |                   RE2      |\n";
+			cout << "                        |                    |       C2\n";
+			cout << "                        |                    |       |\n";
+			cout << "                        ------------------------------\n";
+			cout << "                                      |\n";
+			cout << "                                      |\n";
+			cout << "                                     GND\n\n";
+
+			cout << "This is the Common-Emitter (CE) Amplifier with bypass capacitor (C2) in the emitter, involving swapping process.\n\n";
+
+			cout << "Case 2: \n";
+
+			cout << "                                         VCC\n";
+			cout << "                                          |\n";
+			cout << "                        ------------------|\n";
+			cout << "                        |                 RC\n";
+			cout << "                        |                 |\n";
+			cout << "                        R1                |-------C3---o---Vout-----\n";
+			cout << "                        |                /                          |\n";
+			cout << "                        |              |                            |\n";
+			cout << "      Vin ---o---C1-----| -------------|                            |\n";
+			cout << "                        |              |                            |\n";
+			cout << "                        |                \\                         |\n";
+			cout << "                        R2                   |                      RL\n";
+			cout << "                        |                    |--------              |\n";
+			cout << "                        |                    RE      |              |\n";
+			cout << "                        |                    |       C2             |\n";
+			cout << "                        |                    |       |              |\n";
+			cout << "                        --------------------------------------------\n";
+			cout << "                                             |\n";
+			cout << "                                             |\n";
+			cout << "                                            GND\n\n";
+
+			cout << "This is the Common-Emitter (CE) Amplifier with bypass capacitor (C2) in the emitter, with a load resistance.\n\n";
+
+			cout << "Case 3: \n";
+
+			cout << "                                         VCC\n";
+			cout << "                                          |\n";
+			cout << "                        ------------------|\n";
+			cout << "                        |                 RC\n";
+			cout << "                        |                 |\n";
+			cout << "                        R1                |-------C3---o---Vout\n";
+			cout << "                        |                /\n";
+			cout << "                        |              |\n";
+			cout << "      Vin ---o---C1-----| -------------|\n";
+			cout << "                        |              |\n";
+			cout << "                        |                \\\n";
+			cout << "                        R2                   |\n";
+			cout << "                        |                    |\n";
+			cout << "                        |                    |--------\n";
+			cout << "                        |                    RE      |\n";
+			cout << "                        |                    |       C2\n";
+			cout << "                        |                    |       |\n";
+			cout << "                        ------------------------------\n";
+			cout << "                                      |\n";
+			cout << "                                      |\n";
+			cout << "                                     GND\n\n";
+
+			cout << "This is the Common-Emitter (CE) Amplifier with bypass capacitor (C2) in the emitter, not involving swapping process and no load resistance, RL.\n\n";
+
+			cout << "Case 4: \n";
+
+			cout << "                                         VCC\n";
+			cout << "                                          |\n";
+			cout << "                        ------------------|\n";
+			cout << "                        |                 RC\n";
+			cout << "                        |                 |\n";
+			cout << "                        R1                |-------C3---o---Vout\n";
+			cout << "                        |                /\n";
+			cout << "                        |              |\n";
+			cout << "      Vin ---o---C1-----| -------------|\n";
+			cout << "                        |              |\n";
+			cout << "                        |                \\\n";
+			cout << "                        R2                   |\n";
+			cout << "                        |                    |\n";
+			cout << "                        |                    |\n";
+			cout << "                        |                    RE\n";
+			cout << "                        |                    |\n";
+			cout << "                        |                    |\n";
+			cout << "                        ---------------------\n";
+			cout << "                                  |\n";
+			cout << "                                  |\n";
+			cout << "                                 GND\n\n";
+
+			cout << "This is the Common-Emitter (CE) Amplifier without bypass capacitor (C2) in the emitter, not involving swapping process and no load resistance, RL.\n\n";
+
+
+			cout << "There are 10 equations for the Common-Emitter (CE) Amplifier in AC analysis.\n";
+			cout << "All equations are expressed in terms of voltage (V), current (A), and resistance (ohm), instead of using prefixes such as milli (m) or kilo (k).\n\n";
+
+			cout << "[Equation 1 (for finding AC emitter resistance, re)]: re = 25mV / IE ";
+			cout << ",where IE = (VB - VBE) / RE\n\n\n";
+
+			cout << "[Equation 2 (for finding input resistance at the base, Rin_base)]: Rin_base = betaAC * re\n\n\n";
+
+			cout << "[Equation 3 (for finding the total input resistance of the amplifier, Rin_total)]:\n";
+			cout << "\tCase 1: If Rin_base >= 10R2, Rin_total = 1 / ((1 / R1) + (1 / R2))\n";
+			cout << "\tCase 2: If Rin_base < 10R2, Rin_total = 1 / ((1 / R1) + (1 / R2) + (1 / Rin_base))\n\n\n";
+
+			cout << "[Equation 4 (for finding base voltage, VB)]: VB = Rin_total * VCC\n\n\n";
+
+			cout << "[Equation 5 (for finding voltage gain, AV)]:\n";
+			cout << "\tCase 1: With bypass capacitor (C2) in the emitter, involving swapping process and RE1 > 10re, AV = - RC / RE1\n";
+			cout << "\tCase 2: With bypass capacitor (C2) in the emitter, involving swapping process and RE1 < 10re, AV = - RC / (re + RE1)\n";
+			cout << "\tCase 3: With bypass capacitor (C2) in the emitter, with a load resistance: RC_total = 1 / ((1 / RC) + (1 / RL)), AV = - RC_total / re\n";
+			cout << "\tCase 4: With bypass capacitor (C2) in the emitter, not involving a swapping process and with no load resistance, AV = - RC / re\n";
+			cout << "\tCase 5: Without bypass capacitor (C2) in the emitter, not involving a swapping process and with no load resistance, AV = - RC / (re + RE) \n\n\n";
+		}
+
+		else if (study_analysis == 'D')
+		{
+			cout << "For DC analysis, the common-emitter configuration has two types of biasing methods: base bias and voltage divider bias.\n";
+			cout << "To perform DC analysis, a DC equivalent circuit is developed by replacing the coupling and bypass capacitors with open circuits.\n";
+
+			do //if dc_bias is not equal to 'B' or 'V',it will ask user to enter again
+			{
+				cout << "Enter your choice of bias (B for base bias, V for voltage divider bias): ";
+				cin >> dc_bias;
+				dc_bias = toupper(dc_bias);
+
+				if (dc_bias == 'B')
+				{
+					cout << "Base bias is also called fixed bias, which is the simplest way to bias a transistor.\n";
+					cout << "In base bias, a resistor is connected from the base to the power supply, and the emitter is connected to ground.\n";
+					cout << "The advantage of base bias is its simplicity.\n";
+					cout << "The disadvantage of base bias is that it is beta-dependent and affected by temperature variations.\n";
+					cout << "Base bias is mainly used for switching applications.\n";
+
+					cout << "                       VCC\n";
+					cout << "                        |\n";
+					cout << "      ------------------|\n";
+					cout << "      |                 RC\n";
+					cout << "      |                 |\n";
+					cout << "      |                 |\n";
+					cout << "      |                /\n";
+					cout << "      |             |\n";
+					cout << "      ----- RB -----|\n";
+					cout << "                    |\n";
+					cout << "                       \\\n";
+					cout << "                         |\n";
+					cout << "                         |\n";
+					cout << "                         |\n";
+					cout << "                        GND\n\n";
+
+					cout << "This is the base bias circuit.\n\n";
+
+					cout << "There are 3 equations for the base bias circuit in DC analysis.\n";
+					cout << "All equations are expressed in terms of voltage (V), current (A), and resistance (ohm), instead of using prefixes such as milli (m) or kilo (k).\n\n";
+
+					cout << "[Equation 1 (for finding IB)]: VCC - IBRB - VBE = 0 and VBE is 0.7V.\n\n\n";
+
+					cout << "[Equation 2 (for finding IC)]: IC = betaDC * IB\n\n\n";
+
+					cout << "[Equation 3 (for finding VCE)]: VCC - ICRC -VCE = 0\n\n\n";
+
+				}
+
+				else if (dc_bias == 'V')
+				{
+					cout << "Voltage divider bias uses a voltage divider in the base circuit.\n";
+					cout << "The advantage of voltage divider bias is that it is beta-independent and does not require a dual polarity power supply.\n";
+					cout << "The disadvantage of voltage divider bias is essentially none (compared to other biasing circuits) in terms of DC operation.\n";
+					cout << "Voltage divider bias is primarily used to bias linear amplifiers.\n";
+
+					cout << "                       VCC\n";
+					cout << "                        |\n";
+					cout << "      ------------------|\n";
+					cout << "      |                 RC\n";
+					cout << "      |                 |\n";
+					cout << "      R1                |\n";
+					cout << "      |                /\n";
+					cout << "      |             |\n";
+					cout << "      --------------|\n";
+					cout << "      |             |\n";
+					cout << "      |                \\\n";
+					cout << "      R2                 |\n";
+					cout << "      |                  RE\n";
+					cout << "      |                  |\n";
+					cout << "      --------------------\n";
+					cout << "               |\n";
+					cout << "               |\n";
+					cout << "              GND\n\n";
+
+					cout << "This is the voltage divider bias circuit.\n\n";
+
+					cout << "There are 5 equations for the voltage divider bias circuit in DC analysis.\n";
+					cout << "All equations are expressed in terms of voltage (V), current (A), and resistance (ohm), instead of using prefixes such as milli (m) or kilo (k).\n\n";
+
+					cout << "[Equation 1 (for finding RIN_base)]: RIN_base = betaDC * RE\n\n\n";
+
+					cout << "[Equation 2 (for finding R2_total)]: \n";
+					cout << "\tCase 1: if RIN_base >= 10R2, R2_total = R2\n";
+					cout << "\tCase 2: if RIN_base < 10R2, R2_total = 1 / ((1 / R2) + (1 / RIN_base))\n\n\n";
+
+					cout << "[Equation 3 (for finding VB)]: VB = R2_total / (R1 + R2_total) * VCC\n\n\n";
+
+					cout << "[Equation 4 (for finding IC)]: IC = (VB - 0.7) / RE\n\n\n";
+
+					cout << "[Equation 5 (for finding VCE)]: VCE = VCC - IC * (RC + RE)\n\n\n";
+				}
+
+				else
+					cout << "Invalid input! Please enter B or V!\n\n"; //if dc_bias is not equal to 'B' or 'V', it will ask user to enter again
+
+			} while (dc_bias != 'B' && dc_bias != 'V');
+		}
+
+		else if (study_analysis == 'Q')
+			cout << "Exiting notes program... Bye-bye (^-^)\n\n";
+
+		else
+			cout << "Invalid input! Please enter A, D or Q!\n\n"; //if study_analysis is not equal to 'A' or 'D' or 'Q', it will ask user to enter again
+
+	} while (study_analysis != 'Q');
+}
+
+
+
+void quiz_BJT()
+{
+	char simulator;
+	int calculate;
+	double RIN_base, betaDC, RE, R2, R2_total, R1, VCC, VB, IC_mA, RC, VCE, betaAC, Rin_base, Rin_total, IE_mA, re, AV;
+	double ans_VCE, ans_IC, ans_VCE1, ans_VCE2, ans_AV;
+
+	cout << "There will be 3 questions in the BJT quiz.\n\n\n";
+
+	//Question 4:
+	cout << "Question 4: Determine VCE and IC in the voltage-divider biased transistor circuit shown below. Assume betaDC = 100.\n\n";
+
+	cout << "                       VCC = 10 V\n";
+	cout << "                        |\n";
+	cout << "      ------------------|\n";
+	cout << "      |                 RC = 1.0k ohm\n";
+	cout << "      |                 |\n";
+	cout << "      R1 = 10k ohm      |\n";
+	cout << "      |                /\n";
+	cout << "      |             |\n";
+	cout << "      --------------|\n";
+	cout << "      |             |\n";
+	cout << "      |                \\\n";
+	cout << "      R2 = 5.6k ohm      |\n";
+	cout << "      |                  RE = 560 ohm\n";
+	cout << "      |                  |\n";
+	cout << "      --------------------\n";
+	cout << "               |\n";
+	cout << "               |\n";
+	cout << "              GND\n\n";
+	cout << "           Figure 4\n\n\n";
+
+
+	bool running = true;   // control the question 4
+
+	do
+	{
+		cout << "Do you want to use the simulator? (Y/N): ";
+		cin >> simulator;
+		simulator = toupper(simulator);
+
+		if (simulator == 'Y')
+		{
+			cout << "\nChoose what you want to calculate:\n";
+			cout << "(1. RIN_base and R2_total, 2. VB, 3. IC, 4. VCE): ";
+			cin >> calculate;
+			cout << endl;
+
+			switch (calculate)
+			{
+			case 1:
+				cout << "Enter the value of R2 (in ohm), RE (in ohm) and betaDC: ";
+				cin >> R2 >> RE >> betaDC;
+				RIN_base = betaDC * RE;
+
+				if (RIN_base >= 10 * R2)
+					R2_total = R2;
+				else
+					R2_total = 1.0 / ((1.0 / R2) + (1.0 / RIN_base));
+
+				cout << "\nRIN_base = betaDC * RE\n";
+				cout << "--> The value of RIN_base is " << fixed << setprecision(2) << RIN_base << " ohm.\n\n";
+
+				cout << "\nif (RIN_base >= 10 * R2), R2_total = R2\n"; 
+				cout << "if (RIN_base < 10 * R2), R2_total = 1.0 / ((1.0 / R2) + (1.0 / RIN_base))\n";
+				cout << "--> The value of R2_total is " << fixed << setprecision(2) << R2_total << " ohm.\n\n";
+				break;
+
+			case 2:
+				cout << "Enter the value of R1 (in ohm), R2_total (in ohm) and VCC (in V): ";
+				cin >> R1 >> R2_total >> VCC;
+				VB = R2_total / (R1 + R2_total) * VCC;
+				cout << "\nVB = R2_total / (R1 + R2_total) * VCC\n";
+				cout << "--> The value of VB is " << fixed << setprecision(2) << VB << " V.\n\n";
+				break;
+
+			case 3:
+				cout << "Enter the value of VB (in V) and RE (in ohm): ";
+				cin >> VB >> RE;
+				IC_mA = (VB - 0.7) / RE; //note that the IC_mA at here is in A
+				cout << "\nIC = (VB - 0.7) / RE\n";
+				cout << "--> The value of IC is " << fixed << setprecision(2) << IC_mA * 1000 << " mA.\n\n";
+				break;
+
+			case 4:
+				cout << "Enter the value of VCC (in V), IC (in mA), RC (in ohm) and RE (in ohm): ";
+				cin >> VCC >> IC_mA >> RC >> RE;
+				VCE = VCC - (IC_mA / 1000 * (RC + RE));
+				cout << "\nVCE = VCC - IC * (RC + RE)\n";
+				cout << "--> The value of VCE is " << fixed << setprecision(2) << VCE << " V\n\n";
+				break;
+
+			default:
+				cout << "Invalid input! Please enter 1, 2, 3 or 4!\n\n";
+			}
+
+		}
+
+		else if (simulator == 'N')
+		{
+			//let user directly answer the quiz
+			cout << "Enter the answer for IC (in mA) and VCE (in V): ";
+			cin >> ans_IC >> ans_VCE;
+
+			cout << "--> The value of IC is " << fixed << setprecision(2) << ans_IC << " mA.\n";
+			cout << "--> The value of VCE is " << fixed << setprecision(2) << ans_VCE << " V\n";
+
+			if (ans_IC == 5.16 && ans_VCE == 1.95)
+				cout << "Congratulations! Your answers are correct! ^.^\n";
+			else
+				cout << "Your answer is incorrect. T^T Please try again. You can use the simulator.\n";
+		}
+		else
+		{
+			cout << "Invalid input! Please enter 'Y' or 'N'!\n\n";
+		}
+
+		// ask user want to continue this question?
+		cout << "\nDo you want to continue this question? (Y/N): ";
+		cin >> simulator;
+		simulator = toupper(simulator);
+
+		if (simulator == 'N')
+			running = false;
+
+	} while (running);
+
+
+	running = true;   // control the question 5
+
+	//Question 5:
+
+	cout << "\n\n\nQuestion 5: Determine the value of VCE when IC = 0.1mA and 0.2mA.\n\n";
+
+	cout << "                       VCC = 36 V\n";
+	cout << "                        |\n";
+	cout << "      ------------------|\n";
+	cout << "      |                 RC = 36k ohm\n";
+	cout << "      |                 |\n";
+	cout << "      |                 |\n";
+	cout << "      |                /\n";
+	cout << "      |             |\n";
+	cout << "      ----- RB -----|\n";
+	cout << "                    |\n";
+	cout << "                       \\\n";
+	cout << "                         |\n";
+	cout << "                         |\n";
+	cout << "                         |\n";
+	cout << "                        GND\n\n";
+	cout << "                     Figure 5\n\n\n";
+
+
+
+	do
+	{
+		cout << "Do you want to use the simulator? (Y/N): ";
+		cin >> simulator;
+		simulator = toupper(simulator);
+
+		if (simulator == 'Y')
+		{
+			cout << "\nChoose what you want to calculate:\n";
+			cout << "(1. VCE): ";
+			cin >> calculate;
+			cout << endl;
+
+			switch (calculate)
+			{
+			case 1:
+				cout << "Enter the value of VCC (in V), IC (in mA) and RC (in ohm): ";
+				cin >> VCC >> IC_mA >> RC;
+				VCE = VCC - (IC_mA / 1000 * RC);
+
+				cout << "\nVCE = VCC - (IC * RC)\n";
+				cout << "The value for VCE is " << fixed << setprecision(2) << VCE << "V\n";
+				break;
+
+			default:
+				cout << "Invalid input! Please enter 1!\n\n";
+			}
+		}
+
+		else if (simulator == 'N')
+		{
+			//let user directly answer the quiz
+			cout << "\nEnter the answer for VCE when IC = 0.1mA and 0.2mA (in V): ";
+			cin >> ans_VCE1 >> ans_VCE2;
+
+			cout << "--> The value of VCE when IC = 0.1mA is " << fixed << setprecision(2) << ans_VCE1 << " V\n";
+			cout << "--> The value of VCE when IC = 0.2mA is " << fixed << setprecision(2) << ans_VCE2 << " V\n";
+
+			if (ans_VCE1 == 32.40 && ans_VCE2 == 28.80)
+				cout << "Congratulations! Your answers are correct! ^.^\n";
+			else
+				cout << "Your answer is incorrect. T^T Please try again. You can use the simulator.\n";
+		}
+		else
+		{
+			cout << "Invalid input! Please enter 'Y' or 'N'!\n\n";
+		}
+		
+
+		// ask user want to continue this question?
+		cout << "\nDo you want to continue this question? (Y/N): ";
+		cin >> simulator;
+		simulator = toupper(simulator);
+
+		if (simulator == 'N')
+			running = false;
+
+
+	} while (running);
+
+
+	running = true;   // control the question 6
+
+	//Question 6:
+
+	cout << "\n\n\nQuestion 6: Find AV.\n\n";
+
+	cout << "                                         VCC = 22 V\n";
+	cout << "                                          |\n";
+	cout << "                        ------------------|\n";
+	cout << "                        |                 RC = 6.8k ohm\n";
+	cout << "                        |                 |\n";
+	cout << "                        R1 = 56k ohm      |-------C3---o---Vout\n";
+	cout << "                        |                /\n";
+	cout << "                        |              |\n";
+	cout << " Vin ---o---RS---C1-----| -------------|\n";
+	cout << "                        |              |\n";
+	cout << "                        |                \\\n";
+	cout << "                        R2 = 8.2k ohm        |\n";
+	cout << "                        |                    |\n";
+	cout << "                        |                    |----------------\n";
+	cout << "                        |                    RE = 1.5k ohm    |\n";
+	cout << "                        |                    |                C2\n";
+	cout << "                        |                    |                |\n";
+	cout << "                        --------------------------------------\n";
+	cout << "                                             |\n";
+	cout << "                                             |\n";
+	cout << "                                            GND\n\n";
+	cout << "                                         Figure 6\n\n\n";
+	cout << " Hint: This is the Common-Emitter (CE) Amplifier with bypass capacitor (C2) in the emitter, not involving swapping process and no load resistance, RL.\n\n";
+
+
+	do
+	{
+		cout << "Do you want to use the simulator? (Y/N): ";
+		cin >> simulator;
+		simulator = toupper(simulator);
+
+		if (simulator == 'Y')
+		{
+			cout << "\nChoose what you want to calculate:\n";
+			cout << "(1. Rin_base, 2. Rin_total, 3. VB, 4. IE, 5. re, 6. AV): ";
+			cin >> calculate;
+			cout << endl;
+
+			switch (calculate)
+			{
+			case 1:
+				cout << "Enter the value of betaAC and RE (in ohm): ";
+				cin >> betaAC >> RE;
+
+				Rin_base = betaAC * RE;
+
+				cout << "Rin_base = betaAC * RE\n";
+				cout << "The value for Rin_base is " << fixed << setprecision(2) << Rin_base << "ohm\n";
+				break;
+
+			case 2:
+				cout << "Enter the value of Rin_base (in ohm), R1 (in ohm) and R2 (in ohm): ";
+				cin >> Rin_base >> R1 >> R2;
+
+				if (Rin_base >= 10 * R2)
+				{
+					Rin_total = 1.0 / ((1.0 / R1) + (1.0 / R2));
+				}
+
+				else
+				{
+					Rin_total = 1.0 / ((1.0 / R1) + (1.0 / R2) + (1.0 / Rin_base));
+				}
+
+				cout << "\nif (Rin_base >= 10 * R2), Rin_total = 1.0 / ((1.0 / R1) + (1.0 / R2))";
+				cout << "\n(Rin_base < 10 * R2), Rin_total = 1.0 / ((1.0 / R1) + (1.0 / R2) + (1.0 / Rin_base))\n";
+
+				cout << "The value for Rin_total is " << fixed << setprecision(2) << Rin_total << "ohm\n";
+				break;
+
+			case 3:
+				cout << "Enter the value of R1(in ohm), R2(in ohm) and VCC (in V): ";
+				cin >> R1 >> R2 >> VCC;
+				VB = R2 / (R1 + R2) * VCC;
+
+				cout << "VB = R2 / (R1 + R2) * VCC\n";
+				cout << "The value for VB is " << fixed << setprecision(2) << VB << "V\n";
+				break;
+
+			case 4:
+				cout << "Enter the value of VB (in V) and RE (in ohm): ";
+				cin >> VB >> RE;
+				IE_mA = (VB - 0.7) / RE;
+
+				cout << "IE = (VB - 0.7) / RE\n";
+				cout << "The value for IE is " << fixed << setprecision(2) << IE_mA * 1000 << "mA\n";
+				break;
+
+			case 5:
+				cout << "Enter the value of IE (in mA): ";
+				cin >> IE_mA;
+				re = 0.026 / (IE_mA / 1000);
+
+				cout << "re = 0.026 / IE\n";
+				cout << "The value for re is " << fixed << setprecision(2) << re << "ohm\n";
+				break;
+
+			case 6:
+				cout << "Enter the value of RC (in ohm) and re (in ohm): ";
+				cin >> RC >> re;
+				AV = -RC / re;
+
+				cout << "AV = -RC / re\n";
+				cout << "The value of AV is " << fixed << setprecision(2) << AV << endl;
+				break;
+
+			default:
+				cout << "Invalid input! Please enter 1, 2, 3, 4, 5 or 6!\n\n";
+			}
+		}
+
+		else if (simulator == 'N')
+		{
+			//let user directly answer the quiz
+			cout << "\nEnter the answer for AV: ";
+			cin >> ans_AV;
+
+			cout << "--> The value of AV is " << fixed << setprecision(2) << ans_AV << endl;
+
+			if (ans_AV == -366.18)
+				cout << "Congratulations! Your answers are correct! ^.^\n";
+			else
+				cout << "Your answer is incorrect. T^T Please try again. You can use the simulator.\n";
+		}
+		else
+		{
+			cout << "Invalid input! Please enter 'Y' or 'N'!\n\n";
+		}
+
+
+		// ask user want to continue this question?
+		cout << "\nDo you want to continue this question? (Y/N): ";
+		cin >> simulator;
+		simulator = toupper(simulator);
+
+		if (simulator == 'N')
+			running = false;
+
+
+	} while (running);
+}
