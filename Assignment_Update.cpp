@@ -209,10 +209,10 @@ void menu(User stu[], int userindex) {
 			break;
 		case 3:
 			do {
-				cout << "Select the type of stimulator(1.,2.clamper,3., 4.return):";
+				cout << "Select the type of stimulator\n1.\n2.clamper\n3.BJT 1\n4.BJT 2\n5.BJT 3\n6.JFET\n7. E-MOSFET\n8-10.chp4 \n0.return:";
 				cin >> a;
 				cal(a); //select stimular in menu
-			} while (a != 4);
+			} while (a != 0);
 			break;
 		case 4:
 			userlist(stu, userindex);
@@ -229,10 +229,11 @@ void menu(User stu[], int userindex) {
 int quiz() {
 	int b, points;
 	char a;
-	float answer[20] = {};
+	float answer[23] = {};
 	do {
 		cout << "Choose the question you want to answer(13 out):";
 		cin >> b;
+		cout << endl;
 		switch (b) {
 		case 1:
 			cout << "1";//insert your question here
@@ -358,7 +359,7 @@ int quiz() {
 			cout << "Enter the answer for IC (mA):";
 			cin >> answer[5];
 			cout << "Enter the answer for VCE (V):";
-			cin >> answer[5];// havent change the answer[] and the checkAns[]
+			cin >> answer[6];
 			break;
 		case 5:
 			cout << "\n\n\nQuestion 5: Determine the value of VCE when IC = 0.1mA and 0.2mA.\n\n";
@@ -394,9 +395,9 @@ int quiz() {
 
 			} while (a == 'Y');
 			cout << "Enter the answer dor VCE in 0.1mA(V):";
-			cin >> answer[6];
+			cin >> answer[7];
 			cout << "Enter the answer dor VCE in 0.2mA(V):";
-			cin >> answer[6];// havent change the answer[] and the checkAns[]
+			cin >> answer[8];
 			break;
 		case 6:
 			cout << "Question 6 :\n";
@@ -440,13 +441,14 @@ int quiz() {
 
 			} while (a == 'Y');
 			cout << "\nEnter the answer for AV: ";
-			cin >> answer[7]; // havent change ''''
+			cin >> answer[9]; // havent change ''''
 			break;
 
-		case 7:
+		case 7://ANS:2.25 ,1125
+			cout << "Q7. Chp3" << endl;
 			cout << "Determine the drain current (Id) and forward transconductance (gm) for Vgs = -4V for a 2N5459 JFET." << endl;
-			cout << "Refer to the data sheet for the JFET below.";
-			cout << "Igss = -1nA \nVgs_off = -8V \nIdss = 9mA \ngm_0 = 2250 micro_S";
+			cout << "Refer to the data sheet for the JFET below." << endl;
+			cout << "Igss = -1nA \nVgs_off = -8V \nIdss = 9mA \ngm_0 = 2250 micro_S" << endl;
 
 			do {
 				//tips for darain current
@@ -470,9 +472,9 @@ int quiz() {
 					jfet_DrainCurrent(2);
 			} while (toupper(a) == 'Y');
 			cout << "Enter the answer for Id (in mille-amperes):";
-			cin >> answer[8];
+			cin >> answer[10];
 			cout << "Enter the answer for gm (in micro-Siemens):";
-			cin >> answer[8];
+			cin >> answer[11];
 			break;
 		case 8:// Ans: V_DS: 8.9 V_GS:-1.1
 			cout << "Q8. Chp 3: FET (JFET)" << endl << endl;
@@ -506,9 +508,9 @@ int quiz() {
 					jfet();
 			} while (toupper(a) == 'Y');
 			cout << "Enter the answer for V_DS (in volts and round to two decimals):";
-			cin >> answer[9];
+			cin >> answer[12];
 			cout << "Enter the answer for V_GS (in volts and round to two decimals):";
-			cin >> answer[10];
+			cin >> answer[13];
 
 			break;
 		case 9:// Ans 12.7 ; 3.13
@@ -543,9 +545,9 @@ int quiz() {
 					mosfet();
 			} while (toupper(a) == 'Y');
 			cout << "Enter the answer for V_DS (in volts and round to two decimals):";
-			cin >> answer[11];
+			cin >> answer[14];
 			cout << "Enter the answer for V_GS (in volts and round to two decimals):";
-			cin >> answer[12];
+			cin >> answer[15];
 			break;
 
 
@@ -587,11 +589,11 @@ int quiz() {
 			} while (toupper(a) == 'Y');
 
 			cout << "Enter the answer for closed-loop voltage gain,Acl:";
-			cin >> answer[13];
+			cin >> answer[16];
 			cout << "Enter the answer for the input impedance (in Giga ohms) :";
-			cin >> answer[14];
+			cin >> answer[17];
 			cout << "Enter the answer for the output impedance (in micro ohms):";
-			cin >> answer[15];
+			cin >> answer[18];
 			break;
 		case 11://I
 
@@ -629,9 +631,9 @@ int quiz() {
 			} while (toupper(a) == 'Y');
 
 			cout << "Enter the answer for closed-loop voltage gain,Acl:";
-			cin >> answer[16];
+			cin >> answer[19];
 			cout << "Enter the answer for the input impedance:";
-			cin >> answer[17];
+			cin >> answer[20];
 			break;
 		case 12://VF
 
@@ -670,9 +672,9 @@ int quiz() {
 					voltageFollower();
 			} while (toupper(a) == 'Y');
 			cout << "Enter the answer for the input impedance( in Giga ohms):";
-			cin >> answer[18];
+			cin >> answer[21];
 			cout << "Enter the answer for the output impedance (in micro ohms):";
-			cin >> answer[19];
+			cin >> answer[22];
 			break;
 
 		case 13:
@@ -831,22 +833,29 @@ void cal(int a) {
 		break;
 	case 3:
 		cout << "Equation 3" << endl;
-		fun3();
+		simulator1_BJT();
 		break;
-
+	case 4:
+		cout << "Equation 4" << endl;
+		simulator2_BJT();
+		break;
 	case 5:
-		jfet();
+		cout << "Equation 5" << endl;
+		simulator3_BJT();
 		break;
 	case 6:
-		mosfet();
+		jfet();
 		break;
 	case 7:
-		non_inverting();
+		mosfet();
 		break;
 	case 8:
-		voltageFollower();
+		non_inverting();
 		break;
 	case 9:
+		voltageFollower();
+		break;
+	case 10:
 		invertingAmplifier();
 		break;
 
@@ -939,7 +948,8 @@ void savefile(User* stu, string name, int index) {
 
 int check(float* a, int& points) {
 	points = 0;       //9-19: Q8-Q12
-	float checkans[20] = { 1,24.3,4.3,-6.8,-36.8,6,7,8,9,8.9,-1.1,12.7,3.13,23,1.74,8.62,-21,10000,200,350 }; //insert your answer here
+	float checkans[23] = { 0, 24.3, 4.3, -6.8, 5.16, 1.95, 32.40, 28.80, -366.18, -36.8, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
+		10000, 200, 350 }; //insert your answer here
 	for (int i = 0; i < 20; i++) {
 		if (checkans[i] >= 0) {
 			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(a + i) && *(a + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
@@ -962,14 +972,7 @@ float fun1() {
 	cout << a << endl;
 	return a;
 }
-float fun2() {
-	int a = 4;
-	return a;
-}
-float fun3() {
-	int a = 5;
-	return a;
-}
+
 void clamper() {
 	float Vin, Vc, Vd, Vbias, Vout;
 	char polar;
@@ -1125,6 +1128,7 @@ void jfet_DrainCurrent(int option)
 		cout << endl << " Result " << endl;
 		cout << "------------------------" << endl;
 		cout << "Id = " << Id << " mili-ampere." << endl << endl;
+		break;
 	}
 	case 2:
 	{
@@ -1551,19 +1555,19 @@ void simulator1_BJT()
 	double RIN_base, betaDC, RE, R2, R2_total, R1, VCC, VB, IC_mA, RC, VCE;
 	cout << "BJT volatge-divider bised configuration.\n\n";
 
-	cout << "                       VCC = 10 V\n";
+	cout << "                       VCC\n";
 	cout << "                        |\n";
 	cout << "      ------------------|\n";
-	cout << "      |                 RC = 1.0k ohm\n";
+	cout << "      |                 RC\n";
 	cout << "      |                 |\n";
-	cout << "      R1 = 10k ohm      |\n";
+	cout << "      R1                |\n";
 	cout << "      |                /\n";
 	cout << "      |             |\n";
 	cout << "      --------------|\n";
 	cout << "      |             |\n";
 	cout << "      |                \\\n";
-	cout << "      R2 = 5.6k ohm      |\n";
-	cout << "      |                  RE = 560 ohm\n";
+	cout << "      R2                 |\n";
+	cout << "      |                  RE\n";
 	cout << "      |                  |\n";
 	cout << "      --------------------\n";
 	cout << "               |\n";
@@ -1631,7 +1635,7 @@ void simulator2_BJT()
 	double VCC, IC_mA, RC, VCE;
 	cout << "\n\n\nQuestion 5: Determine the value of VCE when IC = 0.1mA and 0.2mA.\n\n";
 
-	cout << "                       VCC \n";
+	cout << "                       VCC\n";
 	cout << "                        |\n";
 	cout << "      ------------------|\n";
 	cout << "      |                 RC \n";
@@ -1647,37 +1651,37 @@ void simulator2_BJT()
 	cout << "                         |\n";
 	cout << "                        GND\n\n";
 
-		cout << "Enter the value of VCC (in V), IC (in mA) and RC (in ohm): ";
-		cin >> VCC >> IC_mA >> RC;
-		VCE = VCC - (IC_mA / 1000 * RC);
+	cout << "Enter the value of VCC (in V), IC (in mA) and RC (in ohm): ";
+	cin >> VCC >> IC_mA >> RC;
+	VCE = VCC - (IC_mA / 1000 * RC);
 
-		cout << "\nVCE = VCC - (IC * RC)\n";
-		cout << "The value for VCE is " << fixed << setprecision(2) << VCE << "V\n";
+	cout << "\nVCE = VCC - (IC * RC)\n";
+	cout << "The value for VCE is " << fixed << setprecision(2) << VCE << "V\n";
 
 }
 
 void simulator3_BJT()
 {
 	int calculate;
-	double R1,R2, VB,VCC, RC,RE,betaAC, Rin_base, Rin_total, IE_mA, re, AV;
+	double R1, R2, VB, VCC, RC, RE, betaAC, Rin_base, Rin_total, IE_mA, re, AV;
 
 	cout << "\n\n\nQuestion 6: Find AV.\n\n";
 
-	cout << "                                         VCC = 22 V\n";
+	cout << "                                         VCC\n";
 	cout << "                                          |\n";
 	cout << "                        ------------------|\n";
-	cout << "                        |                 RC = 6.8k ohm\n";
+	cout << "                        |                 RC\n";
 	cout << "                        |                 |\n";
-	cout << "                        R1 = 56k ohm      |-------C3---o---Vout\n";
+	cout << "                        R1                |-------C3---o---Vout\n";
 	cout << "                        |                /\n";
 	cout << "                        |              |\n";
 	cout << " Vin ---o---RS---C1-----| -------------|\n";
 	cout << "                        |              |\n";
 	cout << "                        |                \\\n";
-	cout << "                        R2 = 8.2k ohm        |\n";
+	cout << "                        R2                   |\n";
 	cout << "                        |                    |\n";
 	cout << "                        |                    |----------------\n";
-	cout << "                        |                    RE = 1.5k ohm    |\n";
+	cout << "                        |                    RE               |\n";
 	cout << "                        |                    |                C2\n";
 	cout << "                        |                    |                |\n";
 	cout << "                        --------------------------------------\n";
