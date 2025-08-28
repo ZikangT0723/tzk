@@ -27,7 +27,7 @@ float fun3();
 void clamper();
 const int num = 100;
 //try using push in github
-
+//test merge
 bool hostLogin();//Daniel
 bool hostMenu();//Daniel
 void jfet(); //Daniel
