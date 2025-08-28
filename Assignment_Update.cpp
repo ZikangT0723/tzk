@@ -14,7 +14,7 @@ void cal(int);
 void note();
 int quiz();
 void getinfo(User&);
-void userlist(User*, int);
+void userlist(User[], int);
 void loaduserdata(User*);
 bool checkopenfile(fstream&, string);
 void menu(User[], int);
@@ -203,7 +203,7 @@ void menu(User stu[], int userindex) {
 			break;
 		case 2:
 
-			stu[userindex].score = quiz();
+			stu[userindex].score = quiz()-1;
 
 			cout << "Score updated:" << stu[userindex].score << endl;
 			break;
@@ -219,7 +219,7 @@ void menu(User stu[], int userindex) {
 			break;
 		case 5:
 			cout << "Programme end." << endl;
-
+			savefile(stu, "Userlist", userindex);
 			break;
 		default:
 			cout << "Invalid input try to choose again.(1,2,3,4)" << endl;
@@ -243,7 +243,8 @@ int quiz() {
 				a = toupper(a);
 
 				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
+					cin >> a;
 				}
 				if (a == 'Y') {
 					fun1();
@@ -275,7 +276,8 @@ int quiz() {
 				a = toupper(a);
 
 				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
+					cin >> a;
 				}
 				if (a == 'Y') {
 					clamper();
@@ -309,7 +311,8 @@ int quiz() {
 				a = toupper(a);
 
 				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
+					cin >> a;
 				}
 				if (a == 'Y') {
 					clamper();
@@ -349,7 +352,8 @@ int quiz() {
 				a = toupper(a);
 
 				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
+					cin >> a;
 				}
 				if (a == 'Y') {
 					simulator1_BJT();
@@ -386,7 +390,7 @@ int quiz() {
 				a = toupper(a);
 
 				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
 					cin >> a;
 				}
 				if (a == 'Y') {
@@ -432,7 +436,7 @@ int quiz() {
 				a = toupper(a);
 
 				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
 					cin >> a;
 				}
 				if (a == 'Y') {
@@ -455,7 +459,7 @@ int quiz() {
 				cout << "\nDo you want a tips to calculate drain current? (Y/N): ";
 				cin >> a;
 				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
 					cin >> a;
 				}
 				if (toupper(a) == 'Y') // added by Daniel to debug
@@ -465,7 +469,7 @@ int quiz() {
 				cout << "\nDo you want a tips to calculate forward transconductance gm? (Y/N): ";
 				cin >> a;
 				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
 					cin >> a;
 				}
 				if (toupper(a) == 'Y') // added by Daniel to debug
@@ -501,7 +505,7 @@ int quiz() {
 
 
 				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
 					cin >> a;
 				}
 				if (toupper(a) == 'Y') // added by Daniel to debug
@@ -538,7 +542,7 @@ int quiz() {
 
 
 				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
 					cin >> a;
 				}
 				if (toupper(a) == 'Y') // added by Daniel to debug
@@ -581,7 +585,7 @@ int quiz() {
 
 
 				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N).\:" << endl;
 					cin >> a;
 				}
 				if (toupper(a) == 'Y')
@@ -623,7 +627,7 @@ int quiz() {
 
 
 				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
 					cin >> a;
 				}
 				if (toupper(a) == 'Y')
@@ -665,7 +669,7 @@ int quiz() {
 
 
 				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N)." << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
 					cin >> a;
 				}
 				if (toupper(a) == 'Y')
