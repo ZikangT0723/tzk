@@ -5,26 +5,32 @@
 #include<fstream>
 #include<cctype>
 using namespace std;
+const int ansnum = 23;
+const int num = 100;
 struct User {
 	string Name;
 	int ID;
 	int score;
+	float ans[ansnum];
 };//hi//hihihihihi
 void cal(int);
 void note();
-int quiz();
+int quiz(float*, float*);
 void getinfo(User&);
 void userlist(User[], int);
 void loaduserdata(User*);
 bool checkopenfile(fstream&, string);
 void menu(User[], int);
 int findslot(User[]);
-void savefile(User*, string, int);
-int check(float*, int&);
+void savefile(User*, string);
+void checksubmit(float*, float*, int);
+int check(float*, int&, float*);
+int checksection(float*, float*, int, int);
+void review(float*, float*, int);
 float fun1();
 void clamper();
 void clipper();
-const int num = 100;
+
 //try using push in github
 //test merge
 bool hostLogin();//Daniel
@@ -187,7 +193,8 @@ bool hostMenu()
 
 
 void menu(User stu[], int userindex) {
-
+	float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
+		10000, 200, 350 };
 	int a, b, opt;
 	if (userindex < 0 || userindex >= num) {
 		cout << "ERROR! Invalid user index!" << endl;
@@ -201,16 +208,21 @@ void menu(User stu[], int userindex) {
 			note();
 			break;
 		case 2:
-
-			stu[userindex].score = quiz() - 1;
-
-			cout << "Score updated:" << stu[userindex].score << endl;
+			if (!stu[userindex].attempt) {
+				stu[userindex].score = quiz(stu[userindex].ans, checkans);
+				cout << "Score updated:" << stu[userindex].score << endl;
+				stu[userindex].attempt = true;
+			}
+			else {
+				cout << "You have submitted the quiz\n";
+				review(stu[userindex].ans, checkans, stu[userindex].score);
+			}
 			break;
 		case 3:
 			do {
-				cout << "Select the type of stimulator\n.clipper\n2.clamper\n3.BJT 1\n4.BJT 2\n5.BJT 3\n6.JFET\n7. E-MOSFET\n8-10.chp4 \n0.return:";
+				cout << "Select the type of stimulator\n1.Clipper\n2.Clamper\n3.BJT 1\n4.BJT 2\n5.BJT 3\n6.JFET\n7. E-MOSFET\n8-10.chp4 \n0.return:";
 				cin >> a;
-				cal(a); //select stimular in menu
+				cal(a); //select stimular in menu 
 			} while (a != 0);
 			break;
 		case 4:
@@ -218,22 +230,43 @@ void menu(User stu[], int userindex) {
 			break;
 		case 5:
 			cout << "Programme end." << endl;
-			savefile(stu, "Userlist", userindex);
+			savefile(stu, "Userlist");
 			break;
 		default:
 			cout << "Invalid input try to choose again.(1,2,3,4)" << endl;
 		}
 	} while (opt != 5);
 }
-int quiz() {
-	int b, points;
+int quiz(float* answer, float* checkans) {
+	int i = 0, points = 0, record[12] = {};
+	bool same;
 	char a;
-	float answer[24] = {};
+	answer[ansnum] = {};
+	checkans[ansnum] = {};
 	do {
-		cout << "Choose the question you want to answer(13 out):";
-		cin >> b;
+		do {
+			same = false;
+			cout << "Choose the question you want to answer(13 out):";
+			cin >> record[i];
+
+			if (record[i] == 13) {
+				break;
+			}
+
+
+			for (int j = 0; j < i; j++) {
+				if (record[i] == record[j]) {
+					same = true;
+					if (same) {
+						cout << "You have done question " << record[i] << ".\n";
+					}
+					break;
+				}
+			}
+		} while (same);
+
 		cout << endl;
-		switch (b) {
+		switch (record[i]) {
 		case 1:
 			cout << "Question 1. Given the following configuration shown in figure 1, Vin = 12V, Vd = 0.7V. " << endl;
 			cout << "Find Vout peak for the the negative half cycle." << endl << endl; //answer is -11.3V 
@@ -267,7 +300,9 @@ int quiz() {
 
 			} while (a == 'Y');
 			cout << "Enter the answer:";//add this two line if your question need answer more than 1
-			cin >> answer[23];           //add this two line if your question need answer more than 1, answer[i+1]
+			cin >> answer[0];     //add this two line if your question need answer more than 1, answer[i+1]
+			checksubmit(answer, checkans, 0);
+			i++;
 			break;
 		case 2:
 			cout << "Quesiton 2. Given the following configuration shown in figure 1, Vin = 10V, Vd = 0.7V, Vbias = 5V. " << endl;
@@ -286,7 +321,7 @@ int quiz() {
 			cout << "   -----------------------------------------o -\n";
 			cout << "                     Figure 2\n";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -303,6 +338,9 @@ int quiz() {
 			cin >> answer[1];
 			cout << "Enter the answer of Vout(-ve):";
 			cin >> answer[2];
+			checksubmit(answer, checkans, 1);
+			checksubmit(answer, checkans, 2);
+			i++;
 			break;
 		case 3:
 			cout << "Quesiton 3. Given the following configuration shown in figure 1, Vin = 15V, Vd = 0.7V, Vbias = 7.5V. " << endl;
@@ -321,7 +359,7 @@ int quiz() {
 			cout << "   -----------------------------------------o -\n";
 			cout << "                     Figure 3\n";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -338,6 +376,9 @@ int quiz() {
 			cin >> answer[3];
 			cout << "Enter the answer of Vout(-ve):";
 			cin >> answer[4];
+			checksubmit(answer, checkans, 3);
+			checksubmit(answer, checkans, 4);
+			i++;
 			break;
 		case 4:
 			cout << "Question 4: Determine VCE and IC in the voltage-divider biased transistor circuit shown below. Assume betaDC = 100.\n\n";
@@ -362,7 +403,7 @@ int quiz() {
 			cout << "              GND\n\n";
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -379,6 +420,9 @@ int quiz() {
 			cin >> answer[5];
 			cout << "Enter the answer for VCE (V):";
 			cin >> answer[6];
+			checksubmit(answer, checkans, 5);
+			checksubmit(answer, checkans, 6);
+			i++;
 			break;
 		case 5:
 			cout << "\n\n\nQuestion 5: Determine the value of VCE when IC = 0.1mA and 0.2mA.\n\n";
@@ -400,7 +444,7 @@ int quiz() {
 			cout << "                        GND\n\n";
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -417,6 +461,9 @@ int quiz() {
 			cin >> answer[7];
 			cout << "Enter the answer dor VCE in 0.2mA(V):";
 			cin >> answer[8];
+			checksubmit(answer, checkans, 7);
+			checksubmit(answer, checkans, 8);
+			i++;
 			break;
 		case 6:
 			cout << "Question 6 :\n";
@@ -446,7 +493,7 @@ int quiz() {
 
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -461,6 +508,8 @@ int quiz() {
 			} while (a == 'Y');
 			cout << "\nEnter the answer for AV: ";
 			cin >> answer[9]; // havent change ''''
+			checksubmit(answer, checkans, 9);
+			i++;
 			break;
 
 		case 7://ANS:2.25 ,1125
@@ -494,6 +543,9 @@ int quiz() {
 			cin >> answer[10];
 			cout << "Enter the answer for gm (in micro-Siemens):";
 			cin >> answer[11];
+			checksubmit(answer, checkans, 10);
+			checksubmit(answer, checkans, 11);
+			i++;
 			break;
 		case 8:// Ans: V_DS: 8.9 V_GS:-1.1
 			cout << "Q8. Chp 3: FET (JFET)" << endl << endl;
@@ -515,7 +567,7 @@ int quiz() {
 			cout << " in the circuit shown above." << endl << endl;
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -530,7 +582,9 @@ int quiz() {
 			cin >> answer[12];
 			cout << "Enter the answer for V_GS (in volts and round to two decimals):";
 			cin >> answer[13];
-
+			checksubmit(answer, checkans, 12);
+			checksubmit(answer, checkans, 13);
+			i++;
 			break;
 		case 9:// Ans 12.7 ; 3.13
 			cout << "Q9. Chapter 3: FET (E-MOSFET)" << endl << endl;
@@ -552,7 +606,7 @@ int quiz() {
 			cout << " in the E-MOSFET circuit shown above. Given that the particular MOSFET has" << endl;
 			cout << " the theshold voltage Vgs_th = 2V and the parameter devices K = 50 mA/V^2 ." << endl << endl;
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -567,6 +621,9 @@ int quiz() {
 			cin >> answer[14];
 			cout << "Enter the answer for V_GS (in volts and round to two decimals):";
 			cin >> answer[15];
+			checksubmit(answer, checkans, 14);
+			checksubmit(answer, checkans, 15);
+			i++;
 			break;
 
 
@@ -595,12 +652,12 @@ int quiz() {
 
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
 				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N).\:" << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
 					cin >> a;
 				}
 				if (toupper(a) == 'Y')
@@ -613,6 +670,10 @@ int quiz() {
 			cin >> answer[17];
 			cout << "Enter the answer for the output impedance (in micro ohms):";
 			cin >> answer[18];
+			checksubmit(answer, checkans, 16);
+			checksubmit(answer, checkans, 17);
+			checksubmit(answer, checkans, 18);
+			i++;
 			break;
 		case 11://I
 
@@ -637,7 +698,7 @@ int quiz() {
 			cout << "Determine the closed-loop voltage gain,Acl and the input impedance of the amplifier.\n";
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -653,6 +714,9 @@ int quiz() {
 			cin >> answer[19];
 			cout << "Enter the answer for the input impedance:";
 			cin >> answer[20];
+			checksubmit(answer, checkans, 19);
+			checksubmit(answer, checkans, 20);
+			i++;
 			break;
 		case 12://VF
 
@@ -679,7 +743,7 @@ int quiz() {
 			cout << "Determine the input and output impedances of the amplifier.\n";
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -694,6 +758,9 @@ int quiz() {
 			cin >> answer[21];
 			cout << "Enter the answer for the output impedance (in micro ohms):";
 			cin >> answer[22];
+			checksubmit(answer, checkans, 21);
+			checksubmit(answer, checkans, 22);
+			i++;
 			break;
 
 		case 13:
@@ -706,8 +773,8 @@ int quiz() {
 
 
 
-	} while (b != 13);
-	check(answer, points);
+	} while (record[i] != 13);
+	check(answer, points, checkans);
 	return points;
 
 
@@ -908,20 +975,38 @@ void loaduserdata(User* stu) {
 		return;
 	}
 	string line;
+	string emptyspace;
 	for (int i = 0; i < num; i++) {
-		if (getline(list, line)) {
-			if (line.empty()) continue; // Skip empty lines
+
+		if (getline(list, line, '|')) {
 			stu[i].Name = line;
-			if (getline(list, line)) {
-				stu[i].ID = stoi(line);
+		}
+		if (getline(list, line, '|')) {
+			stu[i].ID = stoi(line);
+		}
+		if (getline(list, line, '|')) {
+			stu[i].score = stoi(line);
+		}
+		if (getline(list, line, '|'))
+		{
+			stu[i].attempt = stoi(line);
+		}
+		if (getline(list, line, '|')) {
+			emptyspace = line;
+		}
+		for (int j = 0; j < ansnum; j++) {
+			if (getline(list, line, '|'))
+			{
+				stu[i].ans[j] = stof(line);
 			}
-			if (getline(list, line)) {
-				stu[i].score = stoi(line);
+			else {
+				break; // Stop if no more lines to read
 			}
 		}
-		else {
-			break; // Stop if no more lines to read
+		if (getline(list, line, '|')) {
+			emptyspace = line;
 		}
+
 	}
 	list.close();
 }
@@ -952,32 +1037,44 @@ int findslot(User stu[]) {
 	return -1;
 }
 
-void savefile(User* stu, string name, int index) {
-	fstream list = fstream("Userlist", ios::out | ios::app);
+void savefile(User* stu, string name) {
+	fstream list = fstream("Userlist", ios::out);
 	if (!list.is_open()) {
 		cout << "Error opening file for saving: " << name << endl;
 		return;
 	}
-	list << stu[index].Name << endl;
-	list << stu[index].ID << endl;
-	list << stu[index].score << endl;
+	list << stu[0].Name << "|" << stu[0].ID << "|" << stu[0].score << "|" << stu[0].attempt << "|" << endl;
+	list << "|";
+	for (int j = 0; j < ansnum; j++) {
+		list << stu[0].ans[j] << "|";
+	}
+	list << "\n";
+	for (int i = 1; i < num; i++) {
+		if (stu[i].ID != 0) {
+			list << "|" << stu[i].Name << "|" << stu[i].ID << "|" << stu[i].score << "|" << stu[i].attempt << "|" << endl;
+			list << "|";
+			for (int j = 0; j < ansnum; j++) {
+				list << stu[i].ans[j] << "|";
+			}
+			list << "\n";
+		}
+	}
 	list.close();
 	cout << "User data saved successfully." << endl;
 }
 
-int check(float* a, int& points) {
+int check(float* answer, int& points, float* checkans) {
 	points = 0;       //9-19: Q8-Q12
-	float checkans[24] = { 0, 24.3, 4.3, -6.8, 5.16, 1.95, 32.40, 28.80, -366.18, -36.8, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
-		10000, 200, 350,-11.3 }; //insert your answer here
-	for (int i = 0; i < 24; i++) {
+	//insert your answer here
+	for (int i = 0; i < 23; i++) {
 		if (checkans[i] >= 0) {
-			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(a + i) && *(a + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
+			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
 				points++;
 
 			}
 		}
 		else {
-			if ((checkans[i] + (checkans[i] * 5 / 100)) <= *(a + i) && *(a + i) <= (checkans[i] - (checkans[i] * 5 / 100))) {
+			if ((checkans[i] + (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] - (checkans[i] * 5 / 100))) {
 				points++;
 			}
 		}
@@ -985,6 +1082,81 @@ int check(float* a, int& points) {
 	}
 	return points;
 }
+void checksubmit(float* answer, float* checkans, int i) {
+	if (checkans[i] >= 0) {
+		if ((checkans[i] - (checkans[i] * 5 / 100)) >= *(answer + i) || *(answer + i) >= (checkans[i] + (checkans[i] * 5 / 100))) {
+			cout << "Your answer " << answer[i] << " is wrong!\n";
+			cout << "The correct answer is: " << checkans[i] << endl;
+
+		}
+	}
+	else {
+		if ((checkans[i] + (checkans[i] * 5 / 100)) >= *(answer + i) || *(answer + i) >= (checkans[i] - (checkans[i] * 5 / 100))) {
+			cout << "Your answer " << answer[i] << " is wrong!\n";
+			cout << "The correct answer is: " << checkans[i] << endl;
+		}
+	}
+}
+int checksection(float* answer, float* checkans, int i, int range) {
+	int points = 0;
+	for (i; i <= range; i++) {
+		if (checkans[i] >= 0) {
+			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
+				points++;
+
+			}
+		}
+		else {
+			if ((checkans[i] + (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] - (checkans[i] * 5 / 100))) {
+				points++;
+			}
+		}
+	}
+	return points;
+}
+void review(float* answer, float* checkans, int score) {
+	cout << "Quesiton 2. Given the following configuration shown in figure 1, Vin = 10V, Vd = 0.7V, Vbias = 5V. " << endl;
+	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
+	cout << "   -------)|--------------------------------o +\n";
+	cout << "   |      Vc    |               |\n";
+	cout << "   |          -----             |\n";
+	cout << "   |           / \\  Vd=0.7V     |" << endl;
+	cout << "   |           ---              |\n";
+	cout << "Vin=10V         |             RL=100kohm   Vout\n";
+	cout << "   |           ---              |\n";
+	cout << "   |            -   5V          |\n";
+	cout << "   |           ---              |\n";
+	cout << "   |            -               |\n";
+	cout << "   |            |               |\n";
+	cout << "   -----------------------------------------o -\n";
+	cout << "                     Figure 2\n";
+	cout << "Your answer is       : " << setw(5) << right << answer[1] << setw(5) << right << ", " << setw(5) << right << answer[2] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[1] << setw(5) << right << ", " << setw(5) << right << checkans[2] << right
+		<< setw(15) << "Score = " << checksection(answer, checkans, 1, 2) << endl;
+
+	cout << "Quesiton 3. Given the following configuration shown in figure 1, Vin = 15V, Vd = 0.7V, Vbias = 7.5V. " << endl;
+	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
+	cout << "   -------|(--------------------------------o +\n";
+	cout << "   |      Vc    |               |\n";
+	cout << "   |           ---              |\n";
+	cout << "   |           \\ /  Vd=0.7V     |" << endl;
+	cout << "   |          -----             |\n";
+	cout << "Vin=15V         |             RL=100kohm   Vout\n";
+	cout << "   |            -               |\n";
+	cout << "   |           ---   7.5V       |\n";
+	cout << "   |            -               |\n";
+	cout << "   |           ---              |\n";
+	cout << "   |            |               |\n";
+	cout << "   -----------------------------------------o -\n";
+	cout << "                     Figure 3\n";
+	cout << "Your answer is       : " << setw(5) << answer[3] << setw(5) << right << ", " << setw(5) << right << answer[4] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[3] << setw(5) << right << ", " << setw(5) << right << checkans[4] << right
+		<< setw(15) << "Score = " << checksection(answer, checkans, 3, 4) << endl;
+
+	cout << "Total score = " << score <<"/"<<ansnum<< endl;
+}
+
+
 //add your calculator function here;
 float fun1() {
 	int a = 3;
