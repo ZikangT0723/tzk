@@ -22,8 +22,6 @@ int findslot(User[]);
 void savefile(User*, string, int);
 int check(float*, int&);
 float fun1();
-float fun2();
-float fun3();
 void clamper();
 void clipper();
 const int num = 100;
@@ -230,7 +228,7 @@ void menu(User stu[], int userindex) {
 int quiz() {
 	int b, points;
 	char a;
-	float answer[23] = {};
+	float answer[24] = {};
 	do {
 		cout << "Choose the question you want to answer(13 out):";
 		cin >> b;
@@ -269,7 +267,7 @@ int quiz() {
 
 			} while (a == 'Y');
 			cout << "Enter the answer:";//add this two line if your question need answer more than 1
-			cin >> answer[0];           //add this two line if your question need answer more than 1, answer[i+1]
+			cin >> answer[23];           //add this two line if your question need answer more than 1, answer[i+1]
 			break;
 		case 2:
 			cout << "Quesiton 2. Given the following configuration shown in figure 1, Vin = 10V, Vd = 0.7V, Vbias = 5V. " << endl;
@@ -969,9 +967,9 @@ void savefile(User* stu, string name, int index) {
 
 int check(float* a, int& points) {
 	points = 0;       //9-19: Q8-Q12
-	float checkans[23] = { -11.3, 24.3, 4.3, -6.8, 5.16, 1.95, 32.40, 28.80, -366.18, -36.8, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
-		10000, 200, 350 }; //insert your answer here
-	for (int i = 0; i < 23; i++) {
+	float checkans[24] = { 0, 24.3, 4.3, -6.8, 5.16, 1.95, 32.40, 28.80, -366.18, -36.8, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
+		10000, 200, 350,-11.3 }; //insert your answer here
+	for (int i = 0; i < 24; i++) {
 		if (checkans[i] >= 0) {
 			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(a + i) && *(a + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
 				points++;
