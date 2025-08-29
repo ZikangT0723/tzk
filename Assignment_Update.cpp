@@ -5,27 +5,33 @@
 #include<fstream>
 #include<cctype>
 using namespace std;
+const int ansnum = 23;
+const int num = 100;
 struct User {
 	string Name;
 	int ID;
 	int score;
+	bool attempt;
+	float ans[ansnum];
 };//hi//hihihihihi
 void cal(int);
 void note();
-int quiz();
+int quiz(float*, float*);
 void getinfo(User&);
 void userlist(User[], int);
 void loaduserdata(User*);
 bool checkopenfile(fstream&, string);
 void menu(User[], int);
 int findslot(User[]);
-void savefile(User*, string, int);
-int check(float*, int&);
+void savefile(User*, string);
+void checksubmit(float*, float*, int);
+int check(float*, int&, float*);
+int checksection(float*, float*, int, int);
+void review(float*, float*, int);
 float fun1();
-float fun2();
-float fun3();
 void clamper();
-const int num = 100;
+void clipper();
+
 //try using push in github
 //test merge
 bool hostLogin();//Daniel
@@ -75,7 +81,7 @@ int main() {
 			if (hostLogin())
 				Return = hostMenu();
 			else
-				Return = true; 
+				Return = true;
 			break;
 		}
 		case 2:
@@ -188,7 +194,8 @@ bool hostMenu()
 
 
 void menu(User stu[], int userindex) {
-
+	float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
+		10000, 200, 350 };
 	int a, b, opt;
 	if (userindex < 0 || userindex >= num) {
 		cout << "ERROR! Invalid user index!" << endl;
@@ -202,16 +209,21 @@ void menu(User stu[], int userindex) {
 			note();
 			break;
 		case 2:
-
-			stu[userindex].score = quiz()-1;
-
-			cout << "Score updated:" << stu[userindex].score << endl;
+			if (!stu[userindex].attempt) {
+				stu[userindex].score = quiz(stu[userindex].ans, checkans);
+				cout << "Score updated:" << stu[userindex].score << endl;
+				stu[userindex].attempt = true;
+			}
+			else {
+				cout << "You have submitted the quiz\n";
+				review(stu[userindex].ans, checkans, stu[userindex].score);
+			}
 			break;
 		case 3:
 			do {
-				cout << "Select the type of stimulator\n1.\n2.clamper\n3.BJT 1\n4.BJT 2\n5.BJT 3\n6.JFET\n7. E-MOSFET\n8-10.chp4 \n0.return:";
+				cout << "Select the type of stimulator\n1.Clipper\n2.Clamper\n3.BJT 1\n4.BJT 2\n5.BJT 3\n6.JFET\n7. E-MOSFET\n8-10.chp4 \n0.return:";
 				cin >> a;
-				cal(a); //select stimular in menu
+				cal(a); //select stimular in menu 
 			} while (a != 0);
 			break;
 		case 4:
@@ -219,26 +231,63 @@ void menu(User stu[], int userindex) {
 			break;
 		case 5:
 			cout << "Programme end." << endl;
-			savefile(stu, "Userlist", userindex);
+			savefile(stu, "Userlist");
 			break;
 		default:
 			cout << "Invalid input try to choose again.(1,2,3,4)" << endl;
 		}
 	} while (opt != 5);
 }
-int quiz() {
-	int b, points;
+int quiz(float* answer, float* checkans) {
+	int i = 0, points = 0, record[12] = {};
+	bool same;
 	char a;
-	float answer[23] = {};
+	answer[ansnum] = {};
+	checkans[ansnum] = {};
 	do {
-		cout << "Choose the question you want to answer(13 out):";
-		cin >> b;
+		do {
+			same = false;
+			cout << "Choose the question you want to answer(13 out):";
+			cin >> record[i];
+
+			if (record[i] == 13) {
+				break;
+			}
+
+
+			for (int j = 0; j < i; j++) {
+				if (record[i] == record[j]) {
+					same = true;
+					if (same) {
+						cout << "You have done question " << record[i] << ".\n";
+					}
+					break;
+				}
+			}
+		} while (same);
+
 		cout << endl;
-		switch (b) {
+		switch (record[i]) {
 		case 1:
-			cout << "1";//insert your question here
+			cout << "Question 1. Given the following configuration shown in figure 1, Vin = 12V, Vd = 0.7V. " << endl;
+			cout << "Find Vout peak for the the negative half cycle." << endl << endl; //answer is -11.3V 
+			cout << "   ------------------------------\n";
+			cout << "   |                            |            \n";
+			cout << "   |                         -------         \n";
+			cout << "   |                           / \\  Vd=0.7V \n";
+			cout << "   |                          /   \\         \n";
+			cout << " Vin = 12V                    -----          \n";
+			cout << "   |                            |            \n";
+			cout << "   |                            |            \n";
+			cout << "   |                            |            \n";
+			cout << "   |                            |            \n";
+			cout << "   ---------Rload = 1k Ohm-------\n";
+			cout << "         |                  | \n";
+			cout << "         |                  | \n";
+			cout << "         o                  o \n";
+			cout << "         -       Vout       +\n";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -247,12 +296,14 @@ int quiz() {
 					cin >> a;
 				}
 				if (a == 'Y') {
-					fun1();
+					clipper();
 				}
 
 			} while (a == 'Y');
 			cout << "Enter the answer:";//add this two line if your question need answer more than 1
-			cin >> answer[0];           //add this two line if your question need answer more than 1, answer[i+1]
+			cin >> answer[0];     //add this two line if your question need answer more than 1, answer[i+1]
+			checksubmit(answer, checkans, 0);
+			i++;
 			break;
 		case 2:
 			cout << "Quesiton 2. Given the following configuration shown in figure 1, Vin = 10V, Vd = 0.7V, Vbias = 5V. " << endl;
@@ -271,7 +322,7 @@ int quiz() {
 			cout << "   -----------------------------------------o -\n";
 			cout << "                     Figure 2\n";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -288,6 +339,9 @@ int quiz() {
 			cin >> answer[1];
 			cout << "Enter the answer of Vout(-ve):";
 			cin >> answer[2];
+			checksubmit(answer, checkans, 1);
+			checksubmit(answer, checkans, 2);
+			i++;
 			break;
 		case 3:
 			cout << "Quesiton 3. Given the following configuration shown in figure 1, Vin = 15V, Vd = 0.7V, Vbias = 7.5V. " << endl;
@@ -306,7 +360,7 @@ int quiz() {
 			cout << "   -----------------------------------------o -\n";
 			cout << "                     Figure 3\n";
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -323,6 +377,9 @@ int quiz() {
 			cin >> answer[3];
 			cout << "Enter the answer of Vout(-ve):";
 			cin >> answer[4];
+			checksubmit(answer, checkans, 3);
+			checksubmit(answer, checkans, 4);
+			i++;
 			break;
 		case 4:
 			cout << "Question 4: Determine VCE and IC in the voltage-divider biased transistor circuit shown below. Assume betaDC = 100.\n\n";
@@ -347,7 +404,7 @@ int quiz() {
 			cout << "              GND\n\n";
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -364,6 +421,9 @@ int quiz() {
 			cin >> answer[5];
 			cout << "Enter the answer for VCE (V):";
 			cin >> answer[6];
+			checksubmit(answer, checkans, 5);
+			checksubmit(answer, checkans, 6);
+			i++;
 			break;
 		case 5:
 			cout << "\n\n\nQuestion 5: Determine the value of VCE when IC = 0.1mA and 0.2mA.\n\n";
@@ -385,7 +445,7 @@ int quiz() {
 			cout << "                        GND\n\n";
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -402,6 +462,9 @@ int quiz() {
 			cin >> answer[7];
 			cout << "Enter the answer dor VCE in 0.2mA(V):";
 			cin >> answer[8];
+			checksubmit(answer, checkans, 7);
+			checksubmit(answer, checkans, 8);
+			i++;
 			break;
 		case 6:
 			cout << "Question 6 :\n";
@@ -431,7 +494,7 @@ int quiz() {
 
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 				a = toupper(a);
 
@@ -446,6 +509,8 @@ int quiz() {
 			} while (a == 'Y');
 			cout << "\nEnter the answer for AV: ";
 			cin >> answer[9]; // havent change ''''
+			checksubmit(answer, checkans, 9);
+			i++;
 			break;
 
 		case 7://ANS:2.25 ,1125
@@ -479,6 +544,9 @@ int quiz() {
 			cin >> answer[10];
 			cout << "Enter the answer for gm (in micro-Siemens):";
 			cin >> answer[11];
+			checksubmit(answer, checkans, 10);
+			checksubmit(answer, checkans, 11);
+			i++;
 			break;
 		case 8:// Ans: V_DS: 8.9 V_GS:-1.1
 			cout << "Q8. Chp 3: FET (JFET)" << endl << endl;
@@ -500,7 +568,7 @@ int quiz() {
 			cout << " in the circuit shown above." << endl << endl;
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -515,7 +583,9 @@ int quiz() {
 			cin >> answer[12];
 			cout << "Enter the answer for V_GS (in volts and round to two decimals):";
 			cin >> answer[13];
-
+			checksubmit(answer, checkans, 12);
+			checksubmit(answer, checkans, 13);
+			i++;
 			break;
 		case 9:// Ans 12.7 ; 3.13
 			cout << "Q9. Chapter 3: FET (E-MOSFET)" << endl << endl;
@@ -537,7 +607,7 @@ int quiz() {
 			cout << " in the E-MOSFET circuit shown above. Given that the particular MOSFET has" << endl;
 			cout << " the theshold voltage Vgs_th = 2V and the parameter devices K = 50 mA/V^2 ." << endl << endl;
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -552,6 +622,9 @@ int quiz() {
 			cin >> answer[14];
 			cout << "Enter the answer for V_GS (in volts and round to two decimals):";
 			cin >> answer[15];
+			checksubmit(answer, checkans, 14);
+			checksubmit(answer, checkans, 15);
+			i++;
 			break;
 
 
@@ -580,12 +653,12 @@ int quiz() {
 
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
 				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N).\:" << endl;
+					cout << "INPUT ERROR, input (Y/N):" << endl;
 					cin >> a;
 				}
 				if (toupper(a) == 'Y')
@@ -598,6 +671,10 @@ int quiz() {
 			cin >> answer[17];
 			cout << "Enter the answer for the output impedance (in micro ohms):";
 			cin >> answer[18];
+			checksubmit(answer, checkans, 16);
+			checksubmit(answer, checkans, 17);
+			checksubmit(answer, checkans, 18);
+			i++;
 			break;
 		case 11://I
 
@@ -622,7 +699,7 @@ int quiz() {
 			cout << "Determine the closed-loop voltage gain,Acl and the input impedance of the amplifier.\n";
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -638,6 +715,9 @@ int quiz() {
 			cin >> answer[19];
 			cout << "Enter the answer for the input impedance:";
 			cin >> answer[20];
+			checksubmit(answer, checkans, 19);
+			checksubmit(answer, checkans, 20);
+			i++;
 			break;
 		case 12://VF
 
@@ -664,7 +744,7 @@ int quiz() {
 			cout << "Determine the input and output impedances of the amplifier.\n";
 
 			do {
-				cout << "\nDo you want to use a stimulator?(Y/N):";
+				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
 
 
@@ -679,6 +759,9 @@ int quiz() {
 			cin >> answer[21];
 			cout << "Enter the answer for the output impedance (in micro ohms):";
 			cin >> answer[22];
+			checksubmit(answer, checkans, 21);
+			checksubmit(answer, checkans, 22);
+			i++;
 			break;
 
 		case 13:
@@ -691,8 +774,8 @@ int quiz() {
 
 
 
-	} while (b != 13);
-	check(answer, points);
+	} while (record[i] != 13);
+	check(answer, points, checkans);
 	return points;
 
 
@@ -807,7 +890,7 @@ void cal(int a) {
 	switch (a) {
 	case 1:
 		cout << "Equation 1" << endl;
-		fun1();//insert you function here
+		clipper();//insert you function here
 		break;
 	case 2:
 		cout << "\n           Positive-biased clamper                                      Negative-biased clamper\n" << endl;
@@ -893,26 +976,45 @@ void loaduserdata(User* stu) {
 		return;
 	}
 	string line;
+	string emptyspace;
 	for (int i = 0; i < num; i++) {
-		if (getline(list, line)) {
-			if (line.empty()) continue; // Skip empty lines
+
+		if (getline(list, line, '|')) {
 			stu[i].Name = line;
-			if (getline(list, line)) {
-				stu[i].ID = stoi(line);
+		}
+		if (getline(list, line, '|')) {
+			stu[i].ID = stoi(line);
+		}
+		if (getline(list, line, '|')) {
+			stu[i].score = stoi(line);
+		}
+		if (getline(list, line, '|'))
+		{
+			stu[i].attempt = stoi(line);
+		}
+		if (getline(list, line, '|')) {
+			emptyspace = line;
+		}
+		for (int j = 0; j < ansnum; j++) {
+			if (getline(list, line, '|'))
+			{
+				stu[i].ans[j] = stof(line);
 			}
-			if (getline(list, line)) {
-				stu[i].score = stoi(line);
+			else {
+				break; // Stop if no more lines to read
 			}
 		}
-		else {
-			break; // Stop if no more lines to read
+		if (getline(list, line, '|')) {
+			emptyspace = line;
 		}
+
 	}
 	list.close();
 }
 
 void getinfo(User& stu) {
 	cout << "Enter your name:";
+	cin.ignore();
 	getline(cin, stu.Name);
 	cout << "Enter your student ID:";
 	cin >> stu.ID;
@@ -937,32 +1039,44 @@ int findslot(User stu[]) {
 	return -1;
 }
 
-void savefile(User* stu, string name, int index) {
-	fstream list = fstream("Userlist", ios::out | ios::app);
+void savefile(User* stu, string name) {
+	fstream list = fstream("Userlist", ios::out);
 	if (!list.is_open()) {
 		cout << "Error opening file for saving: " << name << endl;
 		return;
 	}
-	list << stu[index].Name << endl;
-	list << stu[index].ID << endl;
-	list << stu[index].score << endl;
+	list << stu[0].Name << "|" << stu[0].ID << "|" << stu[0].score << "|" << stu[0].attempt << "|" << endl;
+	list << "|";
+	for (int j = 0; j < ansnum; j++) {
+		list << stu[0].ans[j] << "|";
+	}
+	list << "\n";
+	for (int i = 1; i < num; i++) {
+		if (stu[i].ID != 0) {
+			list << "|" << stu[i].Name << "|" << stu[i].ID << "|" << stu[i].score << "|" << stu[i].attempt << "|" << endl;
+			list << "|";
+			for (int j = 0; j < ansnum; j++) {
+				list << stu[i].ans[j] << "|";
+			}
+			list << "\n";
+		}
+	}
 	list.close();
 	cout << "User data saved successfully." << endl;
 }
 
-int check(float* a, int& points) {
+int check(float* answer, int& points, float* checkans) {
 	points = 0;       //9-19: Q8-Q12
-	float checkans[23] = { 0, 24.3, 4.3, -6.8, 5.16, 1.95, 32.40, 28.80, -366.18, -36.8, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
-		10000, 200, 350 }; //insert your answer here
-	for (int i = 0; i < 20; i++) {
+	//insert your answer here
+	for (int i = 0; i < 23; i++) {
 		if (checkans[i] >= 0) {
-			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(a + i) && *(a + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
+			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
 				points++;
 
 			}
 		}
 		else {
-			if ((checkans[i] + (checkans[i] * 5 / 100)) <= *(a + i) && *(a + i) <= (checkans[i] - (checkans[i] * 5 / 100))) {
+			if ((checkans[i] + (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] - (checkans[i] * 5 / 100))) {
 				points++;
 			}
 		}
@@ -970,13 +1084,186 @@ int check(float* a, int& points) {
 	}
 	return points;
 }
+void checksubmit(float* answer, float* checkans, int i) {
+	if (checkans[i] >= 0) {
+		if ((checkans[i] - (checkans[i] * 5 / 100)) >= *(answer + i) || *(answer + i) >= (checkans[i] + (checkans[i] * 5 / 100))) {
+			cout << "Your answer " << answer[i] << " is wrong!\n";
+			cout << "The correct answer is: " << checkans[i] << endl;
+
+		}
+	}
+	else {
+		if ((checkans[i] + (checkans[i] * 5 / 100)) >= *(answer + i) || *(answer + i) >= (checkans[i] - (checkans[i] * 5 / 100))) {
+			cout << "Your answer " << answer[i] << " is wrong!\n";
+			cout << "The correct answer is: " << checkans[i] << endl;
+		}
+	}
+}
+int checksection(float* answer, float* checkans, int i, int range) {
+	int points = 0;
+	for (i; i <= range; i++) {
+		if (checkans[i] >= 0) {
+			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
+				points++;
+
+			}
+		}
+		else {
+			if ((checkans[i] + (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] - (checkans[i] * 5 / 100))) {
+				points++;
+			}
+		}
+	}
+	return points;
+}
+void review(float* answer, float* checkans, int score) {
+	cout << "Quesiton 2. Given the following configuration shown in figure 1, Vin = 10V, Vd = 0.7V, Vbias = 5V. " << endl;
+	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
+	cout << "   -------)|--------------------------------o +\n";
+	cout << "   |      Vc    |               |\n";
+	cout << "   |          -----             |\n";
+	cout << "   |           / \\  Vd=0.7V     |" << endl;
+	cout << "   |           ---              |\n";
+	cout << "Vin=10V         |             RL=100kohm   Vout\n";
+	cout << "   |           ---              |\n";
+	cout << "   |            -   5V          |\n";
+	cout << "   |           ---              |\n";
+	cout << "   |            -               |\n";
+	cout << "   |            |               |\n";
+	cout << "   -----------------------------------------o -\n";
+	cout << "                     Figure 2\n";
+	cout << "Your answer is       : " << setw(5) << right << answer[1] << setw(5) << right << ", " << setw(5) << right << answer[2] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[1] << setw(5) << right << ", " << setw(5) << right << checkans[2] << right
+		<< setw(15) << "Score = " << checksection(answer, checkans, 1, 2) << endl;
+
+	cout << "Quesiton 3. Given the following configuration shown in figure 1, Vin = 15V, Vd = 0.7V, Vbias = 7.5V. " << endl;
+	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
+	cout << "   -------|(--------------------------------o +\n";
+	cout << "   |      Vc    |               |\n";
+	cout << "   |           ---              |\n";
+	cout << "   |           \\ /  Vd=0.7V     |" << endl;
+	cout << "   |          -----             |\n";
+	cout << "Vin=15V         |             RL=100kohm   Vout\n";
+	cout << "   |            -               |\n";
+	cout << "   |           ---   7.5V       |\n";
+	cout << "   |            -               |\n";
+	cout << "   |           ---              |\n";
+	cout << "   |            |               |\n";
+	cout << "   -----------------------------------------o -\n";
+	cout << "                     Figure 3\n";
+	cout << "Your answer is       : " << setw(5) << answer[3] << setw(5) << right << ", " << setw(5) << right << answer[4] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[3] << setw(5) << right << ", " << setw(5) << right << checkans[4] << right
+		<< setw(15) << "Score = " << checksection(answer, checkans, 3, 4) << endl;
+
+	cout << "Total score = " << score <<"/"<<ansnum<< endl;
+}
+
+
 //add your calculator function here;
 float fun1() {
 	int a = 3;
 	cout << a << endl;
 	return a;
 }
+void clipper() {
+	float Vin, Vd, Vout;
+	char polar;
+	int opt;
+	cout << "\n        Positive clipper                                 Negative clipper           \n";
 
+	cout << "   ------------------------------                   ------------------------------    \n";
+	cout << "   |                            |                   |                            |    \n";
+	cout << "   |                         -------                |                          -----  \n";
+	cout << "   |                           / \\  Vd=0.7V        |                          \\  /   Vd\n";
+	cout << "   |                          /   \\                |                           \\/   \n";
+	cout << "  Vin                         -----                Vin                        ------- \n";
+	cout << "   |                            |                   |                            |    \n";
+	cout << "   |                            |                   |                            |    \n";
+	cout << "   |                            |                   |                            |    \n";
+	cout << "   |                            |                   |                            |    \n";
+	cout << "   -------------R load-----------                   -------------R load-----------    \n";
+	cout << "         |                  |                                |             | \n";
+	cout << "         |                  |                                |             | \n";
+	cout << "         o                  o                                o             o \n";
+	cout << "         -       Vout       +                                -    V out    + \n\n";
+
+	do {
+		cout << "Select the variation of clipper circuit (input '+' for positive or '-' for negative): ";
+		cin >> polar;
+		if (polar != '+' && polar != '-') cout << "INPUT ERROR, input '+' or '-'";
+	} while (polar != '+' && polar != '-');
+	if (polar == '+') {
+		do {
+			cout << "\nPositive clipper. " << endl;
+			cout << "Select the variable you want to find (1.Vout (Positive half cycle), 2.Vout (Negative half cycle)), 3. return): ";
+			cin >> opt;
+			switch (opt) {
+			case 1:
+				cout << "\nDuring positive cycle, the diode is reverse biased \n";
+				cout << "Vd = Vin \n";
+				cout << "Input the value of Vin: ";
+				cin >> Vin;
+				Vd = Vin;
+				Vout = Vin - Vd;
+				cout << "Vd = " << Vd << endl;
+				cout << "Vout = Vin - Vd \n";
+				cout << "Vout = " << Vout << endl;
+				break;
+			case 2:
+				cout << "\nDuring negative cycle, the diode is forward biased \n";
+				cout << "Input the value of Vin: ";
+				cin >> Vin;
+				cout << "Input the value of Vd: ";
+				cin >> Vd;
+				cout << "Vout = -Vin + Vd \n";
+				Vout = -Vin + Vd;
+				cout << "Vout = " << Vout << endl;
+				break;
+			case 3:
+				cout << "You have returned." << endl;
+				break;
+			default:
+				cout << "\nINPUT ERROR, input integer (1,2,3)" << endl;
+			}
+		} while (opt != 3);
+	}
+	else {
+		do {
+			cout << "\nNegative clipper. " << endl;
+			cout << "Select the variable you want to find (1. Vout (Positive half cycle), 2. Vout (Negative half cycle)), 3. return): ";
+			cin >> opt;
+			switch (opt) {
+			case 1:
+				cout << "\nDuring the positive cycle, the diode is forward biased \n";
+				cout << "Input the value of Vin: ";
+				cin >> Vin;
+				cout << "Input the value of Vd: ";
+				cin >> Vd;
+				cout << "Vout = Vin - Vd \n";
+				Vout = Vin - Vd;
+				cout << "Vout = " << Vout << endl;
+				break;
+			case 2:
+				cout << "\nDuring the negative cycle, the diode is reverse biased \n";
+				cout << "Vd = Vin \n";
+				cout << "Input the value of Vin: ";
+				cin >> Vin;
+				Vd = Vin;
+				Vout = Vin - Vd;
+				cout << "Vd = " << Vd << endl;
+				cout << "Vout = Vin - Vd \n";
+				cout << "Vout = " << Vout << endl;
+				break;
+			case 3:
+				cout << "You have returned." << endl;
+				break;
+			default:
+				cout << "\nINPUT ERROR, input integer (1,2,3)" << endl;
+			}
+		} while (opt != 3);
+
+	}
+}
 void clamper() {
 	float Vin, Vc, Vd, Vbias, Vout;
 	char polar;
@@ -2080,243 +2367,243 @@ void notes_BJT()
 void notes_FET()
 {
 	char proceed;
-		cout << "\n --------------------------------------------" << endl;
-		cout << "| Chapter 3: Field Effect transistors (FETs) |" << endl;
-		cout << " --------------------------------------------" << endl << endl;
-		cout << "3.0 Introduction:" << endl;
-		cout << "=================" << endl;
-		cout << "the FET is a voltage-controlled device where voltage between" << endl;
-		cout << "two of the terminals (gate and source) controls the current through the device." << endl << endl;
-		cout << "A major feature of FETs is that they have very high input resistance." << endl;
-		cout << "Hence, there are very useful in designing VLSI circuits since the devices draws " << endl;
-		cout << "negligible currents due to there high input impedance." << endl << endl;
-		cout << "There are two main types of FETs: " << endl;
-		cout << "1) Junction field-effect transistor (JFET) " << endl;
-		cout << "2) metal-oxide field-effect transistor (MOSFET)" << endl << endl;
+	cout << "\n --------------------------------------------" << endl;
+	cout << "| Chapter 3: Field Effect transistors (FETs) |" << endl;
+	cout << " --------------------------------------------" << endl << endl;
+	cout << "3.0 Introduction:" << endl;
+	cout << "=================" << endl;
+	cout << "the FET is a voltage-controlled device where voltage between" << endl;
+	cout << "two of the terminals (gate and source) controls the current through the device." << endl << endl;
+	cout << "A major feature of FETs is that they have very high input resistance." << endl;
+	cout << "Hence, there are very useful in designing VLSI circuits since the devices draws " << endl;
+	cout << "negligible currents due to there high input impedance." << endl << endl;
+	cout << "There are two main types of FETs: " << endl;
+	cout << "1) Junction field-effect transistor (JFET) " << endl;
+	cout << "2) metal-oxide field-effect transistor (MOSFET)" << endl << endl;
 
-		cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
+	{
+		cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+		cout << "Do you want to proceed? (Y/N): ";
 		cin >> proceed;
-		while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
-		{
-			cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
-			cout << "Do you want to proceed? (Y/N): ";
-			cin >> proceed;
-		}
-		if (toupper(proceed) == 'N') {
-			cout << "Return to notes selection...";
-			return;
-		}
+	}
+	if (toupper(proceed) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
 
 
-		cout << "\n3.1 Junction Field-Effect Transistor (JFET)" << endl;
-		cout << "===========================================" << endl;
-		cout << "the JFET has two regions: a p-type material and an n-type material." << endl;
-		cout << "The construction of the JFET is shown bellow." << endl;
+	cout << "\n3.1 Junction Field-Effect Transistor (JFET)" << endl;
+	cout << "===========================================" << endl;
+	cout << "the JFET has two regions: a p-type material and an n-type material." << endl;
+	cout << "The construction of the JFET is shown bellow." << endl;
 
-		cout << "       Drain                            Drain  " << endl;
-		cout << "      ___|___                          ___|___ " << endl;
-		cout << "     |_  n  _|                        |_  p  _|" << endl;
-		cout << "Gate-|p|   |p|                   Gate-|n|   |n|" << endl;
-		cout << "     |-     -|                        |-     -|" << endl;
-		cout << "      -------                          ------- " << endl;
-		cout << "         |                                |    " << endl;
-		cout << "       Source                           Source " << endl;
-		cout << "     n-channel                        p-channel" << endl << endl;
+	cout << "       Drain                            Drain  " << endl;
+	cout << "      ___|___                          ___|___ " << endl;
+	cout << "     |_  n  _|                        |_  p  _|" << endl;
+	cout << "Gate-|p|   |p|                   Gate-|n|   |n|" << endl;
+	cout << "     |-     -|                        |-     -|" << endl;
+	cout << "      -------                          ------- " << endl;
+	cout << "         |                                |    " << endl;
+	cout << "       Source                           Source " << endl;
+	cout << "     n-channel                        p-channel" << endl << endl;
 
-		cout << "Note that the non-channel material axtually surrounds the channel like" << endl;
-		cout << "\"a belt around the waist\". The non-channel material is diffused in the " << endl;
-		cout << "relative material to form a channel and it is connected to the gate lead." << endl << endl;
+	cout << "Note that the non-channel material axtually surrounds the channel like" << endl;
+	cout << "\"a belt around the waist\". The non-channel material is diffused in the " << endl;
+	cout << "relative material to form a channel and it is connected to the gate lead." << endl << endl;
 
-		cout << "By providing a drain to source voltage Vds, it sypplying a current from the" << endl;
-		cout << "drain to source (then we can say Id = Is , where is is Source current) " << endl;
-		cout << "Next, by providing a negative voltage to gate-to-source and sets a reverse-bias " << endl;
-		cout << "voltage between it and the pn junction become reverse biased." << endl << endl;
+	cout << "By providing a drain to source voltage Vds, it sypplying a current from the" << endl;
+	cout << "drain to source (then we can say Id = Is , where is is Source current) " << endl;
+	cout << "Next, by providing a negative voltage to gate-to-source and sets a reverse-bias " << endl;
+	cout << "voltage between it and the pn junction become reverse biased." << endl << endl;
 
-		cout << "In short, A JFET works by using the gate voltage to widen or narrow the" << endl;
-		cout << "depletion layer, which controls the channel’s width and therefore regulates" << endl;
-		cout << "the current flowing from drain to source." << endl << endl;
+	cout << "In short, A JFET works by using the gate voltage to widen or narrow the" << endl;
+	cout << "depletion layer, which controls the channel’s width and therefore regulates" << endl;
+	cout << "the current flowing from drain to source." << endl << endl;
 
-		cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
+	{
+		cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+		cout << "Do you want to proceed? (Y/N): ";
 		cin >> proceed;
-		while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
-		{
-			cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
-			cout << "Do you want to proceed? (Y/N): ";
-			cin >> proceed;
-		}
-		if (toupper(proceed) == 'N') {
-			cout << "Return to notes selection...";
-			return;
-		}
+	}
+	if (toupper(proceed) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
 
-		cout << "\n3.2 JFET Characteristics and Parameters" << endl;
-		cout << "=======================================" << endl;
-		cout << "The drain current can be determine by using the equation of the" << endl;
-		cout << "JFET transfer characteristics:" << endl;
-		cout << " _________________________________" << endl;
-		cout << "| Id = Idss [1-(Vgs / Vgs_off)]^2 |" << endl;
-		cout << " ---------------------------------" << endl;
-		cout << "the meaning of parameters is shown below: " << endl;
-		cout << "Id: Drain current \nIdss: maximum drain current \nVgs: volatge gate-to-source \nVgs_off: cutoff voltage" << endl;
-		cout << "notes that the Idss and the Vgs_off can be found in related JFET datasheet." << endl << endl;
+	cout << "\n3.2 JFET Characteristics and Parameters" << endl;
+	cout << "=======================================" << endl;
+	cout << "The drain current can be determine by using the equation of the" << endl;
+	cout << "JFET transfer characteristics:" << endl;
+	cout << " _________________________________" << endl;
+	cout << "| Id = Idss [1-(Vgs / Vgs_off)]^2 |" << endl;
+	cout << " ---------------------------------" << endl;
+	cout << "the meaning of parameters is shown below: " << endl;
+	cout << "Id: Drain current \nIdss: maximum drain current \nVgs: volatge gate-to-source \nVgs_off: cutoff voltage" << endl;
+	cout << "notes that the Idss and the Vgs_off can be found in related JFET datasheet." << endl << endl;
 
-		cout << "Besides, the JFET forward transconductance (gm) is the slope of the curve." << endl;
-		cout << "The unit of it is siemens (S), it is used to calculate the voltage gain in an amplifier." << endl;
-		cout << "It can be determined by following equation: " << endl;
-		cout << " ____________________________" << endl;
-		cout << "| gm = gm_0[1-(Vgs/Vgs_off)] |" << endl;
-		cout << " ----------------------------" << endl;
-		cout << "Where gm_0 is the gm at Vgs =0V , and will be given in the data sheets." << endl << endl;
+	cout << "Besides, the JFET forward transconductance (gm) is the slope of the curve." << endl;
+	cout << "The unit of it is siemens (S), it is used to calculate the voltage gain in an amplifier." << endl;
+	cout << "It can be determined by following equation: " << endl;
+	cout << " ____________________________" << endl;
+	cout << "| gm = gm_0[1-(Vgs/Vgs_off)] |" << endl;
+	cout << " ----------------------------" << endl;
+	cout << "Where gm_0 is the gm at Vgs =0V , and will be given in the data sheets." << endl << endl;
 
-		cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
+	{
+		cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+		cout << "Do you want to proceed? (Y/N): ";
 		cin >> proceed;
-		while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
-		{
-			cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
-			cout << "Do you want to proceed? (Y/N): ";
-			cin >> proceed;
-		}
-		if (toupper(proceed) == 'N') {
-			cout << "Return to notes selection...";
-			return;
-		}
+	}
+	if (toupper(proceed) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
 
-		cout << "\n3.3 JFET Biasing" << endl;
-		cout << "================" << endl;
-		cout << "Just like BJTs, there are severals type of JFET biasing like Self biasing and Voltage-divider biasing." << endl;
-		cout << "The most common biasing is self biasing, the circuit is shown below. " << endl;
-		cout << "                Vdd" << endl;
-		cout << "                 |    | Id" << endl;
-		cout << "                 Rd   v" << endl;
-		cout << "                 |" << endl;
-		cout << "                 | " << endl;
-		cout << "                 D" << endl;
-		cout << "                /" << endl;
-		cout << "   ----G----> JFET" << endl;
-		cout << "   |            \\" << endl;
-		cout << "   |             S" << endl;
-		cout << "   Rg            |" << endl;
-		cout << "   |             Rs" << endl;
-		cout << "   |             |" << endl;
-		cout << "  GND           GND" << endl;
-		cout << "Note that the value of source resistor Rs must be greater than Rs_min = |Vgs/Id|,to establishing a JFET bias point" << endl;
-		cout << "The step to determine Vgs and Vds can be explained in JFET self biasing simulation." << endl;
+	cout << "\n3.3 JFET Biasing" << endl;
+	cout << "================" << endl;
+	cout << "Just like BJTs, there are severals type of JFET biasing like Self biasing and Voltage-divider biasing." << endl;
+	cout << "The most common biasing is self biasing, the circuit is shown below. " << endl;
+	cout << "                Vdd" << endl;
+	cout << "                 |    | Id" << endl;
+	cout << "                 Rd   v" << endl;
+	cout << "                 |" << endl;
+	cout << "                 | " << endl;
+	cout << "                 D" << endl;
+	cout << "                /" << endl;
+	cout << "   ----G----> JFET" << endl;
+	cout << "   |            \\" << endl;
+	cout << "   |             S" << endl;
+	cout << "   Rg            |" << endl;
+	cout << "   |             Rs" << endl;
+	cout << "   |             |" << endl;
+	cout << "  GND           GND" << endl;
+	cout << "Note that the value of source resistor Rs must be greater than Rs_min = |Vgs/Id|,to establishing a JFET bias point" << endl;
+	cout << "The step to determine Vgs and Vds can be explained in JFET self biasing simulation." << endl;
+	cout << "\nDo you want jump to JFET simulation? (Y/N):";
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N') {
+		cout << "INPUT ERROR, input (Y/N)." << endl;
 		cout << "\nDo you want jump to JFET simulation? (Y/N):";
 		cin >> proceed;
-		while (toupper(proceed) != 'Y' && toupper(proceed) != 'N') {
-			cout << "INPUT ERROR, input (Y/N)." << endl;
-			cout << "\nDo you want jump to JFET simulation? (Y/N):";
-			cin >> proceed;
-		}
-		if (toupper(proceed) == 'Y') // added by Daniel to debug
-			jfet();
+	}
+	if (toupper(proceed) == 'Y') // added by Daniel to debug
+		jfet();
 
-		cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
+	{
+		cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+		cout << "Do you want to proceed? (Y/N): ";
 		cin >> proceed;
-		while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
-		{
-			cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
-			cout << "Do you want to proceed? (Y/N): ";
-			cin >> proceed;
-		}
-		if (toupper(proceed) == 'N') {
-			cout << "Return to notes selection...";
-			return;
-		}
+	}
+	if (toupper(proceed) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
 
-		cout << "\n3.4 The Metal-Oxide Semiconductor Field-Effect Transistor (MOSFET)" << endl;
-		cout << "==================================================================" << endl;
-		cout << "There are two types of MOSFET: D-MOSFET and E-MOSFET." << endl;
-		cout << "Boths of them are having p and n channel. The construction of n-channel MOSFET was shown below." << endl << endl;
+	cout << "\n3.4 The Metal-Oxide Semiconductor Field-Effect Transistor (MOSFET)" << endl;
+	cout << "==================================================================" << endl;
+	cout << "There are two types of MOSFET: D-MOSFET and E-MOSFET." << endl;
+	cout << "Boths of them are having p and n channel. The construction of n-channel MOSFET was shown below." << endl << endl;
 
-		cout << "       Source       Gate(Metal)    Drain\n";
-		cout << "        |             |              |\n";
-		cout << "        |             |              |\n";
-		cout << "        |       ______|______        |\n";
-		cout << "        |      | Oxide (SiO2)|       |\n";
-		cout << "     | ==[n]===== n-Channel ====>>===[n]==|\n";
-		cout << "     |        p-type Substrate            |\n";
-		cout << "     | ___________________________________|\n";
+	cout << "       Source       Gate(Metal)    Drain\n";
+	cout << "        |             |              |\n";
+	cout << "        |             |              |\n";
+	cout << "        |       ______|______        |\n";
+	cout << "        |      | Oxide (SiO2)|       |\n";
+	cout << "     | ==[n]===== n-Channel ====>>===[n]==|\n";
+	cout << "     |        p-type Substrate            |\n";
+	cout << "     | ___________________________________|\n";
 
-		cout << "An n-channel MOSFET operates in the depletion mode when a negative gate-to-source" << endl;
-		cout << "voltage is applied.In this mode, its characteristics are similar to that of JFET." << endl;
-		cout << "When a positive gate - to - source voltage is applied, the n - channel MOSFET operates" << endl;
-		cout << "in the enhancement - mode." << endl;
-		cout << "*Note that E-MOSFET only can operates in enhancement mode while D-MOSFET can operates in both mode." << endl;
+	cout << "An n-channel MOSFET operates in the depletion mode when a negative gate-to-source" << endl;
+	cout << "voltage is applied.In this mode, its characteristics are similar to that of JFET." << endl;
+	cout << "When a positive gate - to - source voltage is applied, the n - channel MOSFET operates" << endl;
+	cout << "in the enhancement - mode." << endl;
+	cout << "*Note that E-MOSFET only can operates in enhancement mode while D-MOSFET can operates in both mode." << endl;
 
-		cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
+	{
+		cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+		cout << "Do you want to proceed? (Y/N): ";
 		cin >> proceed;
-		while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
-		{
-			cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
-			cout << "Do you want to proceed? (Y/N): ";
-			cin >> proceed;
-		}
-		if (toupper(proceed) == 'N') {
-			cout << "Return to notes selection...";
-			return;
-		}
+	}
+	if (toupper(proceed) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
 
-		cout << "\n3.5 MOSFET Characteristics and Parameters" << endl;
-		cout << "=========================================" << endl;
-		cout << "The transconductance curve equation for D-MOSFET is same with JFET." << endl;
-		cout << "For E-MOSFET, the square law equation is:" << endl;
-		cout << " _____________________________" << endl;
-		cout << "| Id = K [1-(Vgs / Vgs_th)]^2 |" << endl;
-		cout << " -----------------------------" << endl;
-		cout << "where Vgs_th is the threshold voltage and the constant K can be given:" << endl;
-		cout << " _______________________________" << endl;
-		cout << "| K = Id_on / (Vgs_on-Vgs_th)^2 |" << endl;
-		cout << " -------------------------------" << endl;
-		cout << "where Id_on and Vgs_on can be found from the data sheet." << endl;
+	cout << "\n3.5 MOSFET Characteristics and Parameters" << endl;
+	cout << "=========================================" << endl;
+	cout << "The transconductance curve equation for D-MOSFET is same with JFET." << endl;
+	cout << "For E-MOSFET, the square law equation is:" << endl;
+	cout << " _____________________________" << endl;
+	cout << "| Id = K [1-(Vgs / Vgs_th)]^2 |" << endl;
+	cout << " -----------------------------" << endl;
+	cout << "where Vgs_th is the threshold voltage and the constant K can be given:" << endl;
+	cout << " _______________________________" << endl;
+	cout << "| K = Id_on / (Vgs_on-Vgs_th)^2 |" << endl;
+	cout << " -------------------------------" << endl;
+	cout << "where Id_on and Vgs_on can be found from the data sheet." << endl;
 
-		cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
+	{
+		cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+		cout << "Do you want to proceed? (Y/N): ";
 		cin >> proceed;
-		while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
-		{
-			cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
-			cout << "Do you want to proceed? (Y/N): ";
-			cin >> proceed;
-		}
-		if (toupper(proceed) == 'N') {
-			cout << "Return to notes selection...";
-			return;
-		}
+	}
+	if (toupper(proceed) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
 
-		cout << "\n3.6 E-MOSFET Biasing " << endl;
-		cout << "=====================" << endl;
-		cout << "The most common biasing for E-MOSFET is voltage-divider bias and drain-feedback bias" << endl;
-		cout << "The circuit shown below is the voltage-divider bias model for E-MOSFET: " << endl;
-		cout << "                Vdd" << endl;
-		cout << "   --------------|" << endl;
-		cout << "   |             |   | Id " << endl;
-		cout << "   R1            Rd  V" << endl;
-		cout << "   |             | " << endl;
-		cout << "   |             D" << endl;
-		cout << "   |            /" << endl;
-		cout << "   ----G----E_MOSFET" << endl;
-		cout << "   |            \\" << endl;
-		cout << "   |             S" << endl;
-		cout << "   |             |" << endl;
-		cout << "   R2            |" << endl;
-		cout << "   |             |" << endl;
-		cout << "  GND           GND" << endl;
-		cout << "The way we analyse the circuit is almost same with JFET and D-MOSFET by using Kirchhoff's Law" << endl;
-		cout << "It can be explained in E-MOSFET's simulation." << endl << endl;
+	cout << "\n3.6 E-MOSFET Biasing " << endl;
+	cout << "=====================" << endl;
+	cout << "The most common biasing for E-MOSFET is voltage-divider bias and drain-feedback bias" << endl;
+	cout << "The circuit shown below is the voltage-divider bias model for E-MOSFET: " << endl;
+	cout << "                Vdd" << endl;
+	cout << "   --------------|" << endl;
+	cout << "   |             |   | Id " << endl;
+	cout << "   R1            Rd  V" << endl;
+	cout << "   |             | " << endl;
+	cout << "   |             D" << endl;
+	cout << "   |            /" << endl;
+	cout << "   ----G----E_MOSFET" << endl;
+	cout << "   |            \\" << endl;
+	cout << "   |             S" << endl;
+	cout << "   |             |" << endl;
+	cout << "   R2            |" << endl;
+	cout << "   |             |" << endl;
+	cout << "  GND           GND" << endl;
+	cout << "The way we analyse the circuit is almost same with JFET and D-MOSFET by using Kirchhoff's Law" << endl;
+	cout << "It can be explained in E-MOSFET's simulation." << endl << endl;
 
+	cout << "\nDo you want jump to E-MOSFET simulation? (Y/N):";
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N') {
+		cout << "INPUT ERROR, input (Y/N)." << endl;
 		cout << "\nDo you want jump to E-MOSFET simulation? (Y/N):";
 		cin >> proceed;
-		while (toupper(proceed) != 'Y' && toupper(proceed) != 'N') {
-			cout << "INPUT ERROR, input (Y/N)." << endl;
-			cout << "\nDo you want jump to E-MOSFET simulation? (Y/N):";
-			cin >> proceed;
-		}
-		if (toupper(proceed) == 'Y') // added by Daniel to debug
-			mosfet();
+	}
+	if (toupper(proceed) == 'Y') // added by Daniel to debug
+		mosfet();
 
-		cout << "\nCongrats!! you are done on reading the notes for Chapter 3. (*^V^*)/" << endl;
-		cout << "PRESS any key to return to note selection\nor PRESS 'R' to return to the introduction of Chapter 3." << endl;
-		cin >> proceed;
-		if (toupper(proceed) == 'R')
-			notes_FET();
+	cout << "\nCongrats!! you are done on reading the notes for Chapter 3. (*^V^*)/" << endl;
+	cout << "PRESS any key to return to note selection\nor PRESS 'R' to return to the introduction of Chapter 3." << endl;
+	cin >> proceed;
+	if (toupper(proceed) == 'R')
+		notes_FET();
 }
