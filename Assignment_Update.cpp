@@ -11,6 +11,7 @@ struct User {
 	string Name;
 	int ID;
 	int score;
+	bool attempt;
 	float ans[ansnum];
 };//hi//hihihihihi
 void cal(int);
@@ -1013,6 +1014,7 @@ void loaduserdata(User* stu) {
 
 void getinfo(User& stu) {
 	cout << "Enter your name:";
+	cin.ignore();
 	getline(cin, stu.Name);
 	cout << "Enter your student ID:";
 	cin >> stu.ID;
