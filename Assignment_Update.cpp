@@ -1,6 +1,6 @@
-﻿#include <iostream>
-#include <string>
-#include <cmath>
+﻿#include<iostream>
+#include<string>
+#include<cmath>
 #include<iomanip>
 #include<fstream>
 #include<cctype>
@@ -10,8 +10,10 @@ const int num = 100;
 struct User {
 	string Name;
 	int ID;
-	int score;
-	bool attempt;
+	int result_Test1;
+	int result_Test2;
+	bool attempt_Test1;
+	bool attempt_Test2;
 	float ans[ansnum];
 };//hi//hihihihihi
 void cal(int);
@@ -28,36 +30,63 @@ void checksubmit(float*, float*, int);
 int check(float*, int&, float*);
 int checksection(float*, float*, int, int);
 void review(float*, float*, int);
-float fun1();
-void clamper();
-void clipper();
 
-//try using push in github
-//test merge
+
+//HOST FUNCTION
 bool hostLogin();//Daniel
-bool hostMenu();//Daniel
+void hostMenu();//Daniel
+
+// Test1_function
+struct Test1 {
+	int num; //Qustion No.
+	string question;
+	string objective_A;
+	string objective_B;
+	string objective_C;
+	string objective_D;
+	char ans;
+	bool isDeleted;
+};
+Test1 Quizz[10]; //store 10 test1 questions
+int Test1Count = 0; //count question from file
+const int MAX_Numbers = 10; //maximum number
+// quizz function for user
+void Test1_quizz();
+int checkAns(char ans, char answer);
+void shuffle(int* temp, int Question_Numbers);//temporary storage for the sequence array
+//quizz function for host
+bool showTest1();
+void createQuizz();
+void editQuizz(int number);
+void deleteQuizz(int num);
+//file operation
+void saveTest1();
+void LoadTest1();
+
+// Simulator
+void clipper();
+void clamper();
+void simulator1_BJT();
+void simulator2_BJT();
+void simulator3_BJT();
 void jfet(); //Daniel
 void mosfet(); //Daniel
 void jfet_DrainCurrent(int option);//Daniel
-void notes_FET(); //Daniel
-//trang
 void non_inverting();
 void voltageFollower();
 void invertingAmplifier();
 
-// Zinor
-void simulator1_BJT();
-void simulator2_BJT();
-void simulator3_BJT();
+//Notes
 void notes_BJT();
-
+void notes_FET();
 
 int main() {
-	int opt, userindex = -1;
+	LoadTest1();
 
+	int userindex = -1;
 	int choice;
-	bool Return = true;
-	do
+
+	while (true)
 	{
 		cout << "=================================\n";
 		cout << "   WELCOME TO BASIC ELECTRONIC   \n";
@@ -65,10 +94,10 @@ int main() {
 		cout << "Please select mode:\n";
 		cout << "1. Host Mode\n";
 		cout << "2. User Mode\n";
-		cout << "0. Exit\n";
+		cout << "3. Exit\n";
 		cout << "Choice (0~2): ";
 		cin >> choice;
-		while (choice != 0 && choice != 1 && choice != 2)
+		while (choice != 3 && choice != 1 && choice != 2)
 		{
 			cout << "Invalid input please enter 0 to 2." << endl;
 			cout << "Enter your choice: ";
@@ -79,50 +108,47 @@ int main() {
 		case 1:
 		{
 			if (hostLogin())
-				Return = hostMenu();
-			else
-				Return = true;
+				hostMenu();
 			break;
 		}
 		case 2:
 		{
-			cout << "userMenu";//zk code
-			Return = false;
+			if (true)//pavan userLogin function
+			{
+				User stu[num] = {};
+
+				fstream list;
+				list.open("Userlist", ios::app);
+				list.close();
+				if (!checkopenfile(list, "Userlist")) {
+					return 1; // Exit if file cannot be opened
+				}
+				loaduserdata(stu);
+
+				userindex = findslot(stu);
+				if (userindex != -1) {
+					getinfo(stu[userindex]);
+				}
+				else {
+					cout << "The userlist is full." << endl;
+				}
+
+				userlist(stu, userindex);
+
+
+				menu(stu, userindex); //zikang code should be arrange to a function for clean code
+			}
 			break;
 		}
-		case 0:
+		case 3:
 		{
 			cout << "Exitting program...";
+			return 0;
 			break;
 		}
 		}
-	} while (Return);
-	//By zikang
-	User stu[num] = {};
-
-	fstream list;
-	list.open("Userlist", ios::app);
-	list.close();
-	if (!checkopenfile(list, "Userlist")) {
-		return 1; // Exit if file cannot be opened
-	}
-	loaduserdata(stu);
-
-	userindex = findslot(stu);
-	if (userindex != -1) {
-		getinfo(stu[userindex]);
-	}
-	else {
-		cout << "The userlist is full." << endl;
 	}
 
-	userlist(stu, userindex);
-
-
-	menu(stu, userindex);
-
-
-	return 0;
 }
 
 //Daniel
@@ -164,31 +190,87 @@ bool hostLogin() {
 	return false;
 }
 //Daniel
-bool hostMenu()
+void hostMenu()
 {
-	int option;
-	cout << "\n--- Host Menu ---\n";
-	cout << "1. Show Student Result\n";
-	cout << "2. User List\n";
-	cout << "3. Edit / Delete Comments\n";
-	cout << "0. Logout\n";
-	cout << "Enter your choice(0~3):";
-	cin >> option;
-	switch (option) {
-	case 0:
+	int option = 0;
+	char choice;
+	while (true)
 	{
-		cout << "Exit..." << endl << endl;
-		return true;
-		break;
-	}
-	case 1:
-	{
-		cout << "1";
-		return false;
-		break;
-	}
-	default:
-		return true; // temporary logout
+		cout << "\n--- Host Menu ---\n";
+		cout << "1. Show student comment\n";
+		cout << "2. Show Test1 Question\n";
+		cout << "3. Show Student Result\n";
+		cout << "4. User List\n";
+		cout << "5. Logout\n";
+		cout << "Enter your choice(1~5):";
+		cin >> option;
+		switch (option)
+		{
+		case 5:
+		{
+			cout << "Exit..." << endl << endl;
+			return;
+		}
+		case 1:
+		{
+			cout << "1"; //add your function here
+			break;
+		}
+		case 2:
+		{
+			do {
+				cout << "---Show Test 1 Question---" << endl;
+
+				if (!showTest1())
+				{
+					cout << "Do you want to create a new Question for Test 1 (MCQ)\n";
+					cout << "'Y' for yes, 'N' to return menu:";
+					cin >> choice;
+					while (toupper(choice) != 'Y' && toupper(choice) != 'N') {
+						cout << "INPUT ERROR, input (Y/N):" << endl;
+						cin >> choice;
+					}
+					if (toupper(choice) == 'Y') // added by Daniel to debug
+						createQuizz();
+					else
+					{
+						cout << "back to menu...\n";
+						break;
+					}
+				}
+				else
+				{
+					cout << "Enter the question you want to eddit or any int to create (999 to return):";
+					cin >> option;
+					while (cin.fail())
+					{
+						cin.clear();
+						cin.ignore();
+						cout << "Invalid input ..." << endl;
+						cout << "Enter the question you want to eddit or any int to create (999 to return):";
+						cin >> option;
+					}//check valid data
+					cout << "testing option:" << option << endl; //testing
+					cout << "option % Test1Count + 1= " << option % (Test1Count + 1) << endl;//testing pls delete
+					if (option == 999) {
+						cout << "Cancel successfully, exit to menu..." << endl;
+						break;
+					}
+					else if (option == (option % (Test1Count + 1))) //when user key in the question
+						editQuizz(option);
+					else
+						createQuizz();
+				}
+			} while (true);
+			break;
+		}
+		case 3:
+		{
+			cout << "3";
+			break;
+
+		}
+		}
 	}
 }
 
@@ -196,47 +278,50 @@ bool hostMenu()
 void menu(User stu[], int userindex) {
 	float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
 		10000, 200, 350 };
-	int a, b, opt;
+	int a, opt;
 	if (userindex < 0 || userindex >= num) {
 		cout << "ERROR! Invalid user index!" << endl;
 		return;
 	}
 	do {
-		cout << "Choose the action you want to proceed 1. note, 2. quiz, 3. stimulator, 4. userlist, 5. end:(i.e. 1,2,3,4,5 out)";
+		cout << "Choose the action you want to proceed 1. note\n2. Test 1\n3. Test 2\n4. stimulator\n5. userlist\n6. end:(i.e. 1,2,3,4,5 out)";
 		cin >> opt;
 		switch (opt) {
 		case 1:
 			note();
 			break;
 		case 2:
-			if (!stu[userindex].attempt) {
-				stu[userindex].score = quiz(stu[userindex].ans, checkans);
-				cout << "Score updated:" << stu[userindex].score << endl;
-				stu[userindex].attempt = true;
+			Test1_quizz();
+			break;
+		case 3:
+			if (!stu[userindex].attempt_Test2) {
+				stu[userindex].result_Test2 = quiz(stu[userindex].ans, checkans);
+				cout << "Score updated:" << stu[userindex].result_Test2 << endl;
+				stu[userindex].attempt_Test2 = true;
 			}
 			else {
 				cout << "You have submitted the quiz\n";
-				review(stu[userindex].ans, checkans, stu[userindex].score);
+				review(stu[userindex].ans, checkans, stu[userindex].result_Test2);
 			}
 			break;
-		case 3:
+		case 4:
 			do {
 				cout << "Select the type of stimulator\n1.Clipper\n2.Clamper\n3.BJT 1\n4.BJT 2\n5.BJT 3\n6.JFET\n7. E-MOSFET\n8-10.chp4 \n0.return:";
 				cin >> a;
 				cal(a); //select stimular in menu 
 			} while (a != 0);
 			break;
-		case 4:
+		case 5:
 			userlist(stu, userindex);
 			break;
-		case 5:
+		case 6:
 			cout << "Programme end." << endl;
 			savefile(stu, "Userlist");
 			break;
 		default:
 			cout << "Invalid input try to choose again.(1,2,3,4)" << endl;
 		}
-	} while (opt != 5);
+	} while (opt != 6);
 }
 int quiz(float* answer, float* checkans) {
 	int i = 0, points = 0, record[12] = {};
@@ -986,11 +1071,11 @@ void loaduserdata(User* stu) {
 			stu[i].ID = stoi(line);
 		}
 		if (getline(list, line, '|')) {
-			stu[i].score = stoi(line);
+			stu[i].result_Test2 = stoi(line);
 		}
 		if (getline(list, line, '|'))
 		{
-			stu[i].attempt = stoi(line);
+			stu[i].attempt_Test2 = stoi(line);
 		}
 		if (getline(list, line, '|')) {
 			emptyspace = line;
@@ -1018,14 +1103,14 @@ void getinfo(User& stu) {
 	getline(cin, stu.Name);
 	cout << "Enter your student ID:";
 	cin >> stu.ID;
-	stu.score = 0;
+	stu.result_Test2 = 0;
 
 }
 void userlist(User stu[], int index) {
 	for (int i = 0; i <= index; i++) {
 		cout << "Name: " << left << setw(20) << stu[i].Name <<
 			" | Student ID: " << setw(7) << stu[i].ID <<
-			" | Score: " << stu[i].score << endl;
+			" | Score: " << stu[i].result_Test2 << endl;
 
 	}
 }
@@ -1045,7 +1130,7 @@ void savefile(User* stu, string name) {
 		cout << "Error opening file for saving: " << name << endl;
 		return;
 	}
-	list << stu[0].Name << "|" << stu[0].ID << "|" << stu[0].score << "|" << stu[0].attempt << "|" << endl;
+	list << stu[0].Name << "|" << stu[0].ID << "|" << stu[0].result_Test2 << "|" << stu[0].attempt_Test2 << "|" << endl;
 	list << "|";
 	for (int j = 0; j < ansnum; j++) {
 		list << stu[0].ans[j] << "|";
@@ -1053,7 +1138,7 @@ void savefile(User* stu, string name) {
 	list << "\n";
 	for (int i = 1; i < num; i++) {
 		if (stu[i].ID != 0) {
-			list << "|" << stu[i].Name << "|" << stu[i].ID << "|" << stu[i].score << "|" << stu[i].attempt << "|" << endl;
+			list << "|" << stu[i].Name << "|" << stu[i].ID << "|" << stu[i].result_Test2 << "|" << stu[i].attempt_Test2 << "|" << endl;
 			list << "|";
 			for (int j = 0; j < ansnum; j++) {
 				list << stu[i].ans[j] << "|";
@@ -1155,16 +1240,279 @@ void review(float* answer, float* checkans, int score) {
 	cout << "The correct answer is: " << setw(5) << checkans[3] << setw(5) << right << ", " << setw(5) << right << checkans[4] << right
 		<< setw(15) << "Score = " << checksection(answer, checkans, 3, 4) << endl;
 
-	cout << "Total score = " << score <<"/"<<ansnum<< endl;
+	cout << "Total score = " << score << "/" << ansnum << endl;
 }
 
+void Test1_quizz()
+{
+	/* this function is to let user answer 10 question made
+	by host and each user the sequence will be shuffled*/
 
+	int sequence[MAX_Numbers] = { 1,2,3,4,5,6,7,8,9,10 };
+	int Num = 1, score = 0;
+	char ans;
+
+	shuffle(sequence, MAX_Numbers);
+
+	for (int i = 0; i < MAX_Numbers; i++) //i<10
+	{
+		if (!Quizz[sequence[i] - 1].question.empty()) {
+			cout << "Question " << Num++ << ": " << endl;
+			cout << Quizz[sequence[i] - 1].question << endl;
+			cout << "A: " << Quizz[sequence[i] - 1].objective_A << endl;
+			cout << "B: " << Quizz[sequence[i] - 1].objective_B << endl;
+			cout << "C: " << Quizz[sequence[i] - 1].objective_C << endl;
+			cout << "D: " << Quizz[sequence[i] - 1].objective_D << endl;
+			cout << "Enter your answer: ";
+			cin >> ans;
+			ans = toupper(ans);
+			score += checkAns(ans, Quizz[sequence[i] - 1].ans);
+			cout << endl;
+		}
+	}
+	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << endl;
+}
+
+void shuffle(int* temp, int Question_Numbers)//temporary storage for the sequence array
+{
+	srand(time(NULL));
+
+	int storage;//temporary keep 1 number
+	int random_element; //store the random number
+	// Fisher-Yates (exchange element tiwce to shuffle sequence)
+	for (int i = Question_Numbers - 1; i > 0; i--) {
+		random_element = rand() % (i + 1);
+		storage = temp[i];
+		temp[i] = temp[random_element]; //exchange element 
+		temp[random_element] = storage;
+	}
+}
+
+int checkAns(char response, char answer)
+{
+	int score = 0;
+	if (response == answer)
+	{
+		score++;
+		cout << "Correct!" << endl;
+	}
+	else
+	{
+		cout << "Wrong! The correct answer is " << answer << "." << endl;
+	}
+	return score;
+}
+
+bool showTest1()
+{
+	cout << "Test1Count= " << Test1Count << endl; //testing pls delete
+	if (Test1Count == 0)
+	{
+		cout << "There are no Question insert." << endl;
+		return false;
+	}
+	else {
+		for (int i = 0;i < Test1Count;i++)
+		{
+			if (Quizz[i].isDeleted == false) {
+				cout << "Question " << Quizz[i].num << ": " << endl;
+				cout << Quizz[i].question << endl << endl;
+			}
+		}
+		return true;
+	}
+
+}
+void createQuizz()
+{
+	cin.ignore(); // clear buffer
+	Test1 newQuizz;
+	newQuizz.num = Test1Count + 1;
+
+	if (Test1Count >= 10) {
+		cout << "The questions are full. Please delete before creating.\n";
+		return;
+	}
+
+	cout << "Enter your question for Question " << newQuizz.num << " (999 to cancel): " << endl;
+	getline(cin, newQuizz.question);
+	if (newQuizz.question == "999")
+	{
+		cout << "Cancel successfully, return to Edit Question..." << endl;
+		return;
+	}
+	
+	cout << "Enter the option A." << endl;
+	cout << "A :";
+	getline(cin, newQuizz.objective_A);
+
+	cout << "Enter the option B." << endl;
+	cout << "B :";
+	getline(cin, newQuizz.objective_B);
+
+	cout << "Enter the option C." << endl;
+	cout << "C :";
+	getline(cin, newQuizz.objective_C);
+
+	cout << "Enter the option D." << endl;
+	cout << "D :";
+	getline(cin, newQuizz.objective_D);
+
+	cout << "Answer for Question " << newQuizz.num << " : ";
+	cin >> newQuizz.ans;
+	cin.ignore();
+
+	newQuizz.isDeleted = false;
+
+	Quizz[Test1Count++] = newQuizz;
+	saveTest1();
+	cout << "\nThe Question was save successfully..." << endl;
+
+	//back to menu....
+}
+
+void editQuizz(int number)
+{
+	int option;
+	Test1 EditQuizz;
+	
+		EditQuizz = Quizz[number - 1]; //temporary storage
+		do {
+			cout << "Enter the part you want to edit in Question " << number << ":\n"
+				<< "1. Question\n"
+				<< "2. Option A\n"
+				<< "3. Option B\n"
+				<< "4. Option C\n"
+				<< "5. Option D\n"
+				<< "6. Correct answer\n"
+				<< "7. Delete\n"
+				<< "8. Cancel\n"
+				<< "Enter (1-8):";
+			cin >> option;
+			cin.ignore();
+			if (option == 7)
+			{
+				deleteQuizz(number - 1);
+				break;
+			}
+			else if (option == 8) break;
+			else {
+				switch (option)
+				{
+				case 1:
+					cout << "Question: " << EditQuizz.question << endl;
+					cout << "Enter your new Question:" << endl;
+					getline(cin, EditQuizz.question);
+					break;
+
+				case 2:
+					cout << "A: " << EditQuizz.objective_A << endl;
+					cout << "Enter your new Option A:" << endl;
+					getline(cin, EditQuizz.objective_A);
+					break;
+				
+				case 3:
+					cout << "B: " << EditQuizz.objective_B << endl;
+					cout << "Enter your new Option B:" << endl;
+					getline(cin, EditQuizz.objective_B);
+					break;
+				
+				case 4:
+					cout << "C: " << EditQuizz.objective_C << endl;
+					cout << "Enter your new Option C:" << endl;
+					getline(cin, EditQuizz.objective_C);
+					break;
+				
+				case 5:
+					cout << "D: " << EditQuizz.objective_D << endl;
+					cout << "Enter your new Option D:" << endl;
+					getline(cin, EditQuizz.objective_D);
+					break;
+				
+				case 6:
+					cout << "Answer: " << EditQuizz.ans << endl;
+					cout << "Enter your new Answer:" << endl;
+					cin >> EditQuizz.ans;
+					cin.ignore();
+					break;
+				
+				default: cout << "Invalid option, please Enter (1-7)";
+				}
+				Quizz[number - 1] = EditQuizz;
+				Quizz[number - 1].isDeleted = false;
+				saveTest1();
+				cout << "Editted successfully..." << endl;
+			}
+		} while (option != 8);
+}
+
+void deleteQuizz(int num)
+{
+	Quizz[num].isDeleted = true;
+	for (int i = num + 1; i < Test1Count; i++)
+	{
+		Quizz[i].num = i;
+		Quizz[i - 1] = Quizz[i];
+	}
+	Test1Count--;
+	saveTest1();
+	cout << "The quizz was deleted successfully.\n";
+}
+
+void saveTest1()
+{
+	ofstream outputFile;
+	outputFile.open("Test1");
+	for (int i = 0; i < Test1Count; i++)
+	{
+		if (Quizz[i].isDeleted == false) {
+			outputFile << Quizz[i].num << "|";
+			outputFile << Quizz[i].question << "|";
+			outputFile << Quizz[i].objective_A << "|";
+			outputFile << Quizz[i].objective_B << "|";
+			outputFile << Quizz[i].objective_C << "|";
+			outputFile << Quizz[i].objective_D << "|";
+			outputFile << Quizz[i].ans << "\n";
+
+		}
+	}
+	outputFile.close();
+}
+
+void LoadTest1()
+{
+	Test1Count = 0;
+	ifstream inFile("Test1");
+	if (!inFile) {
+		cout << "Cann't find the File\n";
+		return;
+	}
+	string line;
+	Test1 tempQuizz;
+
+	while (true)
+	{
+
+		if (!getline(inFile, line, '|')) break;
+		tempQuizz.num = stoi(line);
+
+		if (!getline(inFile, tempQuizz.question, '|')) break;
+		if (!getline(inFile, tempQuizz.objective_A, '|')) break;
+		if (!getline(inFile, tempQuizz.objective_B, '|')) break;
+		if (!getline(inFile, tempQuizz.objective_C, '|')) break;
+		if (!getline(inFile, tempQuizz.objective_D, '|')) break;
+		if (!getline(inFile, line)) break;
+		tempQuizz.ans = line[0]; //store ans to char from string line[0] means the first character.
+		tempQuizz.isDeleted = false;
+		Quizz[Test1Count++] = tempQuizz;
+
+		if (Test1Count >= MAX_Numbers) break; //break if exceed the limit
+		if (line.empty()) break;
+	}
+	inFile.close();
+}
 //add your calculator function here;
-float fun1() {
-	int a = 3;
-	cout << a << endl;
-	return a;
-}
+
 void clipper() {
 	float Vin, Vd, Vout;
 	char polar;
