@@ -106,13 +106,10 @@ int main() {
 		switch (choice)
 		{
 		case 1:
-		{
 			if (hostLogin())
 				hostMenu();
 			break;
-		}
 		case 2:
-		{
 			if (true)//pavan userLogin function
 			{
 				User stu[num] = {};
@@ -134,18 +131,13 @@ int main() {
 				}
 
 				userlist(stu, userindex);
-
-
 				menu(stu, userindex); //zikang code should be arrange to a function for clean code
 			}
 			break;
-		}
 		case 3:
-		{
 			cout << "Exitting program...";
 			return 0;
 			break;
-		}
 		}
 	}
 
@@ -207,18 +199,13 @@ void hostMenu()
 		switch (option)
 		{
 		case 5:
-		{
 			cout << "Exit..." << endl << endl;
 			return;
-		}
 		case 1:
-		{
 			cout << "1"; //add your function here
 			break;
-		}
 		case 2:
-		{
-			do {
+			while(true){
 				cout << "---Show Test 1 Question---" << endl;
 
 				if (!showTest1())
@@ -261,15 +248,11 @@ void hostMenu()
 					else
 						createQuizz();
 				}
-			} while (true);
+			}
 			break;
-		}
 		case 3:
-		{
 			cout << "3";
 			break;
-
-		}
 		}
 	}
 }
@@ -283,7 +266,7 @@ void menu(User stu[], int userindex) {
 		cout << "ERROR! Invalid user index!" << endl;
 		return;
 	}
-	do {
+	while (true){
 		cout << "Choose the action you want to proceed 1. note\n2. Test 1\n3. Test 2\n4. stimulator\n5. userlist\n6. end:(i.e. 1,2,3,4,5 out)";
 		cin >> opt;
 		switch (opt) {
@@ -317,11 +300,11 @@ void menu(User stu[], int userindex) {
 		case 6:
 			cout << "Programme end." << endl;
 			savefile(stu, "Userlist");
-			break;
+			return;
 		default:
 			cout << "Invalid input try to choose again.(1,2,3,4)" << endl;
 		}
-	} while (opt != 6);
+	} 
 }
 int quiz(float* answer, float* checkans) {
 	int i = 0, points = 0, record[12] = {};
@@ -1256,7 +1239,7 @@ void Test1_quizz()
 
 	for (int i = 0; i < MAX_Numbers; i++) //i<10
 	{
-		if (!Quizz[sequence[i] - 1].question.empty()) {
+		if (!Quizz[sequence[i] - 1].question.empty() && (!Quizz[sequence[i] - 1].isDeleted)) {
 			cout << "Question " << Num++ << ": " << endl;
 			cout << Quizz[sequence[i] - 1].question << endl;
 			cout << "A: " << Quizz[sequence[i] - 1].objective_A << endl;
