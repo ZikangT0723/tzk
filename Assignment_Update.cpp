@@ -10,8 +10,8 @@ const int num = 100;
 struct User {
 	string Name;
 	int ID;
-	int result_Test1;
-	int result_Test2;
+	float result_Test1=0; //7%
+	int result_Test2=0; //23%
 	bool attempt_Test1;
 	bool attempt_Test2;
 	float ans[ansnum];
@@ -23,7 +23,7 @@ void getinfo(User&);
 void userlist(User[], int);
 void loaduserdata(User*);
 bool checkopenfile(fstream&, string);
-void menu(User[], int);
+void userMenu(User[], int);
 int findslot(User[]);
 void savefile(User*, string);
 void checksubmit(float*, float*, int);
@@ -34,7 +34,7 @@ void review(float*, float*, int);
 
 //HOST FUNCTION
 bool hostLogin();//Daniel
-void hostMenu();//Daniel
+void hostMenu(User stu[], int userindex);//Daniel
 
 // Test1_function
 struct Test1 {
@@ -51,7 +51,7 @@ Test1 Quizz[10]; //store 10 test1 questions
 int Test1Count = 0; //count question from file
 const int MAX_Numbers = 10; //maximum number
 // quizz function for user
-void Test1_quizz();
+void Test1_quizz(User* stu,int userindex);
 int checkAns(char ans, char answer);
 void shuffle(int* temp, int Question_Numbers);//temporary storage for the sequence array
 //quizz function for host
@@ -82,7 +82,7 @@ void notes_FET();
 
 int main() {
 	LoadTest1();
-
+	User stu[num] = {};
 	int userindex = -1;
 	int choice;
 
@@ -107,13 +107,12 @@ int main() {
 		{
 		case 1:
 			if (hostLogin())
-				hostMenu();
+				hostMenu(stu,userindex);
 			break;
 		case 2:
 			if (true)//pavan userLogin function
 			{
-				User stu[num] = {};
-
+				
 				fstream list;
 				list.open("Userlist", ios::app);
 				list.close();
@@ -131,7 +130,7 @@ int main() {
 				}
 
 				userlist(stu, userindex);
-				menu(stu, userindex); //zikang code should be arrange to a function for clean code
+				userMenu(stu, userindex); //zikang code should be arrange to a function for clean code
 			}
 			break;
 		case 3:
@@ -182,7 +181,7 @@ bool hostLogin() {
 	return false;
 }
 //Daniel
-void hostMenu()
+void hostMenu(User stu[], int userindex)
 {
 	int option = 0;
 	char choice;
@@ -191,18 +190,17 @@ void hostMenu()
 		cout << "\n--- Host Menu ---\n";
 		cout << "1. Show student comment\n";
 		cout << "2. Show Test1 Question\n";
-		cout << "3. Show Student Result\n";
-		cout << "4. User List\n";
-		cout << "5. Logout\n";
+		cout << "3. User List\n";
+		cout << "4. Logout\n";
 		cout << "Enter your choice(1~5):";
 		cin >> option;
 		switch (option)
 		{
-		case 5:
+		case 4:
 			cout << "Exit..." << endl << endl;
 			return;
 		case 1:
-			cout << "1"; //add your function here
+			//comment
 			break;
 		case 2:
 			while(true){
@@ -251,14 +249,15 @@ void hostMenu()
 			}
 			break;
 		case 3:
-			cout << "3";
+			cout << "3";//userlist
+			userlist(stu, userindex);
 			break;
 		}
 	}
 }
 
 
-void menu(User stu[], int userindex) {
+void userMenu(User stu[], int userindex) {
 	float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
 		10000, 200, 350 };
 	int a, opt;
@@ -267,14 +266,21 @@ void menu(User stu[], int userindex) {
 		return;
 	}
 	while (true){
-		cout << "Choose the action you want to proceed 1. note\n2. Test 1\n3. Test 2\n4. stimulator\n5. userlist\n6. end:(i.e. 1,2,3,4,5 out)";
+		cout << "Choose the action you want to proceed \n1. note\n2. Test 1 (7%)\n3. Test 2 (23%)\n4. stimulator\n5. userlist\n6. end:(i.e. 1,2,3,4,5 out)";
 		cin >> opt;
 		switch (opt) {
 		case 1:
 			note();
 			break;
 		case 2:
-			Test1_quizz();
+			if (!stu[userindex].attempt_Test1) {
+				Test1_quizz(stu,userindex);
+			}
+			else
+			{
+				cout << "You have submitted the Test 1\n";
+				cout << "Result of test 1: " << stu[userindex].result_Test1 << " %\n\n";
+			}
 			break;
 		case 3:
 			if (!stu[userindex].attempt_Test2) {
@@ -283,7 +289,7 @@ void menu(User stu[], int userindex) {
 				stu[userindex].attempt_Test2 = true;
 			}
 			else {
-				cout << "You have submitted the quiz\n";
+				cout << "You have submitted the Test 2\n";
 				review(stu[userindex].ans, checkans, stu[userindex].result_Test2);
 			}
 			break;
@@ -306,6 +312,8 @@ void menu(User stu[], int userindex) {
 		}
 	} 
 }
+
+
 int quiz(float* answer, float* checkans) {
 	int i = 0, points = 0, record[12] = {};
 	bool same;
@@ -1046,36 +1054,39 @@ void loaduserdata(User* stu) {
 	string line;
 	string emptyspace;
 	for (int i = 0; i < num; i++) {
-
-		if (getline(list, line, '|')) {
+		
+		if (!getline(list, line, '|')) break;
 			stu[i].Name = line;
-		}
+		
 		if (getline(list, line, '|')) {
 			stu[i].ID = stoi(line);
 		}
 		if (getline(list, line, '|')) {
-			stu[i].result_Test2 = stoi(line);
+			stu[i].result_Test1 = stof(line);
 		}
 		if (getline(list, line, '|'))
 		{
-			stu[i].attempt_Test2 = stoi(line);
+			stu[i].result_Test2 = stoi(line);
 		}
 		if (getline(list, line, '|')) {
-			emptyspace = line;
+			stu[i].attempt_Test1 = stoi(line);
 		}
+		if (getline(list, line,'\n'))
+		{
+			stu[i].attempt_Test2 = stoi(line);
+		}
+		
 		for (int j = 0; j < ansnum; j++) {
-			if (getline(list, line, '|'))
+			if (getline(list, line, ','))
 			{
 				stu[i].ans[j] = stof(line);
 			}
 			else {
 				break; // Stop if no more lines to read
 			}
+			
 		}
-		if (getline(list, line, '|')) {
-			emptyspace = line;
-		}
-
+		getline(list, line);
 	}
 	list.close();
 }
@@ -1086,14 +1097,14 @@ void getinfo(User& stu) {
 	getline(cin, stu.Name);
 	cout << "Enter your student ID:";
 	cin >> stu.ID;
-	stu.result_Test2 = 0;
 
 }
 void userlist(User stu[], int index) {
 	for (int i = 0; i <= index; i++) {
 		cout << "Name: " << left << setw(20) << stu[i].Name <<
 			" | Student ID: " << setw(7) << stu[i].ID <<
-			" | Score: " << stu[i].result_Test2 << endl;
+			" | Test 1: " << stu[i].result_Test1 <<
+			" | Test 2: " << stu[i].result_Test2 << endl;
 
 	}
 }
@@ -1113,18 +1124,29 @@ void savefile(User* stu, string name) {
 		cout << "Error opening file for saving: " << name << endl;
 		return;
 	}
-	list << stu[0].Name << "|" << stu[0].ID << "|" << stu[0].result_Test2 << "|" << stu[0].attempt_Test2 << "|" << endl;
+	/*
+	list << stu[0].Name << "|"
+		<< stu[0].ID << "|" 
+		<< stu[0].result_Test2 
+		<< "|" << stu[0].attempt_Test2 
+		<< "|" << endl;
 	list << "|";
 	for (int j = 0; j < ansnum; j++) {
 		list << stu[0].ans[j] << "|";
 	}
 	list << "\n";
-	for (int i = 1; i < num; i++) {
+	*/
+	
+	for (int i = 0; i < num; i++) {
 		if (stu[i].ID != 0) {
-			list << "|" << stu[i].Name << "|" << stu[i].ID << "|" << stu[i].result_Test2 << "|" << stu[i].attempt_Test2 << "|" << endl;
-			list << "|";
+			list << stu[i].Name << "|"
+				<< stu[i].ID << "|"
+				<< stu[i].result_Test1 << "|"
+				<< stu[i].result_Test2 << "|"
+				<< stu[i].attempt_Test1 << "|"
+				<< stu[i].attempt_Test2 << "\n";
 			for (int j = 0; j < ansnum; j++) {
-				list << stu[i].ans[j] << "|";
+				list << stu[i].ans[j] << ",";
 			}
 			list << "\n";
 		}
@@ -1140,7 +1162,6 @@ int check(float* answer, int& points, float* checkans) {
 		if (checkans[i] >= 0) {
 			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
 				points++;
-
 			}
 		}
 		else {
@@ -1226,7 +1247,7 @@ void review(float* answer, float* checkans, int score) {
 	cout << "Total score = " << score << "/" << ansnum << endl;
 }
 
-void Test1_quizz()
+void Test1_quizz(User* stu,int userindex)
 {
 	/* this function is to let user answer 10 question made
 	by host and each user the sequence will be shuffled*/
@@ -1253,7 +1274,11 @@ void Test1_quizz()
 			cout << endl;
 		}
 	}
-	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << endl;
+	stu[userindex].result_Test1 = (score / float(Test1Count)) * 7;
+	stu[userindex].attempt_Test1 = true;
+	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 <<" ("
+		<<fixed<<setprecision(2)<< stu[userindex].result_Test1 <<"%)." << endl;
+
 }
 
 void shuffle(int* temp, int Question_Numbers)//temporary storage for the sequence array
