@@ -7,18 +7,20 @@
 using namespace std;
 const int ansnum = 23;
 const int num = 100;
+const float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
+		10000, 200, 350 };
 struct User {
 	string Name;
 	int ID;
-	float result_Test1=0; //7%
-	int result_Test2=0; //23%
+	float result_Test1 = 0; //7%
+	int result_Test2 = 0; //23%
 	bool attempt_Test1;
 	bool attempt_Test2;
 	float ans[ansnum];
 };//hi//hihihihihi
 void cal(int);
 void note();
-int quiz(float*, float*);
+int quiz(float*);
 void getinfo(User&);
 void userlist(User[], int);
 void loaduserdata(User*);
@@ -26,10 +28,10 @@ bool checkopenfile(fstream&, string);
 void userMenu(User[], int);
 int findslot(User[]);
 void savefile(User*, string);
-void checksubmit(float*, float*, int);
-int check(float*, int&, float*);
-int checksection(float*, float*, int, int);
-void review(float*, float*, int);
+void checksubmit(float*, int);
+int check(float*, int&);
+int checksection(float*, int, int);
+void review(float*, int);
 
 
 //HOST FUNCTION
@@ -51,7 +53,7 @@ Test1 Quizz[10]; //store 10 test1 questions
 int Test1Count = 0; //count question from file
 const int MAX_Numbers = 10; //maximum number
 // quizz function for user
-void Test1_quizz(User* stu,int userindex);
+void Test1_quizz(User* stu, int userindex);
 int checkAns(char ans, char answer);
 void shuffle(int* temp, int Question_Numbers);//temporary storage for the sequence array
 //quizz function for host
@@ -107,12 +109,12 @@ int main() {
 		{
 		case 1:
 			if (hostLogin())
-				hostMenu(stu,userindex);
+				hostMenu(stu, userindex);
 			break;
 		case 2:
 			if (true)//pavan userLogin function
 			{
-				
+
 				fstream list;
 				list.open("Userlist", ios::app);
 				list.close();
@@ -203,7 +205,7 @@ void hostMenu(User stu[], int userindex)
 			//comment
 			break;
 		case 2:
-			while(true){
+			while (true) {
 				cout << "---Show Test 1 Question---" << endl;
 
 				if (!showTest1())
@@ -258,14 +260,13 @@ void hostMenu(User stu[], int userindex)
 
 
 void userMenu(User stu[], int userindex) {
-	float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
-		10000, 200, 350 };
+
 	int a, opt;
 	if (userindex < 0 || userindex >= num) {
 		cout << "ERROR! Invalid user index!" << endl;
 		return;
 	}
-	while (true){
+	while (true) {
 		cout << "Choose the action you want to proceed \n1. note\n2. Test 1 (7%)\n3. Test 2 (23%)\n4. stimulator\n5. userlist\n6. end:(i.e. 1,2,3,4,5 out)";
 		cin >> opt;
 		switch (opt) {
@@ -274,7 +275,7 @@ void userMenu(User stu[], int userindex) {
 			break;
 		case 2:
 			if (!stu[userindex].attempt_Test1) {
-				Test1_quizz(stu,userindex);
+				Test1_quizz(stu, userindex);
 			}
 			else
 			{
@@ -284,13 +285,13 @@ void userMenu(User stu[], int userindex) {
 			break;
 		case 3:
 			if (!stu[userindex].attempt_Test2) {
-				stu[userindex].result_Test2 = quiz(stu[userindex].ans, checkans);
+				stu[userindex].result_Test2 = quiz(stu[userindex].ans);
 				cout << "Score updated:" << stu[userindex].result_Test2 << endl;
 				stu[userindex].attempt_Test2 = true;
 			}
 			else {
 				cout << "You have submitted the Test 2\n";
-				review(stu[userindex].ans, checkans, stu[userindex].result_Test2);
+				review(stu[userindex].ans, stu[userindex].result_Test2);
 			}
 			break;
 		case 4:
@@ -310,16 +311,16 @@ void userMenu(User stu[], int userindex) {
 		default:
 			cout << "Invalid input try to choose again.(1,2,3,4)" << endl;
 		}
-	} 
+	}
 }
 
 
-int quiz(float* answer, float* checkans) {
+int quiz(float* answer) {
 	int i = 0, points = 0, record[12] = {};
 	bool same;
 	char a;
 	answer[ansnum] = {};
-	checkans[ansnum] = {};
+
 	do {
 		do {
 			same = false;
@@ -378,7 +379,7 @@ int quiz(float* answer, float* checkans) {
 			} while (a == 'Y');
 			cout << "Enter the answer:";//add this two line if your question need answer more than 1
 			cin >> answer[0];     //add this two line if your question need answer more than 1, answer[i+1]
-			checksubmit(answer, checkans, 0);
+			checksubmit(answer, 0);
 			i++;
 			break;
 		case 2:
@@ -415,8 +416,8 @@ int quiz(float* answer, float* checkans) {
 			cin >> answer[1];
 			cout << "Enter the answer of Vout(-ve):";
 			cin >> answer[2];
-			checksubmit(answer, checkans, 1);
-			checksubmit(answer, checkans, 2);
+			checksubmit(answer, 1);
+			checksubmit(answer, 2);
 			i++;
 			break;
 		case 3:
@@ -453,8 +454,8 @@ int quiz(float* answer, float* checkans) {
 			cin >> answer[3];
 			cout << "Enter the answer of Vout(-ve):";
 			cin >> answer[4];
-			checksubmit(answer, checkans, 3);
-			checksubmit(answer, checkans, 4);
+			checksubmit(answer, 3);
+			checksubmit(answer, 4);
 			i++;
 			break;
 		case 4:
@@ -497,8 +498,8 @@ int quiz(float* answer, float* checkans) {
 			cin >> answer[5];
 			cout << "Enter the answer for VCE (V):";
 			cin >> answer[6];
-			checksubmit(answer, checkans, 5);
-			checksubmit(answer, checkans, 6);
+			checksubmit(answer, 5);
+			checksubmit(answer, 6);
 			i++;
 			break;
 		case 5:
@@ -538,8 +539,8 @@ int quiz(float* answer, float* checkans) {
 			cin >> answer[7];
 			cout << "Enter the answer dor VCE in 0.2mA(V):";
 			cin >> answer[8];
-			checksubmit(answer, checkans, 7);
-			checksubmit(answer, checkans, 8);
+			checksubmit(answer, 7);
+			checksubmit(answer, 8);
 			i++;
 			break;
 		case 6:
@@ -585,7 +586,7 @@ int quiz(float* answer, float* checkans) {
 			} while (a == 'Y');
 			cout << "\nEnter the answer for AV: ";
 			cin >> answer[9]; // havent change ''''
-			checksubmit(answer, checkans, 9);
+			checksubmit(answer, 9);
 			i++;
 			break;
 
@@ -620,8 +621,8 @@ int quiz(float* answer, float* checkans) {
 			cin >> answer[10];
 			cout << "Enter the answer for gm (in micro-Siemens):";
 			cin >> answer[11];
-			checksubmit(answer, checkans, 10);
-			checksubmit(answer, checkans, 11);
+			checksubmit(answer, 10);
+			checksubmit(answer, 11);
 			i++;
 			break;
 		case 8:// Ans: V_DS: 8.9 V_GS:-1.1
@@ -659,8 +660,8 @@ int quiz(float* answer, float* checkans) {
 			cin >> answer[12];
 			cout << "Enter the answer for V_GS (in volts and round to two decimals):";
 			cin >> answer[13];
-			checksubmit(answer, checkans, 12);
-			checksubmit(answer, checkans, 13);
+			checksubmit(answer, 12);
+			checksubmit(answer, 13);
 			i++;
 			break;
 		case 9:// Ans 12.7 ; 3.13
@@ -698,8 +699,8 @@ int quiz(float* answer, float* checkans) {
 			cin >> answer[14];
 			cout << "Enter the answer for V_GS (in volts and round to two decimals):";
 			cin >> answer[15];
-			checksubmit(answer, checkans, 14);
-			checksubmit(answer, checkans, 15);
+			checksubmit(answer, 14);
+			checksubmit(answer, 15);
 			i++;
 			break;
 
@@ -747,9 +748,9 @@ int quiz(float* answer, float* checkans) {
 			cin >> answer[17];
 			cout << "Enter the answer for the output impedance (in micro ohms):";
 			cin >> answer[18];
-			checksubmit(answer, checkans, 16);
-			checksubmit(answer, checkans, 17);
-			checksubmit(answer, checkans, 18);
+			checksubmit(answer, 16);
+			checksubmit(answer, 17);
+			checksubmit(answer, 18);
 			i++;
 			break;
 		case 11://I
@@ -791,8 +792,8 @@ int quiz(float* answer, float* checkans) {
 			cin >> answer[19];
 			cout << "Enter the answer for the input impedance:";
 			cin >> answer[20];
-			checksubmit(answer, checkans, 19);
-			checksubmit(answer, checkans, 20);
+			checksubmit(answer, 19);
+			checksubmit(answer, 20);
 			i++;
 			break;
 		case 12://VF
@@ -835,8 +836,8 @@ int quiz(float* answer, float* checkans) {
 			cin >> answer[21];
 			cout << "Enter the answer for the output impedance (in micro ohms):";
 			cin >> answer[22];
-			checksubmit(answer, checkans, 21);
-			checksubmit(answer, checkans, 22);
+			checksubmit(answer, 21);
+			checksubmit(answer, 22);
 			i++;
 			break;
 
@@ -851,7 +852,7 @@ int quiz(float* answer, float* checkans) {
 
 
 	} while (record[i] != 13);
-	check(answer, points, checkans);
+	check(answer, points);
 	return points;
 
 
@@ -1054,10 +1055,10 @@ void loaduserdata(User* stu) {
 	string line;
 	string emptyspace;
 	for (int i = 0; i < num; i++) {
-		
+
 		if (!getline(list, line, '|')) break;
-			stu[i].Name = line;
-		
+		stu[i].Name = line;
+
 		if (getline(list, line, '|')) {
 			stu[i].ID = stoi(line);
 		}
@@ -1071,11 +1072,11 @@ void loaduserdata(User* stu) {
 		if (getline(list, line, '|')) {
 			stu[i].attempt_Test1 = stoi(line);
 		}
-		if (getline(list, line,'\n'))
+		if (getline(list, line, '\n'))
 		{
 			stu[i].attempt_Test2 = stoi(line);
 		}
-		
+
 		for (int j = 0; j < ansnum; j++) {
 			if (getline(list, line, ','))
 			{
@@ -1084,7 +1085,7 @@ void loaduserdata(User* stu) {
 			else {
 				break; // Stop if no more lines to read
 			}
-			
+
 		}
 		getline(list, line);
 	}
@@ -1126,9 +1127,9 @@ void savefile(User* stu, string name) {
 	}
 	/*
 	list << stu[0].Name << "|"
-		<< stu[0].ID << "|" 
-		<< stu[0].result_Test2 
-		<< "|" << stu[0].attempt_Test2 
+		<< stu[0].ID << "|"
+		<< stu[0].result_Test2
+		<< "|" << stu[0].attempt_Test2
 		<< "|" << endl;
 	list << "|";
 	for (int j = 0; j < ansnum; j++) {
@@ -1136,7 +1137,7 @@ void savefile(User* stu, string name) {
 	}
 	list << "\n";
 	*/
-	
+
 	for (int i = 0; i < num; i++) {
 		if (stu[i].ID != 0) {
 			list << stu[i].Name << "|"
@@ -1155,7 +1156,7 @@ void savefile(User* stu, string name) {
 	cout << "User data saved successfully." << endl;
 }
 
-int check(float* answer, int& points, float* checkans) {
+int check(float* answer, int& points) {
 	points = 0;       //9-19: Q8-Q12
 	//insert your answer here
 	for (int i = 0; i < 23; i++) {
@@ -1173,7 +1174,7 @@ int check(float* answer, int& points, float* checkans) {
 	}
 	return points;
 }
-void checksubmit(float* answer, float* checkans, int i) {
+void checksubmit(float* answer, int i) {
 	if (checkans[i] >= 0) {
 		if ((checkans[i] - (checkans[i] * 5 / 100)) >= *(answer + i) || *(answer + i) >= (checkans[i] + (checkans[i] * 5 / 100))) {
 			cout << "Your answer " << answer[i] << " is wrong!\n";
@@ -1188,7 +1189,7 @@ void checksubmit(float* answer, float* checkans, int i) {
 		}
 	}
 }
-int checksection(float* answer, float* checkans, int i, int range) {
+int checksection(float* answer, int i, int range) {
 	int points = 0;
 	for (i; i <= range; i++) {
 		if (checkans[i] >= 0) {
@@ -1205,7 +1206,7 @@ int checksection(float* answer, float* checkans, int i, int range) {
 	}
 	return points;
 }
-void review(float* answer, float* checkans, int score) {
+void review(float* answer, int score) {
 	cout << "Quesiton 2. Given the following configuration shown in figure 1, Vin = 10V, Vd = 0.7V, Vbias = 5V. " << endl;
 	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
 	cout << "   -------)|--------------------------------o +\n";
@@ -1223,7 +1224,7 @@ void review(float* answer, float* checkans, int score) {
 	cout << "                     Figure 2\n";
 	cout << "Your answer is       : " << setw(5) << right << answer[1] << setw(5) << right << ", " << setw(5) << right << answer[2] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[1] << setw(5) << right << ", " << setw(5) << right << checkans[2] << right
-		<< setw(15) << "Score = " << checksection(answer, checkans, 1, 2) << endl;
+		<< setw(15) << "Score = " << checksection(answer, 1, 2) << endl;
 
 	cout << "Quesiton 3. Given the following configuration shown in figure 1, Vin = 15V, Vd = 0.7V, Vbias = 7.5V. " << endl;
 	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
@@ -1242,12 +1243,12 @@ void review(float* answer, float* checkans, int score) {
 	cout << "                     Figure 3\n";
 	cout << "Your answer is       : " << setw(5) << answer[3] << setw(5) << right << ", " << setw(5) << right << answer[4] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[3] << setw(5) << right << ", " << setw(5) << right << checkans[4] << right
-		<< setw(15) << "Score = " << checksection(answer, checkans, 3, 4) << endl;
+		<< setw(15) << "Score = " << checksection(answer, 3, 4) << endl;
 
 	cout << "Total score = " << score << "/" << ansnum << endl;
 }
 
-void Test1_quizz(User* stu,int userindex)
+void Test1_quizz(User* stu, int userindex)
 {
 	/* this function is to let user answer 10 question made
 	by host and each user the sequence will be shuffled*/
@@ -1257,6 +1258,11 @@ void Test1_quizz(User* stu,int userindex)
 	char ans;
 
 	shuffle(sequence, MAX_Numbers);
+	if (Test1Count == 0) {
+		cout << "There are no Question uploaded by Teacher." << endl;
+		return;
+	}
+
 
 	for (int i = 0; i < MAX_Numbers; i++) //i<10
 	{
@@ -1276,8 +1282,8 @@ void Test1_quizz(User* stu,int userindex)
 	}
 	stu[userindex].result_Test1 = (score / float(Test1Count)) * 7;
 	stu[userindex].attempt_Test1 = true;
-	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 <<" ("
-		<<fixed<<setprecision(2)<< stu[userindex].result_Test1 <<"%)." << endl;
+	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << " ("
+		<< fixed << setprecision(2) << stu[userindex].result_Test1 << "%)." << endl;
 
 }
 
@@ -1320,7 +1326,7 @@ bool showTest1()
 		return false;
 	}
 	else {
-		for (int i = 0;i < Test1Count;i++)
+		for (int i = 0; i < Test1Count; i++)
 		{
 			if (Quizz[i].isDeleted == false) {
 				cout << "Question " << Quizz[i].num << ": " << endl;
@@ -1349,7 +1355,7 @@ void createQuizz()
 		cout << "Cancel successfully, return to Edit Question..." << endl;
 		return;
 	}
-	
+
 	cout << "Enter the option A." << endl;
 	cout << "A :";
 	getline(cin, newQuizz.objective_A);
@@ -1383,75 +1389,75 @@ void editQuizz(int number)
 {
 	int option;
 	Test1 EditQuizz;
-	
-		EditQuizz = Quizz[number - 1]; //temporary storage
-		do {
-			cout << "Enter the part you want to edit in Question " << number << ":\n"
-				<< "1. Question\n"
-				<< "2. Option A\n"
-				<< "3. Option B\n"
-				<< "4. Option C\n"
-				<< "5. Option D\n"
-				<< "6. Correct answer\n"
-				<< "7. Delete\n"
-				<< "8. Cancel\n"
-				<< "Enter (1-8):";
-			cin >> option;
-			cin.ignore();
-			if (option == 7)
-			{
-				deleteQuizz(number - 1);
-				break;
-			}
-			else if (option == 8) break;
-			else {
-				switch (option)
-				{
-				case 1:
-					cout << "Question: " << EditQuizz.question << endl;
-					cout << "Enter your new Question:" << endl;
-					getline(cin, EditQuizz.question);
-					break;
 
-				case 2:
-					cout << "A: " << EditQuizz.objective_A << endl;
-					cout << "Enter your new Option A:" << endl;
-					getline(cin, EditQuizz.objective_A);
-					break;
-				
-				case 3:
-					cout << "B: " << EditQuizz.objective_B << endl;
-					cout << "Enter your new Option B:" << endl;
-					getline(cin, EditQuizz.objective_B);
-					break;
-				
-				case 4:
-					cout << "C: " << EditQuizz.objective_C << endl;
-					cout << "Enter your new Option C:" << endl;
-					getline(cin, EditQuizz.objective_C);
-					break;
-				
-				case 5:
-					cout << "D: " << EditQuizz.objective_D << endl;
-					cout << "Enter your new Option D:" << endl;
-					getline(cin, EditQuizz.objective_D);
-					break;
-				
-				case 6:
-					cout << "Answer: " << EditQuizz.ans << endl;
-					cout << "Enter your new Answer:" << endl;
-					cin >> EditQuizz.ans;
-					cin.ignore();
-					break;
-				
-				default: cout << "Invalid option, please Enter (1-7)";
-				}
-				Quizz[number - 1] = EditQuizz;
-				Quizz[number - 1].isDeleted = false;
-				saveTest1();
-				cout << "Editted successfully..." << endl;
+	EditQuizz = Quizz[number - 1]; //temporary storage
+	do {
+		cout << "Enter the part you want to edit in Question " << number << ":\n"
+			<< "1. Question\n"
+			<< "2. Option A\n"
+			<< "3. Option B\n"
+			<< "4. Option C\n"
+			<< "5. Option D\n"
+			<< "6. Correct answer\n"
+			<< "7. Delete\n"
+			<< "8. Cancel\n"
+			<< "Enter (1-8):";
+		cin >> option;
+		cin.ignore();
+		if (option == 7)
+		{
+			deleteQuizz(number - 1);
+			break;
+		}
+		else if (option == 8) break;
+		else {
+			switch (option)
+			{
+			case 1:
+				cout << "Question: " << EditQuizz.question << endl;
+				cout << "Enter your new Question:" << endl;
+				getline(cin, EditQuizz.question);
+				break;
+
+			case 2:
+				cout << "A: " << EditQuizz.objective_A << endl;
+				cout << "Enter your new Option A:" << endl;
+				getline(cin, EditQuizz.objective_A);
+				break;
+
+			case 3:
+				cout << "B: " << EditQuizz.objective_B << endl;
+				cout << "Enter your new Option B:" << endl;
+				getline(cin, EditQuizz.objective_B);
+				break;
+
+			case 4:
+				cout << "C: " << EditQuizz.objective_C << endl;
+				cout << "Enter your new Option C:" << endl;
+				getline(cin, EditQuizz.objective_C);
+				break;
+
+			case 5:
+				cout << "D: " << EditQuizz.objective_D << endl;
+				cout << "Enter your new Option D:" << endl;
+				getline(cin, EditQuizz.objective_D);
+				break;
+
+			case 6:
+				cout << "Answer: " << EditQuizz.ans << endl;
+				cout << "Enter your new Answer:" << endl;
+				cin >> EditQuizz.ans;
+				cin.ignore();
+				break;
+
+			default: cout << "Invalid option, please Enter (1-7)";
 			}
-		} while (option != 8);
+			Quizz[number - 1] = EditQuizz;
+			Quizz[number - 1].isDeleted = false;
+			saveTest1();
+			cout << "Editted successfully..." << endl;
+		}
+	} while (option != 8);
 }
 
 void deleteQuizz(int num)
