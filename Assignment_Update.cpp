@@ -1,4 +1,4 @@
-﻿#include<iostream>
+﻿#include <iostream>
 #include<string>
 #include<cmath>
 #include<iomanip>
@@ -84,11 +84,37 @@ void notes_BJT();
 void notes_FET();
 void notes_OA();
 
+//Edit comment function by Trang
+struct Comment
+{
+	int studentID = 0;
+	string text;
+	string hostReply;
+	bool deleted = false;
+	bool fromHost = false;
+};
+
+const int MAX_COMMENTS = 100;
+Comment comments[MAX_COMMENTS];
+int commentCount = 0;
+
+void saveComments(Comment comments[], int count);
+void loadComments(Comment comments[], int& count);
+void createNotification(Comment comments[], int& count);
+void hostCommentMenu(Comment comments[], int& count);
+void deleteComment(Comment comments[], int count);
+void replyToComment(Comment comments[], int count);
+void showAllComments(Comment comments[], int count);
+void createStudentComment(Comment comments[], int& count, User stu[], int userindex);
+void studentCommentMenu(Comment comments[], int& count, User stu[], int userindex);
+
+
 int main() {
 	LoadTest1();
 	User stu[num] = {};
 	int userindex = -1;
 	int choice;
+	loadComments(comments, commentCount);
 
 	while (true)
 	{
@@ -99,11 +125,11 @@ int main() {
 		cout << "1. Host Mode\n";
 		cout << "2. User Mode\n";
 		cout << "3. Exit\n";
-		cout << "Choice (0~2): ";
+		cout << "Choice (1~3): ";
 		cin >> choice;
 		while (choice != 3 && choice != 1 && choice != 2)
 		{
-			cout << "Invalid input please enter 0 to 2." << endl;
+			cout << "Invalid input please enter 1 to 3." << endl;
 			cout << "Enter your choice: ";
 			cin >> choice;
 		}
@@ -192,11 +218,11 @@ void hostMenu(User stu[], int userindex)
 	while (true)
 	{
 		cout << "\n--- Host Menu ---\n";
-		cout << "1. Show student comment\n";
-		cout << "2. Show Test1 Question\n";
-		cout << "3. User List\n";
+		cout << "1. Show Test1 Question\n";
+		cout << "2. User List\n";
+		cout << "3. Comment Management\n";//Trang
 		cout << "4. Logout\n";
-		cout << "Enter your choice(1~5):";
+		cout << "Enter your choice(1~4):";
 		cin >> option;
 		switch (option)
 		{
@@ -204,9 +230,6 @@ void hostMenu(User stu[], int userindex)
 			cout << "Exit..." << endl << endl;
 			return;
 		case 1:
-			//comment
-			break;
-		case 2:
 			while (true) {
 				cout << "---Show Test 1 Question---" << endl;
 
@@ -252,10 +275,12 @@ void hostMenu(User stu[], int userindex)
 				}
 			}
 			break;
-		case 3:
-			cout << "3";//userlist
+		case 2:
+			cout << "2";//userlist
 			userlist(stu, userindex);
 			break;
+		case 3:
+			hostCommentMenu(comments, commentCount); break;//Trang
 		}
 	}
 }
@@ -269,7 +294,7 @@ void userMenu(User stu[], int userindex) {
 		return;
 	}
 	while (true) {
-		cout << "Choose the action you want to proceed \n1. note\n2. Test 1 (7%)\n3. Test 2 (23%)\n4. stimulator\n5. userlist\n0. end:";
+		cout << "Choose the action you want to proceed \n1. note\n2. Test 1 (7%)\n3. Test 2 (23%)\n4. stimulator\n5. userlist\n6.Student Comment Menu\n0. end:";
 		cin >> opt;
 		switch (opt) {
 		case 1:
@@ -297,17 +322,20 @@ void userMenu(User stu[], int userindex) {
 			}
 			break;
 		case 4:
-			sim(); 			
+			sim();
 			break;
 		case 5:
 			userlist(stu, userindex);
 			break;
+		case 6:
+			studentCommentMenu(comments, commentCount, stu, userindex); break;
 		case 0:
 			cout << "Programme end." << endl;
 			savefile(stu, "Userlist");
+			saveComments(comments, commentCount);//Trang
 			return;
 		default:
-			cout << "Invalid input try to choose again.(Input:1-5,0 to end)" << endl;
+			cout << "Invalid input try to choose again.(Input:1-6,0 to end)" << endl;
 		}
 	}
 }
@@ -843,7 +871,7 @@ int Test2_quizz(float* answer) {
 			i++;
 			break;
 		case 0:
-			cout << "You have submitted Test 2"; << endl;
+			cout << "You have submitted Test 2" << endl;
 			break;
 		default:
 			cout << "Invalid input try to choose again.(Input:1-12,0 to end)" << endl;
@@ -860,10 +888,10 @@ void note() {
 		cout << "Choose the chapter of notes you want to read (0.return):";
 		cin >> chap;
 		switch (chap) {
-		case 1:			
+		case 1:
 			notes_Diode();
 			break;
-		case 2:			
+		case 2:
 			notes_BJT();
 			break;
 		case 3:
@@ -886,45 +914,45 @@ void sim() {
 	do {
 		cout << "Select the type of stimulator\n1.Clipper\n2.Clamper\n3.BJT 1\n4.BJT 2\n5.BJT 3\n6.JFET\n7. E-MOSFET\n8-10.chp4 \n0.return:";
 		cin >> opt;
-	switch (opt) {
-	case 1:
-		clipper();
-		break;
-	case 2:
-		clamper();
-		break;
-	case 3:
-		simulator1_BJT();
-		break;
-	case 4:
-		simulator2_BJT();
-		break;
-	case 5:		
-		simulator3_BJT();
-		break;
-	case 6:
-		jfet();
-		break;
-	case 7:
-		mosfet();
-		break;
-	case 8:
-		non_inverting();
-		break;
-	case 9:
-		voltageFollower();
-		break;
-	case 10:
-		invertingAmplifier();
-		break;
-	case 0:
-		cout << "You have returned to menu." << endl;
-		break;
-	default:
-		cout << "Invalid input try to choose again.(Input:1-10,0 to end)" << endl;
-		break;
-	}
-	} while (opt != 0); 
+		switch (opt) {
+		case 1:
+			clipper();
+			break;
+		case 2:
+			clamper();
+			break;
+		case 3:
+			simulator1_BJT();
+			break;
+		case 4:
+			simulator2_BJT();
+			break;
+		case 5:
+			simulator3_BJT();
+			break;
+		case 6:
+			jfet();
+			break;
+		case 7:
+			mosfet();
+			break;
+		case 8:
+			non_inverting();
+			break;
+		case 9:
+			voltageFollower();
+			break;
+		case 10:
+			invertingAmplifier();
+			break;
+		case 0:
+			cout << "You have returned to menu." << endl;
+			break;
+		default:
+			cout << "Invalid input try to choose again.(Input:1-10,0 to end)" << endl;
+			break;
+		}
+	} while (opt != 0);
 
 }
 bool checkopenfile(fstream& file, string name) {
@@ -1039,7 +1067,7 @@ void savefile(User* stu, string name) {
 }
 
 int check(float* answer, int& points) {
-	points = 0;       
+	points = 0;
 	for (int i = 0; i < 23; i++) {
 		if (checkans[i] >= 0) {
 			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
@@ -1106,7 +1134,7 @@ void review(float* answer, int score) {
 	cout << "         o                  o \n";
 	cout << "         -       Vout       +\n";
 	cout << "                     Figure 1\n";
-	cout << "Your answer is       : " << setw(5) << right << answer[0]<< endl;
+	cout << "Your answer is       : " << setw(5) << right << answer[0] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[0] << right
 		<< setw(15) << "Score = " << checksection(answer, 0, 0) << endl;
 	cout << "Quesiton 2. Given the following configuration shown in figure 1, Vin = 10V, Vd = 0.7V, Vbias = 5V. " << endl;
@@ -1291,8 +1319,8 @@ void review(float* answer, int score) {
 	cout << "Given: Rf =220000 ohms, Ri =10000 ohms ,Vin = 5.0 V, Aol = 200000 , Zin = 2000000 ohms, Zout = 75 ohms.\n";
 	cout << "Determine the closed-loop voltage gain,Acl, the input and output impedances of the amplifier.\n";
 	cout << "Your answer is       : " << setw(5) << answer[16] << setw(5) << right << ", " << setw(5) << right << answer[17]
-		<<setw(5) << right << answer[18] << endl;
-	cout << "The correct answer is: " << setw(5) << checkans[16] << setw(5) << right << ", " << setw(5) << right << checkans[17] 
+		<< setw(5) << right << answer[18] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[16] << setw(5) << right << ", " << setw(5) << right << checkans[17]
 		<< setw(5) << right << checkans[18] << right
 		<< setw(15) << "Score = " << checksection(answer, 16, 18) << endl;
 	cout << "\nQuestion 11 :\n";
@@ -2095,6 +2123,7 @@ void mosfet()
 	cout << "     = " << Vdd - (Id * Rd) << " V" << endl << endl;
 }
 
+//Q10
 void non_inverting()//Trang
 {
 	double Rf_NI, Ri_NI, Vin, Aol, Zin_NI, Zout_NI, Acl_NI, B, Zin, Zout;
@@ -2187,7 +2216,7 @@ void non_inverting()//Trang
 		}
 	} while (true);
 }
-
+//Q12
 void voltageFollower()//Trang
 {
 	double Rf_VF, Ri_VF, Aol, Zin_VF, Zout_VF, B, Zin, Zout;
@@ -2258,6 +2287,7 @@ void voltageFollower()//Trang
 
 	} while (true);
 }
+//Q11
 void invertingAmplifier()//Trang
 {
 	double Rf_I, Ri_I, Acl_I;
@@ -3243,7 +3273,28 @@ void notes_FET()
 }
 
 void notes_OA() {
-	cout << "----Chapter 4: The Operational Amplifier.---- \n";
+	char proceed;
+	cout << "\n --------------------------------------" << endl;
+	cout << "| Chapter 4: The Operational Amplifier. |" << endl;
+	cout << " ----------------------------------------" << endl << endl;
+	cout << "->There are three type of amplifier:\n ";
+	cout << "1.Noninverting Amplifier\n";
+	cout << "2.Inverting Amplifier\n";
+	cout << "3.Voltage-Follower\n\n";
+
+	cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
+	{
+		cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+		cout << "Do you want to proceed? (Y/N): ";
+		cin >> proceed;
+	}
+	if (toupper(proceed) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
+
 	cout << "\n1.Noninverting Amplifier\n";
 	cout << "Circuit Diagram: \n";
 	cout << "                                       \n";
@@ -3268,8 +3319,22 @@ void notes_OA() {
 	cout << "-->The feedback fraction, B = Ri/(Ri + Rf) \n";
 	cout << "-->The closed-loop gain for the noninverting amplifier, Acl(NI) = 1 + (Rf / Ri)\n";
 	cout << "-->The input impedance of a noninverting amplifier configuration, Zin(NI) = (1 + Aol * B ) * Zin\n";
-	cout << "-->The output impedance of a noninverting amplifier configuration, Zout(NI) = Zout/(1 + Aol * B )\n";
-	cout << "\n2.Inverting Amplifier\n";
+	cout << "-->The output impedance of a noninverting amplifier configuration, Zout(NI) = Zout/(1 + Aol * B )\n\n";
+
+	cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
+	{
+		cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+		cout << "Do you want to proceed? (Y/N): ";
+		cin >> proceed;
+	}
+	if (toupper(proceed) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
+
+	cout << "2.Inverting Amplifier\n";
 	cout << "Circuit Diagram: \n";
 	cout << "                                               \n";
 	cout << "                    _______Rf_______           \n";
@@ -3292,7 +3357,21 @@ void notes_OA() {
 	cout << "-->The input impedance of the inverting amplifier configuration, Zin(I) ≅ Ri\n";
 	cout << "The inout impedance,Zin(I), approximately equals the external inout resistance,Ri,";
 	cout << "because of the virtual ground at the inverting input.\n";
-	cout << "-->The output impedance of the inverting amplifier configuration, Zout(I) = Zout/(1 + Aol * B )\n";
+	cout << "-->The output impedance of the inverting amplifier configuration, Zout(I) = Zout/(1 + Aol * B )\n\n";
+	cout << "\nDo you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+
+	cin >> proceed;
+	while (toupper(proceed) != 'Y' && toupper(proceed) != 'N')
+	{
+		cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+		cout << "Do you want to proceed? (Y/N): ";
+		cin >> proceed;
+	}
+	if (toupper(proceed) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
+
 	cout << "\n3.Voltage-Follower\n";
 	cout << "Circuit Diagram: \n";
 	cout << "                                       \n";
@@ -3317,6 +3396,205 @@ void notes_OA() {
 	cout << "Since B = 1, the closed - loop gain of the voltage - follower is Acl(VF) = 1.\n";
 	cout << "-->The input impedance of the voltage-follower, Zin(VF) = (1 + Aol) * Zin\n";
 	cout << "-->The output impedance of the voltage-follower, Zout(VF) = Zout/(1 + Aol)\n";
-	cout << "\nCongrats!! you are done on reading the notes for Chapter 4. " << endl;
+
+
+	cout << "\nCongrats!! you are done on reading the notes for Chapter 4. (*^V^*)/" << endl;
+	cout << "PRESS any key to return to note selection\nor PRESS 'R' to return to the introduction of Chapter 4." << endl;
+	cin >> proceed;
+	if (toupper(proceed) == 'R')
+		notes_OA();
+}
+
+//Trang edit comment fuction
+void hostCommentMenu(Comment comments[], int& count) {
+	int choice;
+	do {
+		cout << "\n--- Host Comment Menu ---\n";
+		cout << "1. Show All Comments\n";
+		cout << "2. Create Notification\n";
+		cout << "3. Reply to Student Comment\n";
+		cout << "4. Delete Comment/Notification (Host only)\n";
+		cout << "0. Return\n";
+		cout << "Choice (0~4): ";
+		cin >> choice;
+
+		switch (choice) {
+		case 1: showAllComments(comments, count); break;
+		case 2: createNotification(comments, count); break;
+		case 3: replyToComment(comments, count); break;
+		case 4: deleteComment(comments, count); break;
+		}
+	} while (choice != 0);
+}
+void showAllComments(Comment comments[], int count) {
+	cout << "\n======= Comment List =======\n";
+	if (count == 0) {
+		cout << "No comments yet.\n";
+		return;
 	}
+
+	for (int i = 0; i < count; i++) {
+		if (!comments[i].deleted) {
+			cout << "Comment #" << i << endl;
+			if (comments[i].fromHost) {
+				cout << " ------Notification------\n";
+				cout << "  Attention: " << comments[i].text << endl;
+			}
+			else {
+				cout << " [Student ID: " << comments[i].studentID << "]\n";
+				cout << "  Comment: " << comments[i].text << endl;
+			}
+
+			if (!comments[i].hostReply.empty())
+				cout << "--->Host Reply: " << comments[i].hostReply << endl;
+			cout << "----------------------------\n";
+		}
+	}
+	cout << "============================\n";
+}
+void replyToComment(Comment comments[], int count) {
+	int index;
+	cout << "Enter the comment number to reply: ";
+	cin >> index;
+	cin.ignore();
+	if (index >= 0 && index < count && !comments[index].deleted)
+	{
+		cout << "Enter your reply: ";
+		getline(cin, comments[index].hostReply);
+		cout << "Reply saved!" << endl;
+		saveComments(comments, count);//save comment
+	}
+	else {
+		cout << "Invalid comment index!" << endl;
+	}
+}
+//only delete host comment or notification 
+void deleteComment(Comment comments[], int count) {
+	int index;
+	cout << "Enter the comment number to delete: ";
+	cin >> index;
+	if (index >= 0 && index < count && !comments[index].deleted) {
+		if (comments[index].fromHost)
+		{
+			comments[index].deleted = true;
+			cout << "Host notification deleted." << endl;
+		}
+		else if (!comments[index].hostReply.empty()) {
+			comments[index].hostReply.clear();
+			cout << "Host reply deleted." << endl;
+		}
+		else {
+			cout << "Error: You cannot delete student comments!" << endl;
+		}
+		saveComments(comments, count);
+	}
+	else {
+		cout << "Invalid comment index!" << endl;
+	}
+}
+void createNotification(Comment comments[], int& count) {
+	if (count >= MAX_COMMENTS) {
+		cout << "Comment list is full!" << endl;
+		return;
+	}
+	cin.ignore();
+	cout << "Enter your comment (as host): ";
+	getline(cin, comments[count].text);
+
+	comments[count].studentID = 0;
+	comments[count].fromHost = true;
+	comments[count].hostReply = "";
+	comments[count].deleted = false;
+
+	cout << "Host comment saved!" << endl;
+	count++;
+	saveComments(comments, count);
+}
+void studentCommentMenu(Comment comments[], int& count, User stu[], int userindex)
+{
+	int option;
+	do {
+		cout << "\n--- Student Comment Menu ---\n";
+		cout << "1. Show All Comments and Reply\n";
+		cout << "2. Create a Comment\n";
+		cout << "0. Return\n";
+		cout << "Choice: ";
+		cin >> option;
+
+		switch (option) {
+		case 1: showAllComments(comments, count); break;
+		case 2:createStudentComment(comments, count, stu, userindex);
+		}
+	} while (option != 0);
+
+
+}
+void createStudentComment(Comment comments[], int& count, User stu[], int userindex) {
+	if (count >= MAX_COMMENTS) {
+		cout << "Comment list is full!" << endl;
+		return;
+	}
+	cin.ignore();
+	cout << "Enter your comment: ";
+	getline(cin, comments[count].text);
+
+	comments[count].studentID = stu[userindex].ID;
+	comments[count].fromHost = false;
+	comments[count].hostReply = "";
+	comments[count].deleted = false;
+
+	cout << "Comment saved! (Student ID: " << stu[userindex].ID << ")" << endl;//can save student id
+	count++;
+}
+void saveComments(Comment comments[], int count) {
+	fstream file("Comments", ios::out );
+	if (!file.is_open()) {
+		cout << "Error saving comments.\n";
+		return;
+	}
+	for (int i = 0; i < count; i++) {
+		if (!comments[i].deleted) {
+
+			file << comments[i].fromHost << endl;
+			file << comments[i].studentID << endl;
+			file << comments[i].text << endl;
+			file << comments[i].hostReply << endl;
+		}
+	}
+	file.close();
+	cout << "Comments saved successfully" << endl;
+}
+void loadComments(Comment comments[], int& count) {
+	fstream file("Comments", ios::in);
+	if (!file.is_open()) {
+		cout << "Starting fresh.\n";
+		return;
+	}
+
+	string line;
+	while (getline(file, line)) {
+		if (line.empty()) continue;
+
+		comments[count].fromHost = (line == "1" || line == "true");
+
+		if (!getline(file, line)) break;
+		try {
+			comments[count].studentID = stoi(line);
+		}
+		catch (...) {
+			comments[count].studentID = -1;
+		}
+
+
+		if (!getline(file, comments[count].text)) break;
+
+
+		if (!getline(file, comments[count].hostReply)) break;
+
+		comments[count].deleted = false;
+		count++;
+		if (count >= MAX_COMMENTS) break;
+	}
+
+	file.close();
 }
