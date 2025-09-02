@@ -18,9 +18,9 @@ struct User {
 	bool attempt_Test2;
 	float ans[ansnum];
 };//hi//hihihihihi
-void cal(int);
+void sim();
 void note();
-int quiz(float*);
+int Test2_quizz(float*);
 void getinfo(User&);
 void userlist(User[], int);
 void loaduserdata(User*);
@@ -79,8 +79,10 @@ void voltageFollower();
 void invertingAmplifier();
 
 //Notes
+void notes_Diode();
 void notes_BJT();
 void notes_FET();
+void notes_OA();
 
 int main() {
 	LoadTest1();
@@ -261,13 +263,13 @@ void hostMenu(User stu[], int userindex)
 
 void userMenu(User stu[], int userindex) {
 
-	int a, opt;
+	int opt;
 	if (userindex < 0 || userindex >= num) {
 		cout << "ERROR! Invalid user index!" << endl;
 		return;
 	}
 	while (true) {
-		cout << "Choose the action you want to proceed \n1. note\n2. Test 1 (7%)\n3. Test 2 (23%)\n4. stimulator\n5. userlist\n6. end:(i.e. 1,2,3,4,5 out)";
+		cout << "Choose the action you want to proceed \n1. note\n2. Test 1 (7%)\n3. Test 2 (23%)\n4. stimulator\n5. userlist\n0. end:";
 		cin >> opt;
 		switch (opt) {
 		case 1:
@@ -279,43 +281,39 @@ void userMenu(User stu[], int userindex) {
 			}
 			else
 			{
-				cout << "You have submitted the Test 1\n";
+				cout << "You have submitted Test 1\n";
 				cout << "Result of test 1: " << stu[userindex].result_Test1 << " %\n\n";
 			}
 			break;
 		case 3:
 			if (!stu[userindex].attempt_Test2) {
-				stu[userindex].result_Test2 = quiz(stu[userindex].ans);
+				stu[userindex].result_Test2 = Test2_quizz(stu[userindex].ans);
 				cout << "Score updated:" << stu[userindex].result_Test2 << endl;
 				stu[userindex].attempt_Test2 = true;
 			}
 			else {
-				cout << "You have submitted the Test 2\n";
+				cout << "Test 2 review.\n";
 				review(stu[userindex].ans, stu[userindex].result_Test2);
 			}
 			break;
 		case 4:
-			do {
-				cout << "Select the type of stimulator\n1.Clipper\n2.Clamper\n3.BJT 1\n4.BJT 2\n5.BJT 3\n6.JFET\n7. E-MOSFET\n8-10.chp4 \n0.return:";
-				cin >> a;
-				cal(a); //select stimular in menu 
-			} while (a != 0);
+			sim(); 			
 			break;
 		case 5:
 			userlist(stu, userindex);
 			break;
-		case 6:
+		case 0:
 			cout << "Programme end." << endl;
 			savefile(stu, "Userlist");
 			return;
 		default:
-			cout << "Invalid input try to choose again.(1,2,3,4)" << endl;
+			cout << "Invalid input try to choose again.(Input:1-5,0 to end)" << endl;
 		}
 	}
 }
 
 
-int quiz(float* answer) {
+int Test2_quizz(float* answer) {
 	int i = 0, points = 0, record[12] = {};
 	bool same;
 	char a;
@@ -324,10 +322,10 @@ int quiz(float* answer) {
 	do {
 		do {
 			same = false;
-			cout << "Choose the question you want to answer(13 out):";
+			cout << "Choose the question you want to answer (Input 1-12, 0 to submit Test 2):";
 			cin >> record[i];
 
-			if (record[i] == 13) {
+			if (record[i] == 0) {
 				break;
 			}
 
@@ -363,6 +361,7 @@ int quiz(float* answer) {
 			cout << "         |                  | \n";
 			cout << "         o                  o \n";
 			cout << "         -       Vout       +\n";
+			cout << "                     Figure 1\n";
 			do {
 				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
@@ -479,7 +478,7 @@ int quiz(float* answer) {
 			cout << "               |\n";
 			cout << "               |\n";
 			cout << "              GND\n\n";
-
+			cout << "                     Figure 4\n";
 			do {
 				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
@@ -520,7 +519,7 @@ int quiz(float* answer) {
 			cout << "                         |\n";
 			cout << "                         |\n";
 			cout << "                        GND\n\n";
-
+			cout << "                     Figure 5\n";
 			do {
 				cout << "\nDo you want to use a simulator?(Y/N):";
 				cin >> a;
@@ -641,6 +640,7 @@ int quiz(float* answer) {
 			cout << "   |             Rs 220_ohms" << endl;
 			cout << "   |             |" << endl;
 			cout << "  GND           GND" << endl << endl;
+			cout << "                     Figure 7\n";
 			cout << " Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
 			cout << " in the circuit shown above." << endl << endl;
 
@@ -680,6 +680,7 @@ int quiz(float* answer) {
 			cout << "   15 k_ohms R2            |" << endl;
 			cout << "             |             |" << endl;
 			cout << "            GND           GND" << endl << endl;
+			cout << "                     Figure 8\n";
 			cout << " Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
 			cout << " in the E-MOSFET circuit shown above. Given that the particular MOSFET has" << endl;
 			cout << " the theshold voltage Vgs_th = 2V and the parameter devices K = 50 mA/V^2 ." << endl << endl;
@@ -724,7 +725,7 @@ int quiz(float* answer) {
 			cout << "                             Ri        \n";
 			cout << "                             |         \n";
 			cout << "                            GND        \n";
-			cout << "                                       \n";
+			cout << "                     Figure 9\n";
 			cout << "Given: Rf =220000 ohms, Ri =10000 ohms ,Vin = 5.0 V, Aol = 200000 , Zin = 2000000 ohms, Zout = 75 ohms.\n";
 			cout << "Determine the closed-loop voltage gain,Acl, the input and output impedances of the amplifier.\n";
 
@@ -772,6 +773,7 @@ int quiz(float* answer) {
 			cout << "                |       |/                     \n";
 			cout << "               GND                             \n";
 			cout << "                                               \n";
+			cout << "                     Figure 10\n";
 			cout << "Given: Rf =210000 ohms, Ri =10000 ohms.\n";
 			cout << "Determine the closed-loop voltage gain,Acl and the input impedance of the amplifier.\n";
 
@@ -816,7 +818,7 @@ int quiz(float* answer) {
 			cout << "                             Ri        \n";
 			cout << "                             |         \n";
 			cout << "                            GND        \n";
-			cout << "                                       \n";
+			cout << "                     Figure 11\n";
 			cout << "Given: Rf =230000 ohms, Ri =10000 ohms , Aol = 200000 , Zin = 1000000 ohms, Zout = 70 ohms and B = 1.\n";
 			cout << "Determine the input and output impedances of the amplifier.\n";
 
@@ -840,171 +842,64 @@ int quiz(float* answer) {
 			checksubmit(answer, 22);
 			i++;
 			break;
-
-		case 13:
-			cout << "You have returned to main function." << endl;
+		case 0:
+			cout << "You have submitted Test 2"; << endl;
 			break;
 		default:
-			cout << "Invalid input." << endl;
+			cout << "Invalid input try to choose again.(Input:1-12,0 to end)" << endl;
 			break;
 		}
-
-
-
-	} while (record[i] != 13);
+	} while (record[i] != 0);
 	check(answer, points);
 	return points;
-
-
 }
 
 void note() {
 	int chap;
 	do {
-		cout << "Choose the chapter of notes you want to read(5 out):";
+		cout << "Choose the chapter of notes you want to read (0.return):";
 		cin >> chap;
 		switch (chap) {
-		case 1:
-			cout << "chap 1." << endl;
+		case 1:			
+			notes_Diode();
 			break;
-		case 2:
-			cout << "chap 2." << endl;
+		case 2:			
 			notes_BJT();
 			break;
 		case 3:
-			cout << "chap 3." << endl;
 			notes_FET();
 			break;
 		case 4:
-			cout << "----Chapter 4: The Operational Amplifier.---- \n";
-			cout << "\n1.Noninverting Amplifier\n";
-			cout << "Circuit Diagram: \n";
-			cout << "                                       \n";
-			cout << "                |\\                    \n";
-			cout << "                | \\                   \n";
-			cout << " Vin (+)------->|+ \\                  \n";
-			cout << "                |   \\_____________Vout\n";
-			cout << "                |   /        |         \n";
-			cout << "        ------->|- /         |         \n";
-			cout << "        |       | /          Rf        \n";
-			cout << "        |       |/           |         \n";
-			cout << "     Vf |____________________|  Feedback    \n";
-			cout << "                             |  Network     \n";
-			cout << "                             |         \n";
-			cout << "                             Ri        \n";
-			cout << "                             |         \n";
-			cout << "                            GND        \n";
-			cout << "                                       \n";
-			cout << "An op-amp connected in a closed-loop configuration as a noninverting amplifier.\n";
-			cout << "The input signal is applied to the noninverting(+) input.A portion of the output\n ";
-			cout << "is applied back to the inverting(-) input through the feedback network.This constitutes negative feedback. \n";
-			cout << "-->The feedback fraction, B = Ri/(Ri + Rf) \n";
-			cout << "-->The closed-loop gain for the noninverting amplifier, Acl(NI) = 1 + (Rf / Ri)\n";
-			cout << "-->The input impedance of a noninverting amplifier configuration, Zin(NI) = (1 + Aol * B ) * Zin\n";
-			cout << "-->The output impedance of a noninverting amplifier configuration, Zout(NI) = Zout/(1 + Aol * B )\n";
-			cout << "\n2.Inverting Amplifier\n";
-			cout << "Circuit Diagram: \n";
-			cout << "                                               \n";
-			cout << "                    _______Rf_______           \n";
-			cout << "                   |                |          \n";
-			cout << "                   |                |          \n";
-			cout << "                   |    |\\         |          \n";
-			cout << "                   |    | \\        |          \n";
-			cout << " Vin (~)------Ri------->|+ \\       |          \n";
-			cout << "                        |   \\______|____Vout  \n";
-			cout << "                        |   /                  \n";
-			cout << "                ------->|- /                   \n";
-			cout << "                |       | /                    \n";
-			cout << "                |       |/                     \n";
-			cout << "               GND                             \n";
-			cout << "                                               \n";
-			cout << "An op-amp connected as an inverting amplifier with a controlled amount of voltage gain. The input signal \n";
-			cout << "is applied through a series input resistor(Ri) to the inverting (-) input.Also, the output is feed back through\n";
-			cout << "Rf to the inverting input. The noninverting (+) inout is grounded.\n";
-			cout << "-->The closed-loop gain for the inverting amplifier, Acl(I) = -(Rf / Ri)\n";
-			cout << "-->The input impedance of the inverting amplifier configuration, Zin(I) ≅ Ri\n";
-			cout << "The inout impedance,Zin(I), approximately equals the external inout resistance,Ri,";
-			cout << "because of the virtual ground at the inverting input.\n";
-			cout << "-->The output impedance of the inverting amplifier configuration, Zout(I) = Zout/(1 + Aol * B )\n";
-			cout << "\n3.Voltage-Follower\n";
-			cout << "Circuit Diagram: \n";
-			cout << "                                       \n";
-			cout << "                |\\                    \n";
-			cout << "                | \\                   \n";
-			cout << " Vin (~)------->|+ \\                  \n";
-			cout << "  |             |   \\_____________Vout\n";
-			cout << "  GND           |   /        |         \n";
-			cout << "        ------->|- /         |         \n";
-			cout << "        |       | /          Rf        \n";
-			cout << "        |       |/           |         \n";
-			cout << "        |____________________|         \n";
-			cout << "                             |         \n";
-			cout << "                             |         \n";
-			cout << "                             Ri        \n";
-			cout << "                             |         \n";
-			cout << "                            GND        \n";
-			cout << "                                       \n";
-			cout << "The voltage-follower configuration is a special case of the noninverting amplifier where all of the \n";
-			cout << "output voltage is fed back to the inverting(-) inout by a straingt connection.The straingt feedback connection \n";
-			cout << "has a voltage gain of approximately 1. The closed - loop voltage gain of a noninverting amplifier is 1 / B as previosly derived. \n";
-			cout << "Since B = 1, the closed - loop gain of the voltage - follower is Acl(VF) = 1.\n";
-			cout << "-->The input impedance of the voltage-follower, Zin(VF) = (1 + Aol) * Zin\n";
-			cout << "-->The output impedance of the voltage-follower, Zout(VF) = Zout/(1 + Aol)\n";
+			notes_OA();
 			break;
-
-			break;
-		case 5:
-			cout << "You have returned to menu" << endl;
+		case 0:
+			cout << "You have returned to menu." << endl;
 			break;
 		default:
-			cout << "Invalid input" << endl;
+			cout << "Invalid input try to choose again.(Input:1-4,0 to end)" << endl;
 			break;
 		}
-	} while (chap != 5);
+	} while (chap != 0);
 }
-void cal(int a) {
-
-	switch (a) {
+void sim() {
+	char opt;
+	do {
+		cout << "Select the type of stimulator\n1.Clipper\n2.Clamper\n3.BJT 1\n4.BJT 2\n5.BJT 3\n6.JFET\n7. E-MOSFET\n8-10.chp4 \n0.return:";
+		cin >> opt;
+	switch (opt) {
 	case 1:
-		cout << "Equation 1" << endl;
-		clipper();//insert you function here
+		clipper();
 		break;
 	case 2:
-		cout << "\n           Positive-biased clamper                                      Negative-biased clamper\n" << endl;
-		cout << "   -------)|--------------------------------o +                -------|(--------------------------------o +\n";
-		cout << "   |      Vc    |               |                              |      Vc    |               |\n";
-		cout << "   |          -----             |                              |           ---              |\n";
-		cout << "   |           / \\  Vd          |                              |           \\ /  Vd          |" << endl;
-		cout << "   |           ---              |                              |          -----             |\n";
-		cout << "  Vin           |               RL         Vout               Vin           |               RL         Vout\n";
-		cout << "   |           ---              |                              |            -               |\n";
-		cout << "   |            -               |                              |           ---              |\n";
-		cout << "   |           ---              |                              |            -               |\n";
-		cout << "   |            -               |                              |           ---              |\n";
-		cout << "   |            |               |                              |            |               |\n";
-		cout << "   -----------------------------------------o -                -----------------------------------------o -\n";
-		cout << "\n           Positive clamper                                             Negative clamper\n" << endl;
-		cout << "   -------)|--------------------------------o +                -------|(--------------------------------o +\n";
-		cout << "   |      Vc    |               |                              |      Vc    |               |\n";
-		cout << "   |          -----             |                              |           ---              |\n";
-		cout << "   |           / \\  Vd          |                              |           \\ /  Vd          |" << endl;
-		cout << "   |           ---              |                              |          -----             |\n";
-		cout << "  Vin           |               RL         Vout               Vin           |               RL         Vout\n";
-		cout << "   |            |               |                              |            |               |\n";
-		cout << "   |            |               |                              |            |               |\n";
-		cout << "   -----------------------------------------o -                -----------------------------------------o -\n";
 		clamper();
 		break;
 	case 3:
-		cout << "Equation 3" << endl;
 		simulator1_BJT();
 		break;
 	case 4:
-		cout << "Equation 4" << endl;
 		simulator2_BJT();
 		break;
-	case 5:
-		cout << "Equation 5" << endl;
+	case 5:		
 		simulator3_BJT();
 		break;
 	case 6:
@@ -1022,15 +917,14 @@ void cal(int a) {
 	case 10:
 		invertingAmplifier();
 		break;
-
 	case 0:
-		cout << "You have returned to quizz" << endl;
+		cout << "You have returned to menu." << endl;
 		break;
-
 	default:
-		cout << "Invalid input" << endl;
+		cout << "Invalid input try to choose again.(Input:1-10,0 to end)" << endl;
 		break;
 	}
+	} while (opt != 0); 
 
 }
 bool checkopenfile(fstream& file, string name) {
@@ -1125,18 +1019,6 @@ void savefile(User* stu, string name) {
 		cout << "Error opening file for saving: " << name << endl;
 		return;
 	}
-	/*
-	list << stu[0].Name << "|"
-		<< stu[0].ID << "|"
-		<< stu[0].result_Test2
-		<< "|" << stu[0].attempt_Test2
-		<< "|" << endl;
-	list << "|";
-	for (int j = 0; j < ansnum; j++) {
-		list << stu[0].ans[j] << "|";
-	}
-	list << "\n";
-	*/
 
 	for (int i = 0; i < num; i++) {
 		if (stu[i].ID != 0) {
@@ -1157,8 +1039,7 @@ void savefile(User* stu, string name) {
 }
 
 int check(float* answer, int& points) {
-	points = 0;       //9-19: Q8-Q12
-	//insert your answer here
+	points = 0;       
 	for (int i = 0; i < 23; i++) {
 		if (checkans[i] >= 0) {
 			if ((checkans[i] - (checkans[i] * 5 / 100)) <= *(answer + i) && *(answer + i) <= (checkans[i] + (checkans[i] * 5 / 100))) {
@@ -1207,6 +1088,27 @@ int checksection(float* answer, int i, int range) {
 	return points;
 }
 void review(float* answer, int score) {
+	cout << "Question 1. Given the following configuration shown in figure 1, Vin = 12V, Vd = 0.7V. " << endl;
+	cout << "Find Vout peak for the the negative half cycle." << endl << endl; //answer is -11.3V 
+	cout << "   ------------------------------\n";
+	cout << "   |                            |            \n";
+	cout << "   |                         -------         \n";
+	cout << "   |                           / \\  Vd=0.7V \n";
+	cout << "   |                          /   \\         \n";
+	cout << " Vin = 12V                    -----          \n";
+	cout << "   |                            |            \n";
+	cout << "   |                            |            \n";
+	cout << "   |                            |            \n";
+	cout << "   |                            |            \n";
+	cout << "   ---------Rload = 1k Ohm-------\n";
+	cout << "         |                  | \n";
+	cout << "         |                  | \n";
+	cout << "         o                  o \n";
+	cout << "         -       Vout       +\n";
+	cout << "                     Figure 1\n";
+	cout << "Your answer is       : " << setw(5) << right << answer[0]<< endl;
+	cout << "The correct answer is: " << setw(5) << checkans[0] << right
+		<< setw(15) << "Score = " << checksection(answer, 0, 0) << endl;
 	cout << "Quesiton 2. Given the following configuration shown in figure 1, Vin = 10V, Vd = 0.7V, Vbias = 5V. " << endl;
 	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
 	cout << "   -------)|--------------------------------o +\n";
@@ -1244,7 +1146,202 @@ void review(float* answer, int score) {
 	cout << "Your answer is       : " << setw(5) << answer[3] << setw(5) << right << ", " << setw(5) << right << answer[4] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[3] << setw(5) << right << ", " << setw(5) << right << checkans[4] << right
 		<< setw(15) << "Score = " << checksection(answer, 3, 4) << endl;
+	cout << "Question 4: Determine VCE and IC in the voltage-divider biased transistor circuit shown below. Assume betaDC = 100.\n\n";
 
+	cout << "                       VCC = 10 V\n";
+	cout << "                        |\n";
+	cout << "      ------------------|\n";
+	cout << "      |                 RC = 1.0k ohm\n";
+	cout << "      |                 |\n";
+	cout << "      R1 = 10k ohm      |\n";
+	cout << "      |                /\n";
+	cout << "      |             |\n";
+	cout << "      --------------|\n";
+	cout << "      |             |\n";
+	cout << "      |                \\\n";
+	cout << "      R2 = 5.6k ohm      |\n";
+	cout << "      |                  RE = 560 ohm\n";
+	cout << "      |                  |\n";
+	cout << "      --------------------\n";
+	cout << "               |\n";
+	cout << "               |\n";
+	cout << "              GND\n\n";
+	cout << "                     Figure 4\n";
+	cout << "Your answer is       : " << setw(5) << answer[5] << setw(5) << right << ", " << setw(5) << right << answer[6] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[5] << setw(5) << right << ", " << setw(5) << right << checkans[6] << right
+		<< setw(15) << "Score = " << checksection(answer, 5, 6) << endl;
+	cout << "\n\n\nQuestion 5: Determine the value of VCE when IC = 0.1mA and 0.2mA.\n\n";
+
+	cout << "                       VCC = 36 V\n";
+	cout << "                        |\n";
+	cout << "      ------------------|\n";
+	cout << "      |                 RC = 36k ohm\n";
+	cout << "      |                 |\n";
+	cout << "      |                 |\n";
+	cout << "      |                /\n";
+	cout << "      |             |\n";
+	cout << "      ----- RB -----|\n";
+	cout << "                    |\n";
+	cout << "                       \\\n";
+	cout << "                         |\n";
+	cout << "                         |\n";
+	cout << "                         |\n";
+	cout << "                        GND\n\n";
+	cout << "                     Figure 5\n";
+	cout << "Your answer is       : " << setw(5) << answer[7] << setw(5) << right << ", " << setw(5) << right << answer[8] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[7] << setw(5) << right << ", " << setw(5) << right << checkans[8] << right
+		<< setw(15) << "Score = " << checksection(answer, 7, 8) << endl;
+	cout << "Question 6 :\n";
+	cout << "                                         VCC = 22 V\n";
+	cout << "                                          |\n";
+	cout << "                        ------------------|\n";
+	cout << "                        |                 RC = 6.8k ohm\n";
+	cout << "                        |                 |\n";
+	cout << "                        R1 = 56k ohm      |-------C3---o---Vout\n";
+	cout << "                        |                /\n";
+	cout << "                        |              |\n";
+	cout << " Vin ---o---RS---C1-----| -------------|\n";
+	cout << "                        |              |\n";
+	cout << "                        |                \\\n";
+	cout << "                        R2 = 8.2k ohm        |\n";
+	cout << "                        |                    |\n";
+	cout << "                        |                    |----------------\n";
+	cout << "                        |                    RE = 1.5k ohm    |\n";
+	cout << "                        |                    |                C2\n";
+	cout << "                        |                    |                |\n";
+	cout << "                        --------------------------------------\n";
+	cout << "                                             |\n";
+	cout << "                                             |\n";
+	cout << "                                            GND\n\n";
+	cout << "                                         Figure 6\n\n\n";
+	cout << " Hint: This is the Common-Emitter (CE) Amplifier with bypass capacitor (C2) in the emitter, not involving swapping process and no load resistance, RL.\n\n";
+	cout << "Your answer is       : " << setw(5) << right << answer[9] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[9] << right
+		<< setw(15) << "Score = " << checksection(answer, 9, 9) << endl;
+	cout << "Q7. Chp3" << endl;
+	cout << "Determine the drain current (Id) and forward transconductance (gm) for Vgs = -4V for a 2N5459 JFET." << endl;
+	cout << "Refer to the data sheet for the JFET below." << endl;
+	cout << "Igss = -1nA \nVgs_off = -8V \nIdss = 9mA \ngm_0 = 2250 micro_S" << endl;
+	cout << "Your answer is       : " << setw(5) << answer[10] << setw(5) << right << ", " << setw(5) << right << answer[11] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[10] << setw(5) << right << ", " << setw(5) << right << checkans[11] << right
+		<< setw(15) << "Score = " << checksection(answer, 10, 11) << endl;
+	cout << "Q8. Chp 3: FET (JFET)" << endl << endl;
+	cout << "              +15 V" << endl;
+	cout << "                 |    | Id = 5 mA" << endl;
+	cout << "       1000_ohms Rd   v" << endl;
+	cout << "                 |" << endl;
+	cout << "                 | " << endl;
+	cout << "                 D" << endl;
+	cout << "                /" << endl;
+	cout << "   ----G----> JFET" << endl;
+	cout << "   |            \\" << endl;
+	cout << "   |             S" << endl;
+	cout << "   Rg 10 M_ohms  |" << endl;
+	cout << "   |             Rs 220_ohms" << endl;
+	cout << "   |             |" << endl;
+	cout << "  GND           GND" << endl << endl;
+	cout << "                     Figure 7\n";
+	cout << " Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
+	cout << " in the circuit shown above." << endl << endl;
+	cout << "Your answer is       : " << setw(5) << answer[12] << setw(5) << right << ", " << setw(5) << right << answer[13] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[13] << setw(5) << right << ", " << setw(5) << right << checkans[13] << right
+		<< setw(15) << "Score = " << checksection(answer, 12, 13) << endl;
+	cout << "Q9. Chapter 3: FET (E-MOSFET)" << endl << endl;
+	cout << "                         +24 V" << endl;
+	cout << "             --------------|" << endl;
+	cout << "             |             |    | Id " << endl;
+	cout << "  100 k_ohms R1   200_ohms Rd   V" << endl;
+	cout << "             |             | " << endl;
+	cout << "             |             D" << endl;
+	cout << "             |            /" << endl;
+	cout << "             ----G---- E_MOSFET" << endl;
+	cout << "             |            \\" << endl;
+	cout << "             |             S" << endl;
+	cout << "             |             |" << endl;
+	cout << "   15 k_ohms R2            |" << endl;
+	cout << "             |             |" << endl;
+	cout << "            GND           GND" << endl << endl;
+	cout << "                     Figure 8\n";
+	cout << " Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
+	cout << " in the E-MOSFET circuit shown above. Given that the particular MOSFET has" << endl;
+	cout << " the theshold voltage Vgs_th = 2V and the parameter devices K = 50 mA/V^2 ." << endl << endl;
+	cout << "Your answer is       : " << setw(5) << answer[14] << setw(5) << right << ", " << setw(5) << right << answer[15] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[14] << setw(5) << right << ", " << setw(5) << right << checkans[15] << right
+		<< setw(15) << "Score = " << checksection(answer, 14, 15) << endl;
+	cout << "Question 10 :\n";
+	cout << "\n---Non-Inverting Amplifier,NI---\n";
+	cout << "Circuit Diagram: \n";
+	cout << "                                       \n";
+	cout << "                |\\                    \n";
+	cout << "                | \\                   \n";
+	cout << " Vin (+)------->|+ \\                  \n";
+	cout << "                |   \\_____________Vout\n";
+	cout << "                |   /        |         \n";
+	cout << "        ------->|- /         |         \n";
+	cout << "        |       | /          Rf        \n";
+	cout << "        |       |/           |         \n";
+	cout << "        |____________________|         \n";
+	cout << "                             |         \n";
+	cout << "                             |         \n";
+	cout << "                             Ri        \n";
+	cout << "                             |         \n";
+	cout << "                            GND        \n";
+	cout << "                                       \n";
+	cout << "                     Figure 9\n";
+	cout << "Given: Rf =220000 ohms, Ri =10000 ohms ,Vin = 5.0 V, Aol = 200000 , Zin = 2000000 ohms, Zout = 75 ohms.\n";
+	cout << "Determine the closed-loop voltage gain,Acl, the input and output impedances of the amplifier.\n";
+	cout << "Your answer is       : " << setw(5) << answer[16] << setw(5) << right << ", " << setw(5) << right << answer[17]
+		<<setw(5) << right << answer[18] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[16] << setw(5) << right << ", " << setw(5) << right << checkans[17] 
+		<< setw(5) << right << checkans[18] << right
+		<< setw(15) << "Score = " << checksection(answer, 16, 18) << endl;
+	cout << "\nQuestion 11 :\n";
+	cout << "\n---Inverting Amplifier,I---\n";
+	cout << "Circuit Diagram: \n";
+	cout << "                                               \n";
+	cout << "                    _______Rf_______           \n";
+	cout << "                   |                |          \n";
+	cout << "                   |                |          \n";
+	cout << "                   |    |\\         |          \n";
+	cout << "                   |    | \\        |          \n";
+	cout << " Vin (~)------Ri------->|+ \\       |          \n";
+	cout << "                        |   \\______|____Vout  \n";
+	cout << "                        |   /                  \n";
+	cout << "                ------->|- /                   \n";
+	cout << "                |       | /                    \n";
+	cout << "                |       |/                     \n";
+	cout << "               GND                             \n";
+	cout << "                                               \n";
+	cout << "                     Figure 10\n";
+	cout << "Given: Rf =210000 ohms, Ri =10000 ohms.\n";
+	cout << "Determine the closed-loop voltage gain,Acl and the input impedance of the amplifier.\n";
+	cout << "Your answer is       : " << setw(5) << answer[19] << setw(5) << right << ", " << setw(5) << right << answer[20] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[19] << setw(5) << right << ", " << setw(5) << right << checkans[20] << right
+		<< setw(15) << "Score = " << checksection(answer, 19, 20) << endl;
+	cout << "\nQuestion 12 :\n";
+	cout << "\n---Voltage Follower,VF---\n";
+	cout << "Circuit Diagram: \n";
+	cout << "                                       \n";
+	cout << "                |\\                    \n";
+	cout << "                | \\                   \n";
+	cout << " Vin (~)------->|+ \\                  \n";
+	cout << "  |             |   \\_____________Vout\n";
+	cout << "  GND           |   /        |         \n";
+	cout << "        ------->|- /         |         \n";
+	cout << "        |       | /          Rf        \n";
+	cout << "        |       |/           |         \n";
+	cout << "        |____________________|         \n";
+	cout << "                             |         \n";
+	cout << "                             |         \n";
+	cout << "                             Ri        \n";
+	cout << "                             |         \n";
+	cout << "                            GND        \n";
+	cout << "                     Figure 11\n";
+	cout << "Given: Rf =230000 ohms, Ri =10000 ohms , Aol = 200000 , Zin = 1000000 ohms, Zout = 70 ohms and B = 1.\n";
+	cout << "Determine the input and output impedances of the amplifier.\n";
+	cout << "Your answer is       : " << setw(5) << answer[21] << setw(5) << right << ", " << setw(5) << right << answer[22] << endl;
+	cout << "The correct answer is: " << setw(5) << checkans[21] << setw(5) << right << ", " << setw(5) << right << checkans[22] << right
+		<< setw(15) << "Score = " << checksection(answer, 21, 22) << endl;
 	cout << "Total score = " << score << "/" << ansnum << endl;
 }
 
@@ -1630,6 +1727,29 @@ void clamper() {
 	float Vin, Vc, Vd, Vbias, Vout;
 	char polar;
 	int opt;
+	cout << "\n           Positive-biased clamper                                      Negative-biased clamper\n" << endl;
+	cout << "   -------)|--------------------------------o +                -------|(--------------------------------o +\n";
+	cout << "   |      Vc    |               |                              |      Vc    |               |\n";
+	cout << "   |          -----             |                              |           ---              |\n";
+	cout << "   |           / \\  Vd          |                              |           \\ /  Vd          |" << endl;
+	cout << "   |           ---              |                              |          -----             |\n";
+	cout << "  Vin           |               RL         Vout               Vin           |               RL         Vout\n";
+	cout << "   |           ---              |                              |            -               |\n";
+	cout << "   |            -               |                              |           ---              |\n";
+	cout << "   |           ---              |                              |            -               |\n";
+	cout << "   |            -               |                              |           ---              |\n";
+	cout << "   |            |               |                              |            |               |\n";
+	cout << "   -----------------------------------------o -                -----------------------------------------o -\n";
+	cout << "\n           Positive clamper                                             Negative clamper\n" << endl;
+	cout << "   -------)|--------------------------------o +                -------|(--------------------------------o +\n";
+	cout << "   |      Vc    |               |                              |      Vc    |               |\n";
+	cout << "   |          -----             |                              |           ---              |\n";
+	cout << "   |           / \\  Vd          |                              |           \\ /  Vd          |" << endl;
+	cout << "   |           ---              |                              |          -----             |\n";
+	cout << "  Vin           |               RL         Vout               Vin           |               RL         Vout\n";
+	cout << "   |            |               |                              |            |               |\n";
+	cout << "   |            |               |                              |            |               |\n";
+	cout << "   -----------------------------------------o -                -----------------------------------------o -\n";
 	do {
 		cout << "Select the type of clamper (input '+' for posivite '-' for negative):";
 		cin >> polar;
@@ -2422,6 +2542,158 @@ void simulator3_BJT()
 		cout << "Invalid input! Please enter 1, 2, 3, 4, 5 or 6!\n\n";
 	}
 }
+void notes_Diode() {
+	char option;
+	cout << "\n-----------------------------------------------------------\n";
+	cout << "| Chapter 1: Diodes                                        |\n";
+	cout << "\n-----------------------------------------------------------\n\n";
+	cout << "1.0 Introduction:" << endl;
+	cout << "=================" << endl;
+	cout << "Materials can be classified by their electrical properties, are " << endl;
+	cout << "Insulators, Conductors and Semiconductors. " << endl;
+	cout << "Insulators do not conduct electricity, conductors do conduct electricity" << endl;
+	cout << "and semiconductors are between conductors and insulators in their ability" << endl;
+	cout << "to conduct electricity. " << endl;
+	cout << "There are two type of semiconductor structures, intrinsic and extrinsic." << endl;
+	cout << "Intrinsic semiconductors are pure while extrinsic are impure." << endl;
+	cout << "Extrinsic semiconductors are semiconductors that have went through the " << endl;
+	cout << "doping process, which is to increase conductivity of pure semiconductor through " << endl;
+	cout << "adding impurities. This process brings rise to n-type and p-type semiconductors. " << endl;
+	cout << "P-type is has holes as its majority carry while n-type has electrons as the majority" << endl;
+	cout << "Putting these two materials together form a pn junction at the boundary, which is" << endl;
+	cout << "the basis of what a diode is. A depletion region will be formed until equilibrium " << endl;
+	cout << "step is established. Once achieved, a barrier potential is formed that repels " << endl;
+	cout << "further diffusion. Biasing is applying a potential to the pn junction to control" << endl;
+	cout << "the width of the depletion layer. There is forward bias and reverse bias. In forward" << endl;
+	cout << "Pn junction is forward biased when the n-type is more negative than the p-type. " << endl;
+	cout << "Pn junction begins to conduct when the forward voltage is greater than the barrier " << endl;
+	cout << "potential. Reverse bias is when the n-type is more positive than the p-type. Charges" << endl;
+	cout << "move away from the junction. " << endl << endl;
+	cout << "Do you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cin >> option;
+	while (toupper(option) != 'Y' && toupper(option) != 'N') {
+		cout << "invalid input, please ENTER 'Y' or 'N'. " << endl;
+		cout << "Do you want to proceed? (Y/N): ";
+		cin >> option;
+	}
+	if (toupper(option) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
+
+	cout << "\n 1.1 PN Junction diode" << endl;
+	cout << "=========================" << endl;
+	cout << "Diode conducts when it is forward biased and forward voltage, Vf is greater than " << endl;
+	cout << "the barrier potential, Vb. There are three diode models: " << endl;
+	cout << "The ideal model, practical model and complete model" << endl;
+	cout << "\n1.1.a The ideal model:" << endl;
+	cout << "The diode is represented as a switch, close (forward bias) and open (reverse bias)" << endl;
+	cout << "In forward bias, diode has no resistance and acts as a short circuit, so no Vdrop" << endl;
+	cout << "In reverse bias, diode has infinite resistance and acts as an open, with all Vdrop" << endl;
+	cout << "\n1.1.b The practical model:" << endl;
+	cout << "The model includes characteristics such as forward voltage Vf, peak reverse voltage Vrrm" << endl;
+	cout << "average forward current Io, and forward power dissipation Pd(max)" << endl;
+	cout << "Forward voltage is the voltage at which the forward current suddenly rises, approximately" << endl;
+	cout << "0.7V for silicone diodes. Hence voltage drop across remaining components = Vin - 0.7V" << endl;
+	cout << "When the diode is reverse-biases, the maximum reverse voltage that will not force conduction" << endl;
+	cout << "is called Vrrm. Vrrm = 1.2(Peak reverse voltage)" << endl;
+	cout << "If a diode is conducting in the reverse direction, the device is destroyed" << endl;
+	cout << "Average forward current indicates the max allowable dc forward current = 120% forward current" << endl;
+	cout << "Forward power dissipation, Pd(max) indicates the max power of diode operation in forward bias" << endl;
+	cout << "\n1.1.c The ideal model: " << endl;
+	cout << "The complete diode model includes bulk resistance and reverse current " << endl;
+	cout << "Bulk resistance is the natural resistance of the materials that make up the pn junction" << endl;
+	cout << "Bulk resistance and barrier potential are only taken into account during forward bias operation" << endl;
+	cout << "Forward voltage Vf = Barrier potential + (Forward current * Bulk resistance) = Vb - IfRb" << endl << endl;
+
+	cout << "Do you want to proceed? ('Y' to proceed | 'N' to return notes selection): ";
+	cin >> option;
+	while (toupper(option) != 'Y' && toupper(option) != 'N') {
+		cout << "invalid input, please ENTER 'Y' or 'N'. " << endl;
+		cout << "Do you want to proceed? (Y/N): ";
+		cin >> option;
+	}
+	if (toupper(option) == 'N') {
+		cout << "Return to notes selection...";
+		return;
+	}
+
+	cout << "\n1.2 Diode Application" << endl;
+	cout << "=======================" << endl;
+	cout << "1.2.a Clippers" << endl;
+	cout << "Clipper (limiter) i a diode circuit that is used to eliminate some portion of a waveform" << endl;
+	cout << "There are two types of clippers, series and shunt clippers";
+	cout << "Series clippers are in series with the load, provide an output when forward biased" << endl;
+	cout << "\n        Positive clipper                                 Negative clipper           \n";
+
+	cout << "   ------------------------------                   ------------------------------    \n";
+	cout << "   |                            |                   |                            |    \n";
+	cout << "   |                         -------                |                          -----  \n";
+	cout << "   |                           / \\  Vd=0.7V        |                          \\  /   Vd\n";
+	cout << "   |                          /   \\                |                           \\/   \n";
+	cout << "  Vin                         -----                Vin                        ------- \n";
+	cout << "   |                            |                   |                            |    \n";
+	cout << "   |                            |                   |                            |    \n";
+	cout << "   |                            |                   |                            |    \n";
+	cout << "   |                            |                   |                            |    \n";
+	cout << "   -------------R load-----------                   -------------R load-----------    \n";
+	cout << "         |                  |                                |             | \n";
+	cout << "         |                  |                                |             | \n";
+	cout << "         o                  o                                o             o \n";
+	cout << "         -       Vout       +                                -    V out    + \n\n";
+	cout << "For positive series clipper in forward bias, V load = -Vin + 0.7V" << endl;
+	cout << "In reverse bias, V diode = V in" << endl; ;
+	cout << "For negative series clipper in forward bias V load = Vin - 0.7V" << endl;
+	cout << "In reverse bias, V diode = -Vin" << endl;
+
+	cout << "\n\n Shunt clippers are parallel to the load, provide an output when forward biased" << endl;
+	cout << "\n        Negative clipper                                 Positive clipper           \n";
+
+	cout << " -----------------------------------------o+    -----------------------------------------o+   \n";
+	cout << " |                    |              |          |                     |            |\n";
+	cout << " |                 -------           |          |                   -----          |\n";
+	cout << " |                   / \\  Vd=0.7V   |          |                   \\  /   Vd     |\n";
+	cout << " |                  /   \\           |          |                    \\/           |\n";
+	cout << "Vin                 -----        R load         Vin                -------         |\n";
+	cout << " |                    |              |          |                     |          R load \n";
+	cout << " |                    |              |          |                     |            |\n";
+	cout << " |                    |              |          |                     |            |\n";
+	cout << " |                    |              | Vout     |                     |            |   Vout \n";
+	cout << " ---------------R1-------------------------o-   ----------------R1-----------------------o-\n\n";
+	cout << "For negative clipper, during reverse bias, Vload = Vin * (R load||R 1)" << endl;
+	cout << "During forward bias, Vload = -0.7V" << endl;
+	cout << "For positive clipper, during reverse bias, Vload = -Vin * (R load||R 1)" << endl;
+	cout << "During forward bias, VLoad = 0.7V" << endl;
+	cout << "Note that R1 has to be made much lower than Rload to ensure that RL has greater V drop" << endl << endl;
+	cout << "1.2.b Clamper circuit (DC restorer)" << endl;
+	cout << "Clamper circuit is used to shift a waveform either above or below a given reference voltage" << endl;
+	cout << "without distorting the waveform. There are positive clampers and negative clampers" << endl;
+	cout << "Positive clampers  would shift the input waveform so that the negative peak of the waveform" << endl;
+	cout << "is approximately equal to the clamper dc reference voltage. " << endl << endl;
+	cout << "\n           Positive clamper                                       Negative clamper\n" << endl;
+	cout << "   -------)|--------------------------------o +           -------|(--------------------------------o +\n";
+	cout << "   |      Vc    |               |                         |      Vc    |               |\n";
+	cout << "   |          -----             |                         |           ---              |\n";
+	cout << "   |           / \\  Vd          |                         |           \\ /  Vd         | \n";
+	cout << "   |           ---              |                         |          -----             |\n";
+	cout << "  Vin           |               RL         Vout          Vin           |               RL         Vout\n";
+	cout << "   |            |               |                         |            |               |\n";
+	cout << "   |            |               |                         |            |               |\n";
+	cout << "   -----------------------------------------o -           -----------------------------------------o -\n\n";
+	cout << "As for Vload of clamper circuits, it is produced by sum of Voltage from source and capacitor" << endl;
+	cout << "For the positive clamper, during the negative half cycle, diode is forward biased. " << endl;
+	cout << "Capacitor is charged during this cycle. A capacitor with a low charge time and high discharge" << endl;
+	cout << "has to be chosen. ";
+	cout << "During the positive half cycle, the diode is reverse biased, assuming that the diode was practical" << endl;
+	cout << "Capacitor voltage would be Vc = Vin - 0.7V. Hence during the positive cycle, V load = Vin + Vc." << endl;
+	cout << "For negative clamper, during the positive half cycle, diode is forward biased." << endl;
+	cout << "The capacitor is charged during this cycle. Vc = Vin - 0.7V" << endl;
+	cout << "During the negative half cycle, the diode is reverse biased" << endl;
+	cout << "V load = -Vc + - Vin " << endl;
+	cout << "\n Congrats!! You are done reading the notes on Chapter 1: Diodes" << endl;
+	cout << "Press any key to return to note selection \n";
+	cin >> option;
+}
 // note for chapter 2
 void notes_BJT()
 {
@@ -2968,4 +3240,83 @@ void notes_FET()
 	cin >> proceed;
 	if (toupper(proceed) == 'R')
 		notes_FET();
+}
+
+void notes_OA() {
+	cout << "----Chapter 4: The Operational Amplifier.---- \n";
+	cout << "\n1.Noninverting Amplifier\n";
+	cout << "Circuit Diagram: \n";
+	cout << "                                       \n";
+	cout << "                |\\                    \n";
+	cout << "                | \\                   \n";
+	cout << " Vin (+)------->|+ \\                  \n";
+	cout << "                |   \\_____________Vout\n";
+	cout << "                |   /        |         \n";
+	cout << "        ------->|- /         |         \n";
+	cout << "        |       | /          Rf        \n";
+	cout << "        |       |/           |         \n";
+	cout << "     Vf |____________________|  Feedback    \n";
+	cout << "                             |  Network     \n";
+	cout << "                             |         \n";
+	cout << "                             Ri        \n";
+	cout << "                             |         \n";
+	cout << "                            GND        \n";
+	cout << "                                       \n";
+	cout << "An op-amp connected in a closed-loop configuration as a noninverting amplifier.\n";
+	cout << "The input signal is applied to the noninverting(+) input.A portion of the output\n ";
+	cout << "is applied back to the inverting(-) input through the feedback network.This constitutes negative feedback. \n";
+	cout << "-->The feedback fraction, B = Ri/(Ri + Rf) \n";
+	cout << "-->The closed-loop gain for the noninverting amplifier, Acl(NI) = 1 + (Rf / Ri)\n";
+	cout << "-->The input impedance of a noninverting amplifier configuration, Zin(NI) = (1 + Aol * B ) * Zin\n";
+	cout << "-->The output impedance of a noninverting amplifier configuration, Zout(NI) = Zout/(1 + Aol * B )\n";
+	cout << "\n2.Inverting Amplifier\n";
+	cout << "Circuit Diagram: \n";
+	cout << "                                               \n";
+	cout << "                    _______Rf_______           \n";
+	cout << "                   |                |          \n";
+	cout << "                   |                |          \n";
+	cout << "                   |    |\\         |          \n";
+	cout << "                   |    | \\        |          \n";
+	cout << " Vin (~)------Ri------->|+ \\       |          \n";
+	cout << "                        |   \\______|____Vout  \n";
+	cout << "                        |   /                  \n";
+	cout << "                ------->|- /                   \n";
+	cout << "                |       | /                    \n";
+	cout << "                |       |/                     \n";
+	cout << "               GND                             \n";
+	cout << "                                               \n";
+	cout << "An op-amp connected as an inverting amplifier with a controlled amount of voltage gain. The input signal \n";
+	cout << "is applied through a series input resistor(Ri) to the inverting (-) input.Also, the output is feed back through\n";
+	cout << "Rf to the inverting input. The noninverting (+) inout is grounded.\n";
+	cout << "-->The closed-loop gain for the inverting amplifier, Acl(I) = -(Rf / Ri)\n";
+	cout << "-->The input impedance of the inverting amplifier configuration, Zin(I) ≅ Ri\n";
+	cout << "The inout impedance,Zin(I), approximately equals the external inout resistance,Ri,";
+	cout << "because of the virtual ground at the inverting input.\n";
+	cout << "-->The output impedance of the inverting amplifier configuration, Zout(I) = Zout/(1 + Aol * B )\n";
+	cout << "\n3.Voltage-Follower\n";
+	cout << "Circuit Diagram: \n";
+	cout << "                                       \n";
+	cout << "                |\\                    \n";
+	cout << "                | \\                   \n";
+	cout << " Vin (~)------->|+ \\                  \n";
+	cout << "  |             |   \\_____________Vout\n";
+	cout << "  GND           |   /        |         \n";
+	cout << "        ------->|- /         |         \n";
+	cout << "        |       | /          Rf        \n";
+	cout << "        |       |/           |         \n";
+	cout << "        |____________________|         \n";
+	cout << "                             |         \n";
+	cout << "                             |         \n";
+	cout << "                             Ri        \n";
+	cout << "                             |         \n";
+	cout << "                            GND        \n";
+	cout << "                                       \n";
+	cout << "The voltage-follower configuration is a special case of the noninverting amplifier where all of the \n";
+	cout << "output voltage is fed back to the inverting(-) inout by a straingt connection.The straingt feedback connection \n";
+	cout << "has a voltage gain of approximately 1. The closed - loop voltage gain of a noninverting amplifier is 1 / B as previosly derived. \n";
+	cout << "Since B = 1, the closed - loop gain of the voltage - follower is Acl(VF) = 1.\n";
+	cout << "-->The input impedance of the voltage-follower, Zin(VF) = (1 + Aol) * Zin\n";
+	cout << "-->The output impedance of the voltage-follower, Zout(VF) = Zout/(1 + Aol)\n";
+	cout << "\nCongrats!! you are done on reading the notes for Chapter 4. " << endl;
+	}
 }
