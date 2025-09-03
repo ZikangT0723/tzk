@@ -20,16 +20,17 @@ struct User {
 };
 User Student[Studentnum];
 int userindex = 0;
+
 void sim();
 void note();
 int Test2_quizz(float*);
 void getinfo(User[]);
-void userlist(User[], int);
-void loaduserdata(User*);
+void userlist(User[]);
+void loaduserdata(User[]);
 bool checkopenfile(fstream&, string);
-void userMenu(User[], int);
+void userMenu(User[]);
 int findslot(User[]);
-void savefile(User*, string);
+void savefile(User*, string, int);
 void checksubmit(float*, int);
 int check(float*, int&);
 int checksection(float*, int, int);
@@ -121,7 +122,6 @@ int main() {
 	if (!checkopenfile(list, "Userlist")) {
 		return 1; // Exit if file cannot be opened
 	}
-	loaduserdata(Student);
 
 	while (true)
 	{
@@ -157,8 +157,8 @@ int main() {
 				else {
 					cout << "The userlist is full." << endl;
 				}
-				userlist(Student, userindex);
-				userMenu(Student, userindex); //zikang code should be arrange to a function for clean code
+				userlist(Student);
+				userMenu(Student); //zikang code should be arrange to a function for clean code
 			}
 			break;
 		case 3:
@@ -275,7 +275,7 @@ void hostMenu(User Student[], int userindex)
 			break;
 		case 2:
 			//userlist
-			userlist(Student, userindex);
+			userlist(Student);
 			break;
 		case 3:
 			hostCommentMenu(comments, commentCount); break;//Trang
@@ -284,9 +284,9 @@ void hostMenu(User Student[], int userindex)
 }
 
 
-void userMenu(User Student[], int userindex) {
+void userMenu(User Student[]) {
 	int opt;
-
+	int temporaryindex = userindex - 1;
 	if (userindex < 0 || userindex >= Studentnum) {
 		cout << "ERROR! Invalid user index!" << endl;
 		return;
@@ -299,37 +299,41 @@ void userMenu(User Student[], int userindex) {
 			note();
 			break;
 		case 2:
-			if (!Student[userindex].attempt_Test1) {
-				Test1_quizz(Student, userindex);
+			if (!Student[temporaryindex].attempt_Test1) {
+				Test1_quizz(Student, temporaryindex);
 			}
 			else
 			{
 				cout << "You have submitted Test 1\n";
-				cout << "Result of test 1: " << Student[userindex].result_Test1 << " %\n\n";
+				cout << "Result of test 1: " << Student[temporaryindex].result_Test1 << " %\n\n";
 			}
 			break;
 		case 3:
-			if (!Student[userindex].attempt_Test2) {
-				Student[userindex].result_Test2 = Test2_quizz(Student[userindex].ans);
-				cout << "Score updated:" << Student[userindex].result_Test2 << endl;
-				Student[userindex].attempt_Test2 = true;
+			if (!Student[temporaryindex].attempt_Test2) {
+				Student[temporaryindex].result_Test2 = Test2_quizz(Student[temporaryindex].ans);
+				cout << "userindex(quiz):" << userindex << endl;
+				cout << "temporaryindex(quiz):" << temporaryindex << endl;
+				cout << "Score updated:" << Student[temporaryindex].result_Test2 << endl;
+				Student[temporaryindex].attempt_Test2 = true;
+				savefile(Student, "Userlist", temporaryindex);
 			}
 			else {
+				cout << "userindex(review):" << userindex << endl;
+				cout << "temporaryindex(review):" << temporaryindex << endl;
 				cout << "Test 2 review.\n";
-				review(Student[userindex].ans, Student[userindex].result_Test2);
+				review(Student[temporaryindex].ans, Student[temporaryindex].result_Test2);
 			}
 			break;
 		case 4:
 			sim();
 			break;
 		case 5:
-			userlist(Student, userindex);
+			userlist(Student);
 			break;
 		case 6:
 			studentCommentMenu(comments, commentCount, Student, userindex); break;
 		case 0:
 			cout << "Programme end." << endl;
-			savefile(Student, "Userlist");
 			saveComments(comments, commentCount);//Trang
 			cout << "User data saved successfully." << endl;
 			return;
@@ -962,7 +966,7 @@ bool checkopenfile(fstream& file, string name) {
 
 }
 
-void loaduserdata(User* Student) {
+void loaduserdata(User Student[]) {
 	userindex = 0;
 	fstream list = fstream("Userlist", ios::in);
 	if (!list.is_open()) {
@@ -972,8 +976,10 @@ void loaduserdata(User* Student) {
 	string line;
 	string emptyspace;
 	while (userindex < Studentnum) {
-
-		if (!getline(list, line, '|')) break;
+		cout << "userindex(load):" << userindex << endl;
+		if (!getline(list, line, '|')) {
+			break;
+		}
 		Student[userindex].Name = line;
 
 		if (getline(list, line, '|')) {
@@ -1004,16 +1010,17 @@ void loaduserdata(User* Student) {
 			}
 		}
 		getline(list, line);
-		Student[userindex++];
+		userindex++;
+
 		if (userindex >= Studentnum) break; //break if exceed the limit
-		if (line.empty()) break;
+
 	}
 	list.close();
 }
 
 void getinfo(User Student[]) {
-	loaduserdata(Student);
 	bool IDvalid, IDdigits;
+	loaduserdata(Student);
 	cout << "Enter your name:";
 	cin.ignore();
 	getline(cin, Student[userindex].Name);
@@ -1041,27 +1048,34 @@ void getinfo(User Student[]) {
 		}
 		IDvalid = true;
 	} while (!IDvalid);
-	savefile(Student, "Userlist");
+	savefile(Student, "Userlist", userindex);
 }
-void userlist(User Student[], int userindex) {
-	for (int i = 0; i <= userindex; i++) {
-		cout << "Name: " << left << setw(20) << Student[i].Name <<
-			" | Student ID: " << setw(7) << Student[i].ID <<
-			" | Test 1: " << Student[i].result_Test1 <<
-			" | Test 2: " << Student[i].result_Test2 << endl;
-
+void userlist(User Student[]) {
+	loaduserdata(Student);
+	for (int i = 0; i < userindex; i++) {
+		if (i == 0 && Student[i].Name == "") {
+			cout << "NO student registered yet.\n";
+		}
+		else {
+			cout << "Name: " << left << setw(20) << Student[i].Name <<
+				" | Student ID: " << setw(7) << Student[i].ID <<
+				" | Test 1: " << Student[i].result_Test1 <<
+				" | Test 2: " << Student[i].result_Test2 << endl;
+		}
 	}
 }
 
 
 
-void savefile(User* Student, string name) {
+void savefile(User* Student, string name, int index) {
 	fstream list = fstream("Userlist", ios::out);
 	if (!list.is_open()) {
 		cout << "Error opening file for saving: " << name << endl;
 		return;
 	}
-	for (int i = 0; i <= userindex; i++) {
+	cout << "index(save):" << index << endl;
+
+	for (int i = 0; i <= index; i++) {
 
 		list << Student[i].Name << "|"
 			<< Student[i].ID << "|"
@@ -1075,6 +1089,7 @@ void savefile(User* Student, string name) {
 		list << "\n";
 
 	}
+
 	list.close();
 
 }
