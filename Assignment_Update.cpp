@@ -23,14 +23,14 @@ int userindex = 0;
 
 void sim();
 void note();
-int Test2_quizz(float*);
-void getinfo(User[]);
+void Test2_quizz(float*, int);
+int getinfo(User[]);
 void userlist(User[]);
 void loaduserdata(User[]);
 bool checkopenfile(fstream&, string);
-void userMenu(User[]);
+void userMenu(User[], int);
 int findslot(User[]);
-void savefile(User*, string, int);
+void savefile(User*, string);
 void checksubmit(float*, int);
 int check(float*, int&);
 int checksection(float*, int, int);
@@ -56,7 +56,7 @@ Test1 Quizz[10]; //store 10 test1 questions
 int Test1Count = 0; //count question from file
 const int MAX_Numbers = 10; //maximum number
 // quizz function for user
-void Test1_quizz(User* Student, int userindex);
+void Test1_quizz(int userindex);
 int checkAns(char ans, char answer);
 void shuffle(int* temp, int Question_Numbers);//temporary storage for the sequence array
 //quizz function for host
@@ -108,13 +108,13 @@ void hostCommentMenu(Comment comments[], int& count);
 void deleteComment(Comment comments[], int count);
 void replyToComment(Comment comments[], int count);
 void showAllComments(Comment comments[], int count);
-void createStudentComment(Comment comments[], int& count, User Student[], int userindex);
-void studentCommentMenu(Comment comments[], int& count, User Student[], int userindex);
+void createStudentComment(Comment comments[], int& count, User Student[], int index);
+void studentCommentMenu(Comment comments[], int& count, User Student[], int index);
 
 
 int main() {
 	LoadTest1();
-	int choice;
+	int choice, index;
 	loadComments(comments, commentCount);
 	fstream list;
 	list.open("Userlist", ios::app);
@@ -152,13 +152,13 @@ int main() {
 			{
 
 				if (userindex < Studentnum) {
-					getinfo(Student);
+					index = getinfo(Student);
 				}
 				else {
 					cout << "The userlist is full." << endl;
 				}
 				userlist(Student);
-				userMenu(Student); //zikang code should be arrange to a function for clean code
+				userMenu(Student, index); //zikang code should be arrange to a function for clean code
 			}
 			break;
 		case 3:
@@ -275,6 +275,7 @@ void hostMenu(User Student[], int userindex)
 			break;
 		case 2:
 			//userlist
+			loaduserdata(Student);
 			userlist(Student);
 			break;
 		case 3:
@@ -284,9 +285,8 @@ void hostMenu(User Student[], int userindex)
 }
 
 
-void userMenu(User Student[]) {
+void userMenu(User Student[], int index) {
 	int opt;
-	int temporaryindex = userindex - 1;
 	if (userindex < 0 || userindex >= Studentnum) {
 		cout << "ERROR! Invalid user index!" << endl;
 		return;
@@ -299,39 +299,36 @@ void userMenu(User Student[]) {
 			note();
 			break;
 		case 2:
-			if (!Student[temporaryindex].attempt_Test1) {
-				Test1_quizz(Student, temporaryindex);
+			if (!Student[index].attempt_Test1) {
+				Test1_quizz(index);
+
 			}
 			else
 			{
 				cout << "You have submitted Test 1\n";
-				cout << "Result of test 1: " << Student[temporaryindex].result_Test1 << " %\n\n";
+				cout << "Result of test 1: " << Student[index].result_Test1 << " %\n\n";
 			}
 			break;
 		case 3:
-			if (!Student[temporaryindex].attempt_Test2) {
-				Student[temporaryindex].result_Test2 = Test2_quizz(Student[temporaryindex].ans);
-				cout << "userindex(quiz):" << userindex << endl;
-				cout << "temporaryindex(quiz):" << temporaryindex << endl;
-				cout << "Score updated:" << Student[temporaryindex].result_Test2 << endl;
-				Student[temporaryindex].attempt_Test2 = true;
-				savefile(Student, "Userlist", temporaryindex);
+			if (!Student[index].attempt_Test2) {
+				Test2_quizz(Student[index].ans, index);
+
 			}
 			else {
 				cout << "userindex(review):" << userindex << endl;
-				cout << "temporaryindex(review):" << temporaryindex << endl;
+				cout << "userindex(review):" << userindex << endl;
 				cout << "Test 2 review.\n";
-				review(Student[temporaryindex].ans, Student[temporaryindex].result_Test2);
+				review(Student[index].ans, Student[index].result_Test2);
 			}
 			break;
 		case 4:
 			sim();
 			break;
 		case 5:
-			userlist(Student);
+			userlist(Student);//cancel
 			break;
 		case 6:
-			studentCommentMenu(comments, commentCount, Student, userindex); break;
+			studentCommentMenu(comments, commentCount, Student, index); break;
 		case 0:
 			cout << "Programme end." << endl;
 			saveComments(comments, commentCount);//Trang
@@ -343,11 +340,10 @@ void userMenu(User Student[]) {
 	}
 }
 
-
-int Test2_quizz(float* answer) {
+void Test2_quizz(float* answer, int index) {
 	int i = 0, points = 0, record[12] = {};
 	bool same;
-	char a;
+	char a;//change name
 	answer[ansnum] = {};
 
 	do {
@@ -876,8 +872,10 @@ int Test2_quizz(float* answer) {
 			break;
 		}
 	} while (record[i] != 13);
-	check(answer, points);
-	return points;
+	check(answer, Student[index].result_Test2);
+	cout << "Score updated:" << Student[index].result_Test2 << endl;
+	Student[index].attempt_Test2 = true;
+	savefile(Student, "Userlist");
 }
 
 void note() {
@@ -1018,7 +1016,7 @@ void loaduserdata(User Student[]) {
 	list.close();
 }
 
-void getinfo(User Student[]) {
+int getinfo(User Student[]) {
 	bool IDvalid, IDdigits;
 	loaduserdata(Student);
 	cout << "Enter your name:";
@@ -1048,34 +1046,37 @@ void getinfo(User Student[]) {
 		}
 		IDvalid = true;
 	} while (!IDvalid);
-	savefile(Student, "Userlist", userindex);
+	userindex++;
+	savefile(Student, "Userlist");
+	return userindex - 1;
 }
 void userlist(User Student[]) {
-	loaduserdata(Student);
-	for (int i = 0; i < userindex; i++) {
-		if (i == 0 && Student[i].Name == "") {
-			cout << "NO student registered yet.\n";
-		}
-		else {
+	if (userindex == 0 && Student[userindex].Name == "") {
+		cout << "NO student registered yet.\n";
+	}
+	else {
+		for (int i = 0; i < userindex; i++) {
+
 			cout << "Name: " << left << setw(20) << Student[i].Name <<
 				" | Student ID: " << setw(7) << Student[i].ID <<
 				" | Test 1: " << Student[i].result_Test1 <<
 				" | Test 2: " << Student[i].result_Test2 << endl;
+
 		}
 	}
 }
 
 
 
-void savefile(User* Student, string name, int index) {
+void savefile(User* Student, string name) {
 	fstream list = fstream("Userlist", ios::out);
 	if (!list.is_open()) {
 		cout << "Error opening file for saving: " << name << endl;
 		return;
 	}
-	cout << "index(save):" << index << endl;
+	cout << "index(save):" << userindex << endl;
 
-	for (int i = 0; i <= index; i++) {
+	for (int i = 0; i < userindex; i++) {
 
 		list << Student[i].Name << "|"
 			<< Student[i].ID << "|"
@@ -1401,7 +1402,7 @@ void review(float* answer, int score) {
 	cout << "Total score = " << score << "/" << ansnum << endl;
 }
 
-void Test1_quizz(User* Student, int userindex)
+void Test1_quizz(int index)
 {
 	/* this function is to let user answer 10 question made
 	by host and each user the sequence will be shuffled*/
@@ -1433,11 +1434,11 @@ void Test1_quizz(User* Student, int userindex)
 			cout << endl;
 		}
 	}
-	Student[userindex].result_Test1 = (score / float(Test1Count)) * 7;
-	Student[userindex].attempt_Test1 = true;
+	Student[index].result_Test1 = (score / float(Test1Count)) * 7;
+	Student[index].attempt_Test1 = true;
 	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << " ("
-		<< fixed << setprecision(2) << Student[userindex].result_Test1 << "%)." << endl;
-
+		<< fixed << setprecision(2) << Student[index].result_Test1 << "%)." << endl;
+	savefile(Student, "Userlist");
 }
 
 void shuffle(int* temp, int Question_Numbers)//temporary storage for the sequence array
@@ -3539,7 +3540,7 @@ void createNotification(Comment comments[], int& count) {
 	count++;
 	saveComments(comments, count);
 }
-void studentCommentMenu(Comment comments[], int& count, User Student[], int userindex)
+void studentCommentMenu(Comment comments[], int& count, User Student[], int index)
 {
 	int option;
 	do {
@@ -3552,13 +3553,13 @@ void studentCommentMenu(Comment comments[], int& count, User Student[], int user
 
 		switch (option) {
 		case 1: showAllComments(comments, count); break;
-		case 2:createStudentComment(comments, count, Student, userindex);
+		case 2:createStudentComment(comments, count, Student, index);
 		}
 	} while (option != 0);
 
 
 }
-void createStudentComment(Comment comments[], int& count, User Student[], int userindex) {
+void createStudentComment(Comment comments[], int& count, User Student[], int index) {
 	if (count >= MAX_COMMENTS) {
 		cout << "Comment list is full!" << endl;
 		return;
@@ -3567,12 +3568,12 @@ void createStudentComment(Comment comments[], int& count, User Student[], int us
 	cout << "Enter your comment: ";
 	getline(cin, comments[count].text);
 
-	comments[count].studentID = Student[userindex].ID;
+	comments[count].studentID = Student[index].ID;
 	comments[count].fromHost = false;
 	comments[count].hostReply = "";
 	comments[count].deleted = false;
 
-	cout << "Comment saved! (Student ID: " << Student[userindex].ID << ")" << endl;//can save student id
+	cout << "Comment saved! (Student ID: " << Student[index].ID << ")" << endl;//can save student id
 	count++;
 }
 void saveComments(Comment comments[], int count) {
@@ -3603,21 +3604,17 @@ void loadComments(Comment comments[], int& count) {
 	string line;
 	while (getline(file, line)) {
 		if (line.empty()) continue;
-
 		comments[count].fromHost = (line == "1" || line == "true");
 
 		if (!getline(file, line)) break;
 		try {
-			comments[count].studentID = stoi(line);
+			comments[count].studentID = line;
 		}
 		catch (...) {
 			comments[count].studentID = -1;
 		}
 
-
 		if (!getline(file, comments[count].text)) break;
-
-
 		if (!getline(file, comments[count].hostReply)) break;
 
 		comments[count].deleted = false;
