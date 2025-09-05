@@ -1,4 +1,4 @@
-﻿#include <iostream>
+﻿#include<iostream>
 #include<string>
 #include<cmath>
 #include<iomanip>
@@ -101,15 +101,17 @@ const int MAX_COMMENTS = 100;
 Comment comments[MAX_COMMENTS];
 int commentCount = 0;
 
-void saveComments(Comment comments[], int count);
-void loadComments(Comment comments[], int& count);
-void createNotification(Comment comments[], int& count);
-void hostCommentMenu(Comment comments[], int& count);
-void deleteComment(Comment comments[], int count);
-void replyToComment(Comment comments[], int count);
-void showAllComments(Comment comments[], int count);
-void createStudentComment(Comment comments[], int& count, User Student[], int index);
-void studentCommentMenu(Comment comments[], int& count, User Student[], int index);
+void saveComments(Comment[], int);
+void loadComments(Comment[], int&);
+void createNotification(Comment[], int&);
+void hostCommentMenu(Comment[], int&);
+void deleteComment(Comment[], int&);
+void replyToComment(Comment[], int);
+void showAllComments(Comment[], int);
+void createStudentComment(Comment[], int&, User[], int);
+void studentCommentMenu(Comment[], int&, User[], int);
+void deleteEntireComment(Comment[], int&, int);
+void deleteHostReply(Comment[], int, int);
 
 
 int main() {
@@ -3436,6 +3438,7 @@ void notes_OA() {
 }
 
 //Trang edit comment fuction
+//menu
 void hostCommentMenu(Comment comments[], int& count) {
 	int choice;
 	do {
@@ -3443,19 +3446,78 @@ void hostCommentMenu(Comment comments[], int& count) {
 		cout << "1. Show All Comments\n";
 		cout << "2. Create Notification\n";
 		cout << "3. Reply to Student Comment\n";
-		cout << "4. Delete Comment/Notification (Host only)\n";
+		cout << "4. Delete Comment\n";
 		cout << "0. Return\n";
 		cout << "Choice (0~4): ";
 		cin >> choice;
 
 		switch (choice) {
+		case 0: cout << "Returning...\n"; break;
 		case 1: showAllComments(comments, count); break;
 		case 2: createNotification(comments, count); break;
 		case 3: replyToComment(comments, count); break;
 		case 4: deleteComment(comments, count); break;
+		default: cout << "Invalid choice.\n"; break;
 		}
 	} while (choice != 0);
 }
+void studentCommentMenu(Comment comments[], int& count, User Student[], int index)
+{
+	int option;
+	do {
+		cout << "\n--- Student Comment Menu ---\n";
+		cout << "1. Show All Comments and Reply\n";
+		cout << "2. Create a Comment\n";
+		cout << "0. Return\n";
+		cout << "Choice: ";
+		cin >> option;
+
+		switch (option) {
+		case 1: showAllComments(comments, count); break;
+		case 2:createStudentComment(comments, count, Student, index);
+		}
+	} while (option != 0);
+
+
+}
+//create
+void createNotification(Comment comments[], int& count) {
+	if (count >= MAX_COMMENTS) {
+		cout << "Comment list is full!" << endl;
+		return;
+	}
+	cin.ignore();
+	cout << "Enter your comment (as host): ";
+	getline(cin, comments[count].text);
+
+	comments[count].studentID = "";
+	comments[count].fromHost = true;
+	comments[count].hostReply = "";
+	comments[count].deleted = false;
+
+	cout << "Host comment saved!" << endl;
+	count++;
+	saveComments(comments, count);
+}
+void createStudentComment(Comment comments[], int& count, User Student[], int index) {
+	if (count >= MAX_COMMENTS) {
+		cout << "Comment list is full!" << endl;
+		return;
+	}
+	cin.ignore();
+	cout << "Enter your comment: ";
+	getline(cin, comments[count].text);
+
+	comments[count].studentID = Student[index].ID;
+	comments[count].fromHost = false;
+	comments[count].hostReply = "";
+	comments[count].deleted = false;
+
+	cout << "Comment saved! (Student ID: " << Student[index].ID << ")" << endl;//can save student id
+	count++;
+	saveComments(comments, count);
+}
+
 void showAllComments(Comment comments[], int count) {
 	cout << "\n======= Comment List =======\n";
 	if (count == 0) {
@@ -3483,99 +3545,111 @@ void showAllComments(Comment comments[], int count) {
 	cout << "============================\n";
 }
 void replyToComment(Comment comments[], int count) {
-	int index;
-	cout << "Enter the comment number to reply: ";
-	cin >> index;
-	cin.ignore();
-	if (index >= 0 && index < count && !comments[index].deleted)
-	{
-		cout << "Enter your reply: ";
-		getline(cin, comments[index].hostReply);
-		cout << "Reply saved!" << endl;
-		saveComments(comments, count);//save comment
+	if (count == 0) {
+		cout << "No comments to reply.\n";
+		return;
 	}
-	else {
-		cout << "Invalid comment index!" << endl;
+
+	char reply = 'Y';
+	while (toupper(reply) == 'Y') {
+		showAllComments(comments, count);
+
+		int index;
+		cout << "Enter the comment number to reply: ";
+		cin >> index;
+
+		if (index < 0 || index >= count) {
+			cout << "Invalid comment index!\n";
+			return;
+		}
+
+		if (!comments[index].hostReply.empty()) {
+			cout << "Already replied.\n";
+		}
+		else {
+			cin.ignore();
+			cout << "Enter your reply: ";
+			getline(cin, comments[index].hostReply);
+
+			cout << "Reply added successfully.\n";
+			saveComments(comments, count);
+		}
+
+		while (true) {
+			cout << "Do you want to continue replying? (Y/N): ";
+			cin >> reply;
+
+			if (reply == 'Y' || reply == 'y' || reply == 'N' || reply == 'n') {
+				break;
+			}
+			else {
+				cout << "Invalid input. Please enter Y or N.\n";
+			}
+		}
 	}
 }
-//only delete host comment or notification 
-void deleteComment(Comment comments[], int count) {
+
+//delete comment function
+void deleteComment(Comment comments[], int& count) {
+	if (count == 0) {
+		cout << "No comments to delete.\n";
+		return;
+	}
+
+	showAllComments(comments, count);
+
 	int index;
 	cout << "Enter the comment number to delete: ";
 	cin >> index;
-	if (index >= 0 && index < count && !comments[index].deleted) {
-		if (comments[index].fromHost)
-		{
-			comments[index].deleted = true;
-			cout << "Host notification deleted." << endl;
-		}
-		else if (!comments[index].hostReply.empty()) {
-			comments[index].hostReply.clear();
-			cout << "Host reply deleted." << endl;
-		}
-		else {
-			cout << "Error: You cannot delete student comments!" << endl;
-		}
+
+	if (index < 0 || index >= count) {
+		cout << "Invalid comment index!\n";
+		return;
+	}
+
+	cout << "\nWhat do you want to delete?\n";
+	cout << "1. Entire comment\n";
+	cout << "2. Host reply\n";
+	cout << "3. Cancel\n";
+	cout << "Choice: ";
+	int choice;
+	cin >> choice;
+
+	switch (choice) {
+	case 1:
+		deleteEntireComment(comments, count, index);
+		break;
+	case 2:
+		deleteHostReply(comments, count, index);
+		break;
+	case 3:
+		cout << "Delete cancelled.\n";
+		return;
+	default:
+		cout << "Invalid choice.\n";
+		return;
+	}
+}
+void deleteEntireComment(Comment comments[], int& count, int index) {
+	for (int i = index; i < count - 1; i++) {
+		comments[i] = comments[i + 1];
+	}
+	comments[count - 1] = {};
+	count--;
+	cout << "Comment deleted successfully.\n";
+	saveComments(comments, count);
+}
+void deleteHostReply(Comment comments[], int count, int index) {
+	if (!comments[index].hostReply.empty()) {
+		comments[index].hostReply.clear();
+		cout << "Host reply deleted successfully.\n";
 		saveComments(comments, count);
 	}
 	else {
-		cout << "Invalid comment index!" << endl;
+		cout << "This comment has no host reply.\n";
 	}
 }
-void createNotification(Comment comments[], int& count) {
-	if (count >= MAX_COMMENTS) {
-		cout << "Comment list is full!" << endl;
-		return;
-	}
-	cin.ignore();
-	cout << "Enter your comment (as host): ";
-	getline(cin, comments[count].text);
 
-	comments[count].studentID = "";
-	comments[count].fromHost = true;
-	comments[count].hostReply = "";
-	comments[count].deleted = false;
-
-	cout << "Host comment saved!" << endl;
-	count++;
-	saveComments(comments, count);
-}
-void studentCommentMenu(Comment comments[], int& count, User Student[], int index)
-{
-	int option;
-	do {
-		cout << "\n--- Student Comment Menu ---\n";
-		cout << "1. Show All Comments and Reply\n";
-		cout << "2. Create a Comment\n";
-		cout << "0. Return\n";
-		cout << "Choice: ";
-		cin >> option;
-
-		switch (option) {
-		case 1: showAllComments(comments, count); break;
-		case 2:createStudentComment(comments, count, Student, index);
-		}
-	} while (option != 0);
-
-
-}
-void createStudentComment(Comment comments[], int& count, User Student[], int index) {
-	if (count >= MAX_COMMENTS) {
-		cout << "Comment list is full!" << endl;
-		return;
-	}
-	cin.ignore();
-	cout << "Enter your comment: ";
-	getline(cin, comments[count].text);
-
-	comments[count].studentID = Student[index].ID;
-	comments[count].fromHost = false;
-	comments[count].hostReply = "";
-	comments[count].deleted = false;
-
-	cout << "Comment saved! (Student ID: " << Student[index].ID << ")" << endl;//can save student id
-	count++;
-}
 void saveComments(Comment comments[], int count) {
 	fstream file("Comments", ios::out);
 	if (!file.is_open()) {
@@ -3592,7 +3666,7 @@ void saveComments(Comment comments[], int count) {
 		}
 	}
 	file.close();
-	cout << "Comments saved successfully" << endl;
+	cout << "Comments saved successfully." << endl;
 }
 void loadComments(Comment comments[], int& count) {
 	fstream file("Comments", ios::in);
@@ -3602,18 +3676,12 @@ void loadComments(Comment comments[], int& count) {
 	}
 
 	string line;
+	count = 0;
 	while (getline(file, line)) {
 		if (line.empty()) continue;
 		comments[count].fromHost = (line == "1" || line == "true");
 
-		if (!getline(file, line)) break;
-		try {
-			comments[count].studentID = line;
-		}
-		catch (...) {
-			comments[count].studentID = -1;
-		}
-
+		if (!getline(file, comments[count].studentID)) break;
 		if (!getline(file, comments[count].text)) break;
 		if (!getline(file, comments[count].hostReply)) break;
 
