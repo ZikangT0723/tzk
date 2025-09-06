@@ -1,4 +1,4 @@
-﻿#include<iostream>
+#include<iostream>
 #include<string>
 #include<cmath>
 #include<iomanip>
@@ -13,6 +13,7 @@ const float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.4
 struct User {
 	string Name;
 	string ID;
+	string password;
 	float result_Test1 = 0; //7%
 	int result_Test2 = 0; //23%
 	bool attempt_Test1;
@@ -42,6 +43,8 @@ int check(float*, int&);
 int checksection(float*, int, int);
 void review(float*, int);
 
+//USER FUNCTION
+bool userLogin(int* index);
 
 //HOST FUNCTION
 bool hostLogin();//Daniel
@@ -157,17 +160,9 @@ int main() {
 				hostMenu(Student, userindex);
 			break;
 		case 2:
-			if (true)//pavan userLogin function
-			{
-
-				if (userindex < Studentnum) {
-					index = getinfo(Student);
-				}
-				else {
-					cout << "The userlist is full." << endl;
-				}
+			if (userLogin(&index)) {
 				userlist(Student);
-				userMenu(Student, index); //zikang code should be arrange to a function for clean code
+				userMenu(Student, index);
 			}
 			break;
 		case 3:
@@ -179,6 +174,68 @@ int main() {
 
 }
 
+//Pavan
+bool userLogin(int* index) {
+	int option;
+	int position;
+	string yourID;
+	string yourPassword;
+
+	cout << "Do you want to login or register [1 login, 2 register]";
+	cin >> option;
+
+	while (option != 1 && option != 2)
+	{
+		cout << "Invalid input please enter 1 or 2." << endl;
+		cout << "Enter your choice: ";
+		cin >> option;
+	}
+
+	if (option == 1) {
+		cout << "Enter your student ID: ";
+		cin >> yourID;
+
+		cout << "Enter your password: ";
+		cin >> yourPassword;
+		for (int i = 0; i < userindex; i++) {
+			if (yourID == Student[i].ID) {
+				position = i;
+				break;
+			}
+		}
+		if (yourPassword == Student[position].password) {
+			cout << "Login successful \n";
+			*index = position;
+			return true;
+		}
+
+
+		else {
+			for (int attempts = 2; attempts > 0; attempts--) {
+				cout << "Your ID: " << yourID << endl;
+				cout << "You have " << attempts << " left...\n";
+				cout << "Enter your correct password: ";
+				cin >> yourPassword;
+				if (yourPassword == Student[position].password) {
+					*index = position;
+					return true;
+				}
+			}
+			cout << "You have no attempts left, please contact your teacher for help...\n";
+			return false;
+		}
+	}
+	else if (option == 2) {
+		if (userindex < Studentnum) {
+			*index = getinfo(Student);
+			return true;
+		}
+		else {
+			cout << "The userlist is full." << endl;
+			return false;
+		}
+	}
+}
 //Daniel
 bool hostLogin() {
 	string hostID, hostPass;
@@ -1009,6 +1066,9 @@ void loaduserdata(User Student[]) {
 			Student[userindex].ID = line;
 		}
 		if (getline(list, line, '|')) {
+			Student[userindex].password = line;
+		}
+		if (getline(list, line, '|')) {
 			Student[userindex].result_Test1 = stof(line);
 		}
 		if (getline(list, line, '|'))
@@ -1071,6 +1131,8 @@ int getinfo(User Student[]) {
 		}
 		IDvalid = true;
 	} while (!IDvalid);
+	cout << "Enter your password: ";
+	getline(cin, Student[userindex].password);
 	userindex++;
 	savefile(Student, "Userlist");
 	return userindex - 1;
@@ -1105,6 +1167,7 @@ void savefile(User* Student, string name) {
 
 		list << Student[i].Name << "|"
 			<< Student[i].ID << "|"
+			<< Student[i].password << "|" //Pavan added this
 			<< Student[i].result_Test1 << "|"
 			<< Student[i].result_Test2 << "|"
 			<< Student[i].attempt_Test1 << "|"
@@ -3000,7 +3063,7 @@ void invertingAmplifier()//Trang
 	{
 		cout << "\nFormula Option:\n";
 		cout << "1. Acl(I)= - (Rf/Ri)\n";
-		cout << "2. Zin(I) ≅ Ri \n";
+		cout << "2. Zin(I) ? Ri \n";
 		cout << "3. Exit formula menu.";
 		cout << "Enter your choice (1-3): ";
 		cin >> opt;
@@ -3121,7 +3184,7 @@ void notes_Diode()
 	cout << "When the diode is reverse-biased, the maximum reverse voltage that will not force conduction is called Vrrm." << endl;
 	cout << "Vrrm = 1.2 * (Peak reverse voltage)." << endl;
 	cout << "If a diode conducts significantly in the reverse direction, the device will be destroyed." << endl;
-	cout << "Average forward current indicates the maximum allowable dc forward current ≈ 120% of rated forward current." << endl;
+	cout << "Average forward current indicates the maximum allowable dc forward current ? 120% of rated forward current." << endl;
 	cout << "Forward power dissipation, Pd(max), indicates the maximum power of diode operation in forward bias." << endl;
 
 	cout << "\n1.1.c <The Complete Model>:" << endl;
@@ -3140,7 +3203,7 @@ void notes_Diode()
 	cout << "There are two types of clippers: series and shunt clippers." << endl;
 	cout << "Series clippers are connected in series with the load and provide an output when forward biased." << endl;
 
-	// ASCII diagrams kept exactly the same ↓
+	// ASCII diagrams kept exactly the same ?
 	cout << "\n        Positive clipper                                 Negative clipper           \n";
 	cout << "   ------------------------------                   ------------------------------    \n";
 	cout << "   |                            |                   |                            |    \n";
@@ -3499,7 +3562,7 @@ void notes_BJT()
 			cout << "This is the voltage divider bias circuit.\n\n";
 
 			cout << "There are 5 equations for the voltage divider bias circuit in DC analysis.\n";
-			cout << "! Note: All equations are expressed in terms of voltage (V), current (A), and resistance (Ω), instead of using prefixes such as milli (m) or kilo (k). !\n\n";
+			cout << "! Note: All equations are expressed in terms of voltage (V), current (A), and resistance (?), instead of using prefixes such as milli (m) or kilo (k). !\n\n";
 
 			cout << "[Equation 1 (for finding RIN_base)]: RIN_base = betaDC * RE\n\n\n";
 
@@ -3567,7 +3630,7 @@ void notes_FET()
 	cout << "Next, by providing a negative voltage to gate-to-source and sets a reverse-bias voltage between it and the pn junction become reverse biased." << endl << endl;
 
 	cout << "In short, A JFET works by using the gate voltage to widen or narrow the depletion layer," << endl;
-	cout << "which controls the channel’s width and therefore regulates the current flowing from drain to source." << endl << endl;
+	cout << "which controls the channel�s width and therefore regulates the current flowing from drain to source." << endl << endl;
 
 	waitEnter("continue");
 	system("cls");
@@ -3749,7 +3812,7 @@ void notes_OA() {
 	cout << "The input signal is applied through a series input resistor(Ri) to the inverting (-) input.\n";
 	cout << "Also, the output is feed back through Rf to the inverting input. The noninverting (+) inout is grounded.\n";
 	cout << "-->The closed-loop gain for the inverting amplifier, Acl(I) = -(Rf / Ri)\n";
-	cout << "-->The input impedance of the inverting amplifier configuration, Zin(I) ≅ Ri\n";
+	cout << "-->The input impedance of the inverting amplifier configuration, Zin(I) ? Ri\n";
 	cout << "The inout impedance,Zin(I), approximately equals the external inout resistance,Ri, because of the virtual ground at the inverting input.\n";
 	cout << "-->The output impedance of the inverting amplifier configuration, Zout(I) = Zout/(1 + Aol * B )\n\n";
 
