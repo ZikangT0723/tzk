@@ -16,12 +16,12 @@ struct User {
 	string password;
 	float result_Test1 = 0; //7%
 	int result_Test2 = 0; //23%
-	bool attempt_Test1;
-	bool attempt_Test2;
-	float ans[ansnum];
+	bool attempt_Test1 = false;
+	bool attempt_Test2 = false;
+	float ans[ansnum] = {};
 };
 User Student[Studentnum];
-int userindex = 0;
+int userindex = 0; //User count
 
 
 // test validation
@@ -33,7 +33,7 @@ void note();
 void Test2_quizz(float*, int);
 int getinfo(User[]);
 void userlist(User[]);
-void loaduserdata(User[]);
+void loaduserdata();
 bool checkopenfile(fstream&, string);
 void userMenu(User[], int);
 int findslot(User[]);
@@ -48,18 +48,18 @@ bool userLogin(int* index);
 
 //HOST FUNCTION
 bool hostLogin();//Daniel
-void hostMenu(User Student[], int userindex);//Daniel
+void hostMenu();//Daniel
 
 // Test1_function
 struct Test1 {
-	int num; //Qustion No.
+	int num = 0; //Qustion No.
 	string question;
 	string objective_A;
 	string objective_B;
 	string objective_C;
 	string objective_D;
-	char ans;
-	bool isDeleted;
+	char ans = ' ';
+	bool isDeleted = false;
 };
 Test1 Quizz[10]; //store 10 test1 questions
 int Test1Count = 0; //count question from file
@@ -69,6 +69,7 @@ void Test1_quizz(int userindex);
 int checkAns(char ans, char answer);
 void shuffle(int* temp, int Question_Numbers);//temporary storage for the sequence array
 //quizz function for host
+void Test1List();
 bool showTest1();
 void createQuizz();
 void editQuizz(int number);
@@ -124,19 +125,20 @@ void deleteHostReply(Comment[], int, int);
 
 
 int main() {
-
+	int index;
+	char choice;
 	LoadTest1();
-	int choice, index;
 	loadComments(comments, commentCount);
+	loaduserdata();
+	/*
 	fstream list;
 	list.open("Userlist", ios::app);
 	list.close();
 	if (!checkopenfile(list, "Userlist")) {
 		return 1; // Exit if file cannot be opened
 	}
-
-	while (true)
-	{
+	*/
+	do {
 		cout << "=================================\n";
 		cout << "   WELCOME TO BASIC ELECTRONIC   \n";
 		cout << "=================================\n";
@@ -146,31 +148,31 @@ int main() {
 		cout << "3. Exit\n";
 		cout << "Choice (1~3): ";
 		cin >> choice;
-		while (choice != 3 && choice != 1 && choice != 2)
-		{
-			cout << "Invalid input please enter 1 to 3." << endl;
-			cout << "Enter your choice: ";
-			cin >> choice;
-		}
-
+		system("cls");
 		switch (choice)
 		{
-		case 1:
+		case '1':
 			if (hostLogin())
-				hostMenu(Student, userindex);
+				hostMenu();
+			system("cls");
 			break;
-		case 2:
+		case '2':
 			if (userLogin(&index)) {
 				userlist(Student);
 				userMenu(Student, index);
 			}
+			system("cls");
 			break;
-		case 3:
-			cout << "Exitting program...";
+		case '3':
+			cout << "Exitting program..."; //can design
+			Sleep(1000);
 			return 0;
 			break;
+		default:
+			cout << "Invalid input please enter 1 to 3." << endl;
 		}
-	}
+	} while (choice != '1' && choice != '2');
+
 
 }
 
@@ -241,19 +243,19 @@ bool hostLogin() {
 	string hostID, hostPass;
 	const string correctID = "Teacher";
 	const string correctPass = "123456";
-
 	int attempts = 0, maxAttempts = 3;
 
-	cout << "\n--- Host Login ---\n";
-	cout << "(Type 999 as Host ID to return to Login Surface)\n\n";
-
 	while (attempts < maxAttempts) {
+		cout << "Host Login\n";
+		cout << "==========\n";
+		cout << "(Type 999 as Host ID to return to Login Surface)\n\n";
 		cout << "Enter Host ID: ";
 		cin >> hostID;
 
 		// Option to return to login surface
 		if (hostID == "999") {
 			cout << "\nReturning to Login Surface...\n";
+			Sleep(1000);
 			return false; // exit without counting as failed attempt
 		}
 
@@ -262,90 +264,54 @@ bool hostLogin() {
 
 		if (hostID == correctID && hostPass == correctPass) {
 			cout << "\nLogin Successful!\n";
+			cout << "Loading......\n";
+			Sleep(1000);
 			return true;
 		}
 		else {
 			attempts++;
-			cout << "\nInvalid ID or Password. Attempts left: "
+			system("cls");
+			cout << "Invalid ID or Password. Attempts left: "
 				<< (maxAttempts - attempts) << "\n";
 		}
 	}
 
 	cout << "\nToo many failed attempts. Returning to Login Surface...\n";
+	Sleep(1500);
 	return false;
 }
 //Daniel
-void hostMenu(User Student[], int userindex)
+void hostMenu()
 {
-	int option = 0;
-	char choice;
+	char option;
+	system("cls");
 	while (true)
 	{
-		cout << "\n--- Host Menu ---\n";
-		cout << "1. Show Test1 Question\n";
+		cout << "Host Menu\n";
+		cout << "=========\n";
+		cout << "1. Test1 Question List\n";
 		cout << "2. User List\n";
 		cout << "3. Comment Management\n";//Trang
 		cout << "4. Logout\n";
 		cout << "Enter your choice(1~4):";
 		cin >> option;
+		system("cls");
 		switch (option)
 		{
-		case 4:
-			cout << "Exit..." << endl << endl;
-			return;
-		case 1:
-			while (true) {
-				cout << "---Show Test 1 Question---" << endl;
-
-				if (!showTest1())
-				{
-					cout << "Do you want to create a new Question for Test 1 (MCQ)\n";
-					cout << "'Y' for yes, 'N' to return menu:";
-					cin >> choice;
-					while (toupper(choice) != 'Y' && toupper(choice) != 'N') {
-						cout << "INPUT ERROR, input (Y/N):" << endl;
-						cin >> choice;
-					}
-					if (toupper(choice) == 'Y') // added by Daniel to debug
-						createQuizz();
-					else
-					{
-						cout << "back to menu...\n";
-						break;
-					}
-				}
-				else
-				{
-					cout << "Enter the question you want to eddit or any int to create (999 to return):";
-					cin >> option;
-					while (cin.fail())
-					{
-						cin.clear();
-						cin.ignore();
-						cout << "Invalid input ..." << endl;
-						cout << "Enter the question you want to eddit or any int to create (999 to return):";
-						cin >> option;
-					}//check valid data
-					cout << "testing option:" << option << endl; //testing
-					cout << "option % Test1Count + 1= " << option % (Test1Count + 1) << endl;//testing pls delete
-					if (option == 999) {
-						cout << "Cancel successfully, exit to menu..." << endl;
-						break;
-					}
-					else if (option == (option % (Test1Count + 1)) && option != 0) //when user key in the question
-						editQuizz(option);
-					else
-						createQuizz();
-				}
-			}
+		case '1':
+			Test1List();
 			break;
-		case 2:
+		case '2':
 			//userlist
-			loaduserdata(Student);
 			userlist(Student);
 			break;
-		case 3:
+		case '3':
 			hostCommentMenu(comments, commentCount); break;//Trang
+		case '4':
+			cout << "Exit..." << endl << endl;
+			return;
+		default:
+			cout << "Invalid input. Please Enter (1-4)." << endl;
 		}
 	}
 }
@@ -938,33 +904,40 @@ void Test2_quizz(float* answer, int index) {
 }
 
 void note() {
-	int chap;
+	char chap;
+	system("cls");
 	do {
-		system("cls");
-
+		cout << "Notes Selection\n";
+		cout << "===============\n";
+		cout << "Chapter 1: Diodes\n"
+			<< "Chapter 2: Bipolar Junction Transistor\n"
+			<< "Chapter 3: Field Effect Transistor\n"
+			<< "Chapter 4: Operational Ampifier\n";
 		cout << "Choose the chapter of notes you want to read (0.return):";
 		cin >> chap;
 		switch (chap) {
-		case 1:
+		case '1':
 			notes_Diode();
 			break;
-		case 2:
+		case '2':
 			notes_BJT();
 			break;
-		case 3:
+		case '3':
 			notes_FET();
 			break;
-		case 4:
+		case '4':
 			notes_OA();
 			break;
-		case 0:
+		case '0':
 			cout << "You have returned to menu." << endl;
 			break;
 		default:
+			system("cls");
 			cout << "Invalid input try to choose again.(Input:1-4,0 to end)" << endl;
 			break;
 		}
-	} while (chap != 0);
+
+	} while (chap != '0');
 }
 void sim()
 {
@@ -1046,7 +1019,7 @@ bool checkopenfile(fstream& file, string name) {
 
 }
 
-void loaduserdata(User Student[]) {
+void loaduserdata() {
 	userindex = 0;
 	fstream list = fstream("Userlist", ios::in);
 	if (!list.is_open()) {
@@ -1103,7 +1076,7 @@ void loaduserdata(User Student[]) {
 
 int getinfo(User Student[]) {
 	bool IDvalid, IDdigits;
-	loaduserdata(Student);
+	loaduserdata();
 	cout << "Enter your name:";
 	cin.ignore();
 	getline(cin, Student[userindex].Name);
@@ -1559,6 +1532,53 @@ int checkAns(char response, char answer)
 	return score;
 }
 
+void Test1List()
+{
+	char choice;
+	int option;
+	while (true) {
+		cout << "Test 1 Question list\n";
+		cout << "====================\n";
+
+		if (!showTest1())
+		{
+			cout << "Do you want to create a new Question for Test 1 (MCQ)\n";
+			cout << "'Y' for yes, 'N' to return menu:";
+			cin >> choice;
+			charValidation(&choice);
+			if (toupper(choice) == 'Y')
+				createQuizz();
+			else
+			{
+				cout << "back to menu...\n";
+				Sleep(1000);
+				break;
+			}
+		}
+		else
+		{
+
+			cout << "Enter the question you want to eddit or other integer to create (0 to return):";
+			cin >> option;
+			if (cin.fail()) {
+				cin.clear();
+				cin.ignore();
+				system("cls");
+				cout << "Invalid input, Please try again." << endl;
+				Test1List();
+			}
+
+			if (option == 0) {
+				cout << "Cancel successfully, exit to menu..." << endl;
+				break;
+			}
+			else if (option > 0 && option <= Test1Count)
+				editQuizz(option);
+			else
+				createQuizz();
+		}
+	}
+}
 bool showTest1()
 {
 	cout << "Test1Count= " << Test1Count << endl; //testing pls delete
@@ -3280,6 +3300,7 @@ void notes_Diode()
 
 	cout << "\nCongrats!! You are done reading the notes on Chapter 1: Diodes." << endl;
 	waitEnter("return notes selection");
+	system("cls");
 }
 
 // note for chapter 2
@@ -3582,6 +3603,7 @@ void notes_BJT()
 		else if (study_analysis == 'Q') {
 			cout << "Exiting notes program... Bye-bye (^-^)\n\n";
 			Sleep(1000);
+			system("cls");
 		}
 
 		else
@@ -3748,6 +3770,7 @@ void notes_FET()
 	cout << "\n\nCongrats!! you are done on reading the notes for Chapter 3. (*^V^*)/" << endl;
 	cin.ignore();
 	waitEnter("return notes selection");
+	system("cls");
 }
 
 
@@ -3848,7 +3871,7 @@ void notes_OA() {
 
 	cout << "\nCongrats!! you are done on reading the notes for Chapter 4. (*^V^*)/" << endl;
 	waitEnter("return notes selection");
-
+	system("cls");
 }
 
 
