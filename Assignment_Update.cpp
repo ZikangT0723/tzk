@@ -65,7 +65,7 @@ Test1 Quizz[10]; //store 10 test1 questions
 int Test1Count = 0; //count question from file
 const int MAX_Numbers = 10; //maximum number
 // quizz function for user
-void Test1_quizz(int userindex);
+void Test1_quizz(int index);
 int checkAns(char ans, char answer);
 void shuffle(int* temp, int Question_Numbers);//temporary storage for the sequence array
 //quizz function for host
@@ -154,14 +154,14 @@ int main() {
 		case '1':
 			if (hostLogin())
 				hostMenu();
-			system("cls");
+
 			break;
 		case '2':
 			if (userLogin(&index)) {
 				userlist(Student);
 				userMenu(Student, index);
 			}
-			system("cls");
+
 			break;
 		case '3':
 			cout << "Exitting program..."; //can design
@@ -171,7 +171,7 @@ int main() {
 		default:
 			cout << "Invalid input please enter 1 to 3." << endl;
 		}
-	} while (choice != '1' && choice != '2');
+	} while (choice != '3'); //debuged
 
 
 }
@@ -244,7 +244,7 @@ bool hostLogin() {
 	const string correctID = "Teacher";
 	const string correctPass = "123456";
 	int attempts = 0, maxAttempts = 3;
-
+	system("cls");
 	while (attempts < maxAttempts) {
 		cout << "Host Login\n";
 		cout << "==========\n";
@@ -285,7 +285,7 @@ void hostMenu()
 {
 	char option;
 	system("cls");
-	while (true)
+	do
 	{
 		cout << "Host Menu\n";
 		cout << "=========\n";
@@ -295,7 +295,6 @@ void hostMenu()
 		cout << "4. Logout\n";
 		cout << "Enter your choice(1~4):";
 		cin >> option;
-		system("cls");
 		switch (option)
 		{
 		case '1':
@@ -306,14 +305,17 @@ void hostMenu()
 			userlist(Student);
 			break;
 		case '3':
-			hostCommentMenu(comments, commentCount); break;//Trang
+			hostCommentMenu(comments, commentCount);
+			break;//Trang
 		case '4':
-			cout << "Exit..." << endl << endl;
-			return;
+			cout << "Exiting to Welcoming Surface..." << endl;
+			Sleep(1000);
+			break;
 		default:
+			system("cls");
 			cout << "Invalid input. Please Enter (1-4)." << endl;
 		}
-	}
+	} while (option != '4');
 }
 
 
@@ -1534,8 +1536,9 @@ int checkAns(char response, char answer)
 
 void Test1List()
 {
-	char choice;
-	int option;
+	char choice = 'N';
+	int option = 0;
+	system("cls");
 	while (true) {
 		cout << "Test 1 Question list\n";
 		cout << "====================\n";
@@ -1551,24 +1554,21 @@ void Test1List()
 			else
 			{
 				cout << "back to menu...\n";
-				Sleep(1000);
 				break;
 			}
 		}
 		else
 		{
 
-			cout << "Enter the question you want to eddit or other integer to create (0 to return):";
+			cout << "Enter the question you want to edit or other integer to create Quizz (0 to return):";
 			cin >> option;
 			if (cin.fail()) {
 				cin.clear();
 				cin.ignore();
 				system("cls");
 				cout << "Invalid input, Please try again." << endl;
-				Test1List();
 			}
-
-			if (option == 0) {
+			else if (option == 0) {
 				cout << "Cancel successfully, exit to menu..." << endl;
 				break;
 			}
@@ -1578,6 +1578,8 @@ void Test1List()
 				createQuizz();
 		}
 	}
+	Sleep(1000);
+	system("cls");
 }
 bool showTest1()
 {
@@ -1605,16 +1607,21 @@ void createQuizz()
 	Test1 newQuizz;
 	newQuizz.num = Test1Count + 1;
 
+	system("cls");
+	cout << "Create Question Test 1\n";
+	cout << "======================\n";
 	if (Test1Count >= 10) {
 		cout << "The questions are full. Please delete before creating.\n";
 		return;
 	}
 
-	cout << "Enter your question for Question " << newQuizz.num << " (999 to cancel): " << endl;
+	cout << "\nEnter your question for Question " << newQuizz.num << " (999 to cancel): " << endl;
 	getline(cin, newQuizz.question);
 	if (newQuizz.question == "999")
 	{
 		cout << "Cancel successfully, return to Edit Question..." << endl;
+		Sleep(1000);
+		system("cls");
 		return;
 	}
 
@@ -1634,7 +1641,7 @@ void createQuizz()
 	cout << "D :";
 	getline(cin, newQuizz.objective_D);
 
-	cout << "Answer for Question " << newQuizz.num << " : ";
+	cout << "Answer for the Question " << newQuizz.num << " : ";
 	cin >> newQuizz.ans;
 	cin.ignore();
 
@@ -1643,17 +1650,27 @@ void createQuizz()
 	Quizz[Test1Count++] = newQuizz;
 	saveTest1();
 	cout << "\nThe Question was save successfully..." << endl;
-
+	Sleep(1000);
+	system("cls");
 	//back to menu....
 }
 
 void editQuizz(int number)
 {
-	int option;
+	char option;
 	Test1 EditQuizz;
 
 	EditQuizz = Quizz[number - 1]; //temporary storage
-	do {
+	while (true) {
+		system("cls");
+		cout << "Edit Question Test 1\n";
+		cout << "====================\n";
+		cout << Quizz[number - 1].question << endl;
+		cout << "A: " << Quizz[number - 1].objective_A << endl;
+		cout << "B: " << Quizz[number - 1].objective_B << endl;
+		cout << "C: " << Quizz[number - 1].objective_C << endl;
+		cout << "D: " << Quizz[number - 1].objective_D << endl;
+		cout << "Corrrect Answer: " << Quizz[number - 1].ans << endl << endl;
 		cout << "Enter the part you want to edit in Question " << number << ":\n"
 			<< "1. Question\n"
 			<< "2. Option A\n"
@@ -1666,60 +1683,68 @@ void editQuizz(int number)
 			<< "Enter (1-8):";
 		cin >> option;
 		cin.ignore();
-		if (option == 7)
+		if (option == '7')
 		{
 			deleteQuizz(number - 1);
 			break;
 		}
-		else if (option == 8) break;
+		else if (option == '8')
+		{
+			cout << "\nReturning to the Test 1 List...\n";
+			break;
+		}
 		else {
 			switch (option)
 			{
-			case 1:
-				cout << "Question: " << EditQuizz.question << endl;
+			case '1':
+				cout << "\nQuestion: " << EditQuizz.question << endl;
 				cout << "Enter your new Question:" << endl;
 				getline(cin, EditQuizz.question);
 				break;
 
-			case 2:
-				cout << "A: " << EditQuizz.objective_A << endl;
+			case '2':
+				cout << "\nA: " << EditQuizz.objective_A << endl;
 				cout << "Enter your new Option A:" << endl;
 				getline(cin, EditQuizz.objective_A);
 				break;
 
-			case 3:
-				cout << "B: " << EditQuizz.objective_B << endl;
+			case '3':
+				cout << "\nB: " << EditQuizz.objective_B << endl;
 				cout << "Enter your new Option B:" << endl;
 				getline(cin, EditQuizz.objective_B);
 				break;
 
-			case 4:
-				cout << "C: " << EditQuizz.objective_C << endl;
+			case '4':
+				cout << "\nC: " << EditQuizz.objective_C << endl;
 				cout << "Enter your new Option C:" << endl;
 				getline(cin, EditQuizz.objective_C);
 				break;
 
-			case 5:
-				cout << "D: " << EditQuizz.objective_D << endl;
+			case '5':
+				cout << "\nD: " << EditQuizz.objective_D << endl;
 				cout << "Enter your new Option D:" << endl;
 				getline(cin, EditQuizz.objective_D);
 				break;
 
-			case 6:
-				cout << "Answer: " << EditQuizz.ans << endl;
+			case '6':
+				cout << "\nAnswer: " << EditQuizz.ans << endl;
 				cout << "Enter your new Answer:" << endl;
 				cin >> EditQuizz.ans;
 				cin.ignore();
 				break;
 
-			default: cout << "Invalid option, please Enter (1-7)";
+			default:
+				cout << "\nInvalid option, please Enter (1-8)";
+				Sleep(1000);
 			}
 			Quizz[number - 1] = EditQuizz;
 			Quizz[number - 1].isDeleted = false;
 			saveTest1();
 			cout << "Editted successfully..." << endl;
 		}
-	} while (option != 8);
+	}
+	Sleep(500);
+	system("cls");
 }
 
 void deleteQuizz(int num)
