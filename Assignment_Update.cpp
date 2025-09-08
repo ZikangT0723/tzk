@@ -1,4 +1,4 @@
-#include<iostream>
+﻿#include<iostream>
 #include<string>
 #include<cmath>
 #include<iomanip>
@@ -6,6 +6,9 @@
 #include<cctype>
 #include<windows.h> // for Sleep()
 using namespace std;
+// test validation
+void charValidation(char* option);
+void waitEnter(string action);
 const int ansnum = 23;
 const int Studentnum = 100;
 const float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
@@ -23,32 +26,30 @@ struct User {
 User Student[Studentnum];
 int userindex = 0; //User count
 
-
-// test validation
-void charValidation(char* option);
-void waitEnter(string action);
-
-void sim();
-void note();
-void Test2_quizz(float*, int);
-int getinfo(User[]);
-void userlist(User[]);
+//Userlist file operation
 void loaduserdata();
-bool checkopenfile(fstream&, string);
-void userMenu(User[], int);
-int findslot(User[]);
 void savefile(User*, string);
-void checksubmit(float*, int);
-int check(float*, int&);
-int checksection(float*, int, int);
-void review(float*, int);
 
-//USER FUNCTION
-bool userLogin(int* index);
+int getinfo(User[]);
+bool checkopenfile(fstream&, string);
+int findslot(User[]);
 
 //HOST FUNCTION
 bool hostLogin();//Daniel
 void hostMenu();//Daniel
+//hostMenu_function
+void Test1List();
+void userlist(User[]);
+
+//USER FUNCTION
+bool userLogin(int* index);
+void userMenu(int);
+//userMenu_function
+void note();
+void sim();
+void Test1_quizz(int);
+void Test2_quizz(float*, int);
+
 
 // Test1_function
 struct Test1 {
@@ -65,11 +66,9 @@ Test1 Quizz[10]; //store 10 test1 questions
 int Test1Count = 0; //count question from file
 const int MAX_Numbers = 10; //maximum number
 // quizz function for user
-void Test1_quizz(int index);
 int checkAns(char ans, char answer);
 void shuffle(int* temp, int Question_Numbers);//temporary storage for the sequence array
 //quizz function for host
-void Test1List();
 bool showTest1();
 void createQuizz();
 void editQuizz(int number);
@@ -77,6 +76,12 @@ void deleteQuizz(int num);
 //file operation
 void saveTest1();
 void LoadTest1();
+
+//Check and review for Test2_quizz
+void checksubmit(float*, int);
+int check(float*, int&);
+int checksection(float*, int, int);
+void review(float*, int);
 
 // Simulator
 void clipper();
@@ -159,7 +164,7 @@ int main() {
 		case '2':
 			if (userLogin(&index)) {
 				userlist(Student);
-				userMenu(Student, index);
+				userMenu(index);
 			}
 
 			break;
@@ -319,23 +324,27 @@ void hostMenu()
 }
 
 
-void userMenu(User Student[], int index) {
+void userMenu(int index) {
 	int opt;
 	if (userindex < 0 || userindex >= Studentnum) {
 		cout << "ERROR! Invalid user index!" << endl;
 		return;
 	}
 	while (true) {
-		cout << "Choose the action you want to proceed \n1. note\n2. Test 1 (7%)\n3. Test 2 (23%)\n4. stimulator\n5. userlist\n6.Student Comment Menu\n0. end:";
+		cout << "User Menu\n";
+		cout << "=========\n";
+		cout << "1. Test 1\n";
+		cout << "2. Test 2 \n";
+		cout << "3. Notes \n";
+		cout << "4. Simulator\n";
+		cout << "5. Student Comment Menu\n";
+		cout << "0. Logout:";
 		cin >> opt;
+		system("cls");
 		switch (opt) {
 		case 1:
-			note();
-			break;
-		case 2:
 			if (!Student[index].attempt_Test1) {
 				Test1_quizz(index);
-
 			}
 			else
 			{
@@ -343,7 +352,7 @@ void userMenu(User Student[], int index) {
 				cout << "Result of test 1: " << Student[index].result_Test1 << " %\n\n";
 			}
 			break;
-		case 3:
+		case 2:
 			if (!Student[index].attempt_Test2) {
 				Test2_quizz(Student[index].ans, index);
 
@@ -355,21 +364,21 @@ void userMenu(User Student[], int index) {
 				review(Student[index].ans, Student[index].result_Test2);
 			}
 			break;
+		case 3:
+			note();
+			break;
 		case 4:
 			sim();
 			break;
 		case 5:
-			userlist(Student);//cancel
+			studentCommentMenu(comments, commentCount, Student, index);
 			break;
-		case 6:
-			studentCommentMenu(comments, commentCount, Student, index); break;
 		case 0:
-			cout << "Programme end." << endl;
+			cout << "You have been logged out." << endl;
 			saveComments(comments, commentCount);//Trang
-			cout << "User data saved successfully." << endl;
 			return;
 		default:
-			cout << "Invalid input try to choose again.(Input:1-6,0 to end)" << endl;
+			cout << "Invalid input try to choose again.(Input:1-5,0 to end)" << endl;
 		}
 	}
 }
@@ -377,14 +386,17 @@ void userMenu(User Student[], int index) {
 void Test2_quizz(float* answer, int index) {
 	int i = 0, points = 0, record[12] = {};
 	bool same;
-	char a;//change name
+	char option;//change name
 	answer[ansnum] = {};
 
 	do {
 		do {
 			same = false;
+			cout << "Test 2\n";
+			cout << "======\n";
 			cout << "Choose the question you want to answer (Input 1-12, 13 to submit Test 2):";
 			cin >> record[i];
+			system("cls");
 			if (record[i] == 0) {
 				break;
 			}
@@ -400,8 +412,8 @@ void Test2_quizz(float* answer, int index) {
 		cout << endl;
 		switch (record[i]) {
 		case 1:
-			cout << "Question 1. Given the following configuration shown in figure 1, Vin = 12V, Vd = 0.7V. " << endl;
-			cout << "Find Vout peak for the the negative half cycle." << endl << endl; //answer is -11.3V 
+			cout << "Question 1: Given the following configuration shown in Figure 1, Vin = 12V, Vd = 0.7V.\n ";
+			cout << "Find Vout peak for the the negative half cycle.\n\n"; //answer is -11.3V 
 			cout << "   ------------------------------\n";
 			cout << "   |                            |            \n";
 			cout << "   |                         -------         \n";
@@ -417,29 +429,24 @@ void Test2_quizz(float* answer, int index) {
 			cout << "         |                  | \n";
 			cout << "         o                  o \n";
 			cout << "         -       Vout       +\n";
-			cout << "                     Figure 1\n";
+			cout << "                Figure 1\n\n";
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-				a = toupper(a);
-
-				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (a == 'Y') {
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					clipper();
 				}
-
-			} while (a == 'Y');
-			cout << "Enter the answer:";//add this two line if your question need answer more than 1
-			cin >> answer[0];     //add this two line if your question need answer more than 1, answer[i+1]
+			} while (toupper(option) == 'Y');
+			cout << "Enter the answer for Vout peak (in V):";
+			cin >> answer[0];
 			checksubmit(answer, 0);
 			i++;
 			break;
+
 		case 2:
-			cout << "Quesiton 2. Given the following configuration shown in figure 1, Vin = 10V, Vd = 0.7V, Vbias = 5V. " << endl;
-			cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
+			cout << "Quesiton 2: Given the following configuration shown in Figure 2, Vin = 10V, Vd = 0.7V, Vbias = 5V.\n ";
+			cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n\n";
 			cout << "   -------)|--------------------------------o +\n";
 			cout << "   |      Vc    |               |\n";
 			cout << "   |          -----             |\n";
@@ -452,32 +459,27 @@ void Test2_quizz(float* answer, int index) {
 			cout << "   |            -               |\n";
 			cout << "   |            |               |\n";
 			cout << "   -----------------------------------------o -\n";
-			cout << "                     Figure 2\n";
+			cout << "                     Figure 2\n\n";
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-				a = toupper(a);
-
-				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (a == 'Y') {
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					clamper();
 				}
-
-			} while (a == 'Y');
-			cout << "Enter the answer of Vout(+ve):";
+			} while (toupper(option) == 'Y');
+			cout << "Enter the answer for Vout (+ve, in V):";
 			cin >> answer[1];
-			cout << "Enter the answer of Vout(-ve):";
+			cout << "Enter the answer for Vout (-ve, in V):";
 			cin >> answer[2];
 			checksubmit(answer, 1);
 			checksubmit(answer, 2);
 			i++;
 			break;
+
 		case 3:
-			cout << "Quesiton 3. Given the following configuration shown in figure 1, Vin = 15V, Vd = 0.7V, Vbias = 7.5V. " << endl;
-			cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
+			cout << "Quesiton 3: Given the following configuration shown in Figure 3, Vin = 15V, Vd = 0.7V, Vbias = 7.5V.\n ";
+			cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n\n";
 			cout << "   -------|(--------------------------------o +\n";
 			cout << "   |      Vc    |               |\n";
 			cout << "   |           ---              |\n";
@@ -490,32 +492,26 @@ void Test2_quizz(float* answer, int index) {
 			cout << "   |           ---              |\n";
 			cout << "   |            |               |\n";
 			cout << "   -----------------------------------------o -\n";
-			cout << "                     Figure 3\n";
+			cout << "                     Figure 3\n\n";
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-				a = toupper(a);
-
-				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (a == 'Y') {
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					clamper();
 				}
-
-			} while (a == 'Y');
-			cout << "Enter the answer of Vout(+ve):";
+			} while (toupper(option) == 'Y');
+			cout << "Enter the answer for Vout (+ve, in V):";
 			cin >> answer[3];
-			cout << "Enter the answer of Vout(-ve):";
+			cout << "Enter the answer for Vout (-ve, in V):";
 			cin >> answer[4];
 			checksubmit(answer, 3);
 			checksubmit(answer, 4);
 			i++;
 			break;
+
 		case 4:
 			cout << "Question 4: Determine VCE and IC in the voltage-divider biased transistor circuit shown below. Assume betaDC = 100.\n\n";
-
 			cout << "                       VCC = 10 V\n";
 			cout << "                        |\n";
 			cout << "      ------------------|\n";
@@ -533,22 +529,16 @@ void Test2_quizz(float* answer, int index) {
 			cout << "      --------------------\n";
 			cout << "               |\n";
 			cout << "               |\n";
-			cout << "              GND\n\n";
-			cout << "                     Figure 4\n";
+			cout << "              GND\n";
+			cout << "                  Figure 4\n\n";
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-				a = toupper(a);
-
-				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (a == 'Y') {
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					BJT_Voltage_divider();
 				}
-
-			} while (a == 'Y');
+			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for IC (mA):";
 			cin >> answer[5];
 			cout << "Enter the answer for VCE (V):";
@@ -557,9 +547,9 @@ void Test2_quizz(float* answer, int index) {
 			checksubmit(answer, 6);
 			i++;
 			break;
-		case 5:
-			cout << "\n\n\nQuestion 5: Determine the value of VCE when IC = 0.1mA and 0.2mA.\n\n";
 
+		case 5:
+			cout << "Question 5: Determine the value of VCE when IC = 0.1mA and 0.2mA.\n\n";
 			cout << "                       VCC = 36 V\n";
 			cout << "                        |\n";
 			cout << "      ------------------|\n";
@@ -574,32 +564,27 @@ void Test2_quizz(float* answer, int index) {
 			cout << "                         |\n";
 			cout << "                         |\n";
 			cout << "                         |\n";
-			cout << "                        GND\n\n";
-			cout << "                     Figure 5\n";
+			cout << "                        GND\n";
+			cout << "                     Figure 5\n\n";
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-				a = toupper(a);
-
-				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (a == 'Y') {
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					BJT_base();
 				}
-
-			} while (a == 'Y');
-			cout << "Enter the answer dor VCE in 0.1mA(V):";
+			} while (toupper(option) == 'Y');
+			cout << "Enter the answer for VCE in 0.1mA (V):";
 			cin >> answer[7];
-			cout << "Enter the answer dor VCE in 0.2mA(V):";
+			cout << "Enter the answer for VCE in 0.2mA (V):";
 			cin >> answer[8];
 			checksubmit(answer, 7);
 			checksubmit(answer, 8);
 			i++;
 			break;
+
 		case 6:
-			cout << "Question 6 :\n";
+			cout << "Question 6: This is the Common - Emitter(CE) Amplifier with bypass capacitor(C2) in the emitter, not involving swapping process and no load resistance, RL.\n\n";
 			cout << "                                         VCC = 22 V\n";
 			cout << "                                          |\n";
 			cout << "                        ------------------|\n";
@@ -620,51 +605,35 @@ void Test2_quizz(float* answer, int index) {
 			cout << "                        --------------------------------------\n";
 			cout << "                                             |\n";
 			cout << "                                             |\n";
-			cout << "                                            GND\n\n";
-			cout << "                                         Figure 6\n\n\n";
-			cout << " Hint: This is the Common-Emitter (CE) Amplifier with bypass capacitor (C2) in the emitter, not involving swapping process and no load resistance, RL.\n\n";
-
-
+			cout << "                                            GND\n";
+			cout << "                                         Figure 6\n\n";
+			cout << "Find the value of voltage gain Av.\n\n";
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-				a = toupper(a);
-
-				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (a == 'Y') {
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					BJT_AC();
 				}
-
-			} while (a == 'Y');
-			cout << "\nEnter the answer for AV: ";
+			} while (toupper(option) == 'Y');
+			cout << "\nEnter the answer for Av: ";
 			cin >> answer[9]; // havent change ''''
 			checksubmit(answer, 9);
 			i++;
 			break;
 
 		case 7://ANS:2.25 ,1125
-			cout << "Q7. Chp3" << endl;
-			cout << "Determine the drain current (Id) and forward transconductance (gm) for Vgs = -4V for a 2N5459 JFET." << endl;
-			cout << "Refer to the data sheet for the JFET below." << endl;
-			cout << "Igss = -1nA \nVgs_off = -8V \nIdss = 9mA \ngm_0 = 2250 micro_S" << endl;
-
+			cout << "Question 7: Determine the drain current (Id) and forward transconductance (gm) for Vgs = -4V for a 2N5459 JFET.\n";
+			cout << "Refer to the data sheet for the JFET below.\n";
+			cout << "Igss = -1nA \nVgs_off = -8V \nIdss = 9mA \ngm_0 = 2250 micro_S\n\n";
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-				a = toupper(a);
-
-				while (a != 'Y' && a != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (a == 'Y') {
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					jfet_DrainCurrent();
 				}
-
-			} while (a == 'Y');
+			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for Id (in mille-amperes):";
 			cin >> answer[10];
 			cout << "Enter the answer for gm (in micro-Siemens):";
@@ -673,8 +642,9 @@ void Test2_quizz(float* answer, int index) {
 			checksubmit(answer, 11);
 			i++;
 			break;
+
 		case 8:// Ans: V_DS: 8.9 V_GS:-1.1
-			cout << "Q8. Chp 3: FET (JFET)" << endl << endl;
+			cout << "Question 8: FET (JFET)." << endl << endl;
 			cout << "              +15 V" << endl;
 			cout << "                 |    | Id = 5 mA" << endl;
 			cout << "       1000_ohms Rd   v" << endl;
@@ -688,33 +658,29 @@ void Test2_quizz(float* answer, int index) {
 			cout << "   Rg 10 M_ohms  |" << endl;
 			cout << "   |             Rs 220_ohms" << endl;
 			cout << "   |             |" << endl;
-			cout << "  GND           GND" << endl << endl;
-			cout << "                     Figure 7\n";
-			cout << " Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
-			cout << " in the circuit shown above." << endl << endl;
-
+			cout << "  GND           GND";
+			cout << "            Figure 7\n\n";
+			cout << "Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
+			cout << "in the circuit shown above." << endl << endl;
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-
-
-				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (toupper(a) == 'Y') // added by Daniel to debug
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					jfet();
-			} while (toupper(a) == 'Y');
-			cout << "Enter the answer for V_DS (in volts and round to two decimals):";
+				}
+			} while (toupper(option) == 'Y');
+			cout << "Enter the answer for V_DS (in V and round to two decimals):";
 			cin >> answer[12];
-			cout << "Enter the answer for V_GS (in volts and round to two decimals):";
+			cout << "Enter the answer for V_GS (in V and round to two decimals):";
 			cin >> answer[13];
 			checksubmit(answer, 12);
 			checksubmit(answer, 13);
 			i++;
 			break;
+
 		case 9:// Ans 12.7 ; 3.13
-			cout << "Q9. Chapter 3: FET (E-MOSFET)" << endl << endl;
+			cout << "Question 9: FET (E-MOSFET)." << endl << endl;
 			cout << "                         +24 V" << endl;
 			cout << "             --------------|" << endl;
 			cout << "             |             |    | Id " << endl;
@@ -728,37 +694,30 @@ void Test2_quizz(float* answer, int index) {
 			cout << "             |             |" << endl;
 			cout << "   15 k_ohms R2            |" << endl;
 			cout << "             |             |" << endl;
-			cout << "            GND           GND" << endl << endl;
-			cout << "                     Figure 8\n";
-			cout << " Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
-			cout << " in the E-MOSFET circuit shown above. Given that the particular MOSFET has" << endl;
-			cout << " the theshold voltage Vgs_th = 2V and the parameter devices K = 50 mA/V^2 ." << endl << endl;
+			cout << "            GND           GND" << endl;
+			cout << "                     Figure 8\n\n";
+			cout << "Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
+			cout << "in the E-MOSFET circuit shown above. Given that the particular MOSFET has" << endl;
+			cout << "the theshold voltage Vgs_th = 2V and the parameter devices K = 50 mA/V^2 ." << endl << endl;
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-
-
-				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (toupper(a) == 'Y') // added by Daniel to debug
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					mosfet();
-			} while (toupper(a) == 'Y');
-			cout << "Enter the answer for V_DS (in volts and round to two decimals):";
+				}
+			} while (toupper(option) == 'Y');
+			cout << "Enter the answer for V_DS (in V and round to two decimals):";
 			cin >> answer[14];
-			cout << "Enter the answer for V_GS (in volts and round to two decimals):";
+			cout << "Enter the answer for V_GS (in V and round to two decimals):";
 			cin >> answer[15];
 			checksubmit(answer, 14);
 			checksubmit(answer, 15);
 			i++;
 			break;
 
-
 		case 10://NI
-			cout << "Question 10 :\n";
-			cout << "\n---Non-Inverting Amplifier,NI---\n";
-			cout << "Circuit Diagram: \n";
+			cout << "Question 10: Non-Inverting Amplifier,NI.\n\n";
 			cout << "                                       \n";
 			cout << "                |\\                    \n";
 			cout << "                | \\                   \n";
@@ -774,25 +733,18 @@ void Test2_quizz(float* answer, int index) {
 			cout << "                             Ri        \n";
 			cout << "                             |         \n";
 			cout << "                            GND        \n";
-			cout << "                     Figure 9\n";
+			cout << "                     Figure 9\n\n";
 			cout << "Given: Rf =220000 ohms, Ri =10000 ohms ,Vin = 5.0 V, Aol = 200000 , Zin = 2000000 ohms, Zout = 75 ohms.\n";
-			cout << "Determine the closed-loop voltage gain,Acl, the input and output impedances of the amplifier.\n";
-
-
+			cout << "Determine the closed-loop voltage gain,Acl, the input and output impedances of the amplifier.\n\n";
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-
-
-				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (toupper(a) == 'Y')
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					non_inverting();
-			} while (toupper(a) == 'Y');
-
-			cout << "Enter the answer for closed-loop voltage gain,Acl:";
+				}
+			} while (toupper(option) == 'Y');
+			cout << "Enter the answer for closed-loop voltage gain, Acl:";
 			cin >> answer[16];
 			cout << "Enter the answer for the input impedance (in Giga ohms) :";
 			cin >> answer[17];
@@ -803,15 +755,13 @@ void Test2_quizz(float* answer, int index) {
 			checksubmit(answer, 18);
 			i++;
 			break;
-		case 11://I
 
-			cout << "\nQuestion 11 :\n";
-			cout << "\n---Inverting Amplifier,I---\n";
-			cout << "Circuit Diagram: \n";
+		case 11://I
+			cout << "Question 11: Inverting Amplifier,I.\n\n";
 			cout << "                                               \n";
 			cout << "                    _______Rf_______           \n";
-			cout << "                   |                |          \n";
-			cout << "                   |                |          \n";
+			cout << "                   |               |          \n";
+			cout << "                   |               |          \n";
 			cout << "                   |    |\\         |          \n";
 			cout << "                   |    | \\        |          \n";
 			cout << " Vin (~)------Ri------->|+ \\       |          \n";
@@ -822,23 +772,17 @@ void Test2_quizz(float* answer, int index) {
 			cout << "                |       |/                     \n";
 			cout << "               GND                             \n";
 			cout << "                                               \n";
-			cout << "                     Figure 10\n";
+			cout << "                     Figure 10\n\n";
 			cout << "Given: Rf =210000 ohms, Ri =10000 ohms.\n";
-			cout << "Determine the closed-loop voltage gain,Acl and the input impedance of the amplifier.\n";
-
+			cout << "Determine the closed-loop voltage gain,Acl and the input impedance of the amplifier.\n\n";
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-
-
-				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (toupper(a) == 'Y')
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					invertingAmplifier();
-			} while (toupper(a) == 'Y');
-
+				}
+			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for closed-loop voltage gain,Acl:";
 			cin >> answer[19];
 			cout << "Enter the answer for the input impedance:";
@@ -847,11 +791,9 @@ void Test2_quizz(float* answer, int index) {
 			checksubmit(answer, 20);
 			i++;
 			break;
-		case 12://VF
 
-			cout << "\nQuestion 12 :\n";
-			cout << "\n---Voltage Follower,VF---\n";
-			cout << "Circuit Diagram: \n";
+		case 12://VF
+			cout << "Question 12: Voltage Follower,VF.\n\n";
 			cout << "                                       \n";
 			cout << "                |\\                    \n";
 			cout << "                | \\                   \n";
@@ -867,23 +809,18 @@ void Test2_quizz(float* answer, int index) {
 			cout << "                             Ri        \n";
 			cout << "                             |         \n";
 			cout << "                            GND        \n";
-			cout << "                     Figure 11\n";
+			cout << "                     Figure 11\n\n";
 			cout << "Given: Rf =230000 ohms, Ri =10000 ohms , Aol = 200000 , Zin = 1000000 ohms, Zout = 70 ohms and B = 1.\n";
-			cout << "Determine the input and output impedances of the amplifier.\n";
-
+			cout << "Determine the input and output impedances of the amplifier.\n\n";
 			do {
-				cout << "\nDo you want to use a simulator?(Y/N):";
-				cin >> a;
-
-
-				while (toupper(a) != 'Y' && toupper(a) != 'N') {
-					cout << "INPUT ERROR, input (Y/N):" << endl;
-					cin >> a;
-				}
-				if (toupper(a) == 'Y')
+				cout << "\nDo you want to use a simulator? (Y/N):";
+				cin >> option;
+				charValidation(&option);
+				if (toupper(option) == 'Y') {
 					VoltageFollower();
-			} while (toupper(a) == 'Y');
-			cout << "Enter the answer for the input impedance( in Giga ohms):";
+				}
+			} while (toupper(option) == 'Y');
+			cout << "Enter the answer for the input impedance (in Giga ohms):";
 			cin >> answer[21];
 			cout << "Enter the answer for the output impedance (in micro ohms):";
 			cin >> answer[22];
@@ -892,9 +829,11 @@ void Test2_quizz(float* answer, int index) {
 			i++;
 			break;
 		case 13:
+			system("cls");
 			cout << "You have submitted Test 2" << endl;
 			break;
 		default:
+			system("cls");
 			cout << "Invalid input try to choose again.(Input:1-12,13 to end)" << endl;
 			break;
 		}
@@ -907,7 +846,7 @@ void Test2_quizz(float* answer, int index) {
 
 void note() {
 	char chap;
-	system("cls");
+
 	do {
 		cout << "Notes Selection\n";
 		cout << "===============\n";
@@ -917,6 +856,7 @@ void note() {
 			<< "Chapter 4: Operational Ampifier\n";
 		cout << "Choose the chapter of notes you want to read (0.return):";
 		cin >> chap;
+		system("cls");
 		switch (chap) {
 		case '1':
 			notes_Diode();
@@ -931,6 +871,7 @@ void note() {
 			notes_OA();
 			break;
 		case '0':
+			system("cls");
 			cout << "You have returned to menu." << endl;
 			break;
 		default:
@@ -949,7 +890,7 @@ void sim()
 		cout << "Select the type of simulator\n1.Clipper\n2.Clamper\n3.DC(Voltage divider bias)\n4.DC(base bias)\n5.AC\n6.JFET Drain Current\n"
 			<< "7.JFET\n8.E-MOSFET\n" << "9.non inverting\n10.Voltage follower\n11.inverting amplifier\n0.return:";
 		cin >> opt_simulator;
-
+		system("cls");
 		switch (opt_simulator)
 		{
 		case 1:
@@ -997,10 +938,12 @@ void sim()
 			break;
 
 		case 0:
+			system("cls");
 			cout << "You have returned to menu." << endl;
 			break;
 
 		default:
+			system("cls");
 			cout << "Invalid input try to choose again! Enter 1-11 and 0 to end only!" << endl;
 			break;
 		}
@@ -1113,18 +1056,28 @@ int getinfo(User Student[]) {
 	return userindex - 1;
 }
 void userlist(User Student[]) {
+	cout << "================================================\n";
+	cout << "     Basic Electronic UGEA1313: User List\n";
+	cout << "================================================\n";
 	if (userindex == 0 && Student[userindex].Name == "") {
 		cout << "NO student registered yet.\n";
 	}
 	else {
+		for (int width = 0; width <= 78; width++) {
+			cout << "-";
+		}
+		cout << "\n";
 		for (int i = 0; i < userindex; i++) {
-
-			cout << "Name: " << left << setw(20) << Student[i].Name <<
+			cout << setw(3) << right << i + 1 << ". " << "Name: " << left << setw(20) << Student[i].Name <<
 				" | Student ID: " << setw(7) << Student[i].ID <<
 				" | Test 1: " << Student[i].result_Test1 <<
 				" | Test 2: " << Student[i].result_Test2 << endl;
 
 		}
+		for (int width = 0; width <= 78; width++) {
+			cout << "-";
+		}
+		cout << "\n";
 	}
 }
 
@@ -1208,8 +1161,11 @@ int checksection(float* answer, int i, int range) {
 	return points;
 }
 void review(float* answer, int score) {
-	cout << "Question 1. Given the following configuration shown in figure 1, Vin = 12V, Vd = 0.7V. " << endl;
-	cout << "Find Vout peak for the the negative half cycle." << endl << endl; //answer is -11.3V 
+	cout << "=========================\n";
+	cout << "      Test 2 Review\n";
+	cout << "=========================\n";
+	cout << "Question 1: Given the following configuration shown in Figure 1, Vin = 12V, Vd = 0.7V.\n ";
+	cout << "Find Vout peak for the the negative half cycle.\n\n"; //answer is -11.3V 
 	cout << "   ------------------------------\n";
 	cout << "   |                            |            \n";
 	cout << "   |                         -------         \n";
@@ -1225,12 +1181,12 @@ void review(float* answer, int score) {
 	cout << "         |                  | \n";
 	cout << "         o                  o \n";
 	cout << "         -       Vout       +\n";
-	cout << "                     Figure 1\n";
+	cout << "                Figure 1\n\n";
 	cout << "Your answer is       : " << setw(5) << right << answer[0] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[0] << right
-		<< setw(15) << "Score = " << checksection(answer, 0, 0) << endl;
-	cout << "Quesiton 2. Given the following configuration shown in figure 1, Vin = 10V, Vd = 0.7V, Vbias = 5V. " << endl;
-	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
+		<< setw(15) << "Score = " << checksection(answer, 0, 0) << endl << endl;
+	cout << "Quesiton 2: Given the following configuration shown in Figure 2, Vin = 10V, Vd = 0.7V, Vbias = 5V.\n ";
+	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n\n";
 	cout << "   -------)|--------------------------------o +\n";
 	cout << "   |      Vc    |               |\n";
 	cout << "   |          -----             |\n";
@@ -1243,13 +1199,12 @@ void review(float* answer, int score) {
 	cout << "   |            -               |\n";
 	cout << "   |            |               |\n";
 	cout << "   -----------------------------------------o -\n";
-	cout << "                     Figure 2\n";
+	cout << "                     Figure 2\n\n";
 	cout << "Your answer is       : " << setw(5) << right << answer[1] << setw(5) << right << ", " << setw(5) << right << answer[2] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[1] << setw(5) << right << ", " << setw(5) << right << checkans[2] << right
-		<< setw(15) << "Score = " << checksection(answer, 1, 2) << endl;
-
-	cout << "Quesiton 3. Given the following configuration shown in figure 1, Vin = 15V, Vd = 0.7V, Vbias = 7.5V. " << endl;
-	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n";
+		<< setw(15) << "Score = " << checksection(answer, 1, 2) << endl << endl;
+	cout << "Quesiton 3: Given the following configuration shown in Figure 3, Vin = 15V, Vd = 0.7V, Vbias = 7.5V.\n ";
+	cout << "Find Vout peak in + ve half cycle and -ve half cycle.\n\n";
 	cout << "   -------|(--------------------------------o +\n";
 	cout << "   |      Vc    |               |\n";
 	cout << "   |           ---              |\n";
@@ -1262,12 +1217,11 @@ void review(float* answer, int score) {
 	cout << "   |           ---              |\n";
 	cout << "   |            |               |\n";
 	cout << "   -----------------------------------------o -\n";
-	cout << "                     Figure 3\n";
+	cout << "                     Figure 3\n\n";
 	cout << "Your answer is       : " << setw(5) << answer[3] << setw(5) << right << ", " << setw(5) << right << answer[4] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[3] << setw(5) << right << ", " << setw(5) << right << checkans[4] << right
-		<< setw(15) << "Score = " << checksection(answer, 3, 4) << endl;
+		<< setw(15) << "Score = " << checksection(answer, 3, 4) << endl << endl;
 	cout << "Question 4: Determine VCE and IC in the voltage-divider biased transistor circuit shown below. Assume betaDC = 100.\n\n";
-
 	cout << "                       VCC = 10 V\n";
 	cout << "                        |\n";
 	cout << "      ------------------|\n";
@@ -1285,13 +1239,12 @@ void review(float* answer, int score) {
 	cout << "      --------------------\n";
 	cout << "               |\n";
 	cout << "               |\n";
-	cout << "              GND\n\n";
-	cout << "                     Figure 4\n";
+	cout << "              GND\n";
+	cout << "                  Figure 4\n\n";
 	cout << "Your answer is       : " << setw(5) << answer[5] << setw(5) << right << ", " << setw(5) << right << answer[6] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[5] << setw(5) << right << ", " << setw(5) << right << checkans[6] << right
-		<< setw(15) << "Score = " << checksection(answer, 5, 6) << endl;
-	cout << "\n\n\nQuestion 5: Determine the value of VCE when IC = 0.1mA and 0.2mA.\n\n";
-
+		<< setw(15) << "Score = " << checksection(answer, 5, 6) << endl << endl;
+	cout << "Question 5 : Determine the value of VCE when IC = 0.1mA and 0.2mA.\n\n";
 	cout << "                       VCC = 36 V\n";
 	cout << "                        |\n";
 	cout << "      ------------------|\n";
@@ -1306,12 +1259,12 @@ void review(float* answer, int score) {
 	cout << "                         |\n";
 	cout << "                         |\n";
 	cout << "                         |\n";
-	cout << "                        GND\n\n";
-	cout << "                     Figure 5\n";
+	cout << "                        GND\n";
+	cout << "                     Figure 5\n\n";
 	cout << "Your answer is       : " << setw(5) << answer[7] << setw(5) << right << ", " << setw(5) << right << answer[8] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[7] << setw(5) << right << ", " << setw(5) << right << checkans[8] << right
-		<< setw(15) << "Score = " << checksection(answer, 7, 8) << endl;
-	cout << "Question 6 :\n";
+		<< setw(15) << "Score = " << checksection(answer, 7, 8) << endl << endl;
+	cout << "Question 6: This is the Common - Emitter(CE) Amplifier with bypass capacitor(C2) in the emitter, not involving swapping process and no load resistance, RL.\n\n";
 	cout << "                                         VCC = 22 V\n";
 	cout << "                                          |\n";
 	cout << "                        ------------------|\n";
@@ -1332,20 +1285,18 @@ void review(float* answer, int score) {
 	cout << "                        --------------------------------------\n";
 	cout << "                                             |\n";
 	cout << "                                             |\n";
-	cout << "                                            GND\n\n";
-	cout << "                                         Figure 6\n\n\n";
-	cout << " Hint: This is the Common-Emitter (CE) Amplifier with bypass capacitor (C2) in the emitter, not involving swapping process and no load resistance, RL.\n\n";
+	cout << "                                            GND\n";
+	cout << "                                         Figure 6\n\n";
 	cout << "Your answer is       : " << setw(5) << right << answer[9] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[9] << right
-		<< setw(15) << "Score = " << checksection(answer, 9, 9) << endl;
-	cout << "Q7. Chp3" << endl;
-	cout << "Determine the drain current (Id) and forward transconductance (gm) for Vgs = -4V for a 2N5459 JFET." << endl;
-	cout << "Refer to the data sheet for the JFET below." << endl;
-	cout << "Igss = -1nA \nVgs_off = -8V \nIdss = 9mA \ngm_0 = 2250 micro_S" << endl;
+		<< setw(15) << "Score = " << checksection(answer, 9, 9) << endl << endl;
+	cout << "Question 7: Determine the drain current (Id) and forward transconductance (gm) for Vgs = -4V for a 2N5459 JFET.\n";
+	cout << "Refer to the data sheet for the JFET below.\n";
+	cout << "Igss = -1nA \nVgs_off = -8V \nIdss = 9mA \ngm_0 = 2250 micro_S\n\n";
 	cout << "Your answer is       : " << setw(5) << answer[10] << setw(5) << right << ", " << setw(5) << right << answer[11] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[10] << setw(5) << right << ", " << setw(5) << right << checkans[11] << right
-		<< setw(15) << "Score = " << checksection(answer, 10, 11) << endl;
-	cout << "Q8. Chp 3: FET (JFET)" << endl << endl;
+		<< setw(15) << "Score = " << checksection(answer, 10, 11) << endl << endl;
+	cout << "Question 8: FET (JFET)." << endl << endl;
 	cout << "              +15 V" << endl;
 	cout << "                 |    | Id = 5 mA" << endl;
 	cout << "       1000_ohms Rd   v" << endl;
@@ -1359,14 +1310,14 @@ void review(float* answer, int score) {
 	cout << "   Rg 10 M_ohms  |" << endl;
 	cout << "   |             Rs 220_ohms" << endl;
 	cout << "   |             |" << endl;
-	cout << "  GND           GND" << endl << endl;
-	cout << "                     Figure 7\n";
-	cout << " Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
-	cout << " in the circuit shown above." << endl << endl;
+	cout << "  GND           GND";
+	cout << "            Figure 7\n\n";
+	cout << "Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
+	cout << "in the circuit shown above." << endl << endl;
 	cout << "Your answer is       : " << setw(5) << answer[12] << setw(5) << right << ", " << setw(5) << right << answer[13] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[13] << setw(5) << right << ", " << setw(5) << right << checkans[13] << right
-		<< setw(15) << "Score = " << checksection(answer, 12, 13) << endl;
-	cout << "Q9. Chapter 3: FET (E-MOSFET)" << endl << endl;
+		<< setw(15) << "Score = " << checksection(answer, 12, 13) << endl << endl;
+	cout << "Question 9: FET (E-MOSFET)." << endl << endl;
 	cout << "                         +24 V" << endl;
 	cout << "             --------------|" << endl;
 	cout << "             |             |    | Id " << endl;
@@ -1380,17 +1331,15 @@ void review(float* answer, int score) {
 	cout << "             |             |" << endl;
 	cout << "   15 k_ohms R2            |" << endl;
 	cout << "             |             |" << endl;
-	cout << "            GND           GND" << endl << endl;
-	cout << "                     Figure 8\n";
-	cout << " Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
-	cout << " in the E-MOSFET circuit shown above. Given that the particular MOSFET has" << endl;
-	cout << " the theshold voltage Vgs_th = 2V and the parameter devices K = 50 mA/V^2 ." << endl << endl;
+	cout << "            GND           GND" << endl;
+	cout << "                     Figure 8\n\n";
+	cout << "Find the voltage drain to source (V_DS) and voltage gate to source (V_GS)" << endl;
+	cout << "in the E-MOSFET circuit shown above. Given that the particular MOSFET has" << endl;
+	cout << "the theshold voltage Vgs_th = 2V and the parameter devices K = 50 mA/V^2 ." << endl << endl;
 	cout << "Your answer is       : " << setw(5) << answer[14] << setw(5) << right << ", " << setw(5) << right << answer[15] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[14] << setw(5) << right << ", " << setw(5) << right << checkans[15] << right
-		<< setw(15) << "Score = " << checksection(answer, 14, 15) << endl;
-	cout << "Question 10 :\n";
-	cout << "\n---Non-Inverting Amplifier,NI---\n";
-	cout << "Circuit Diagram: \n";
+		<< setw(15) << "Score = " << checksection(answer, 14, 15) << endl << endl;
+	cout << "Question 10: Non-Inverting Amplifier,NI.\n\n";
 	cout << "                                       \n";
 	cout << "                |\\                    \n";
 	cout << "                | \\                   \n";
@@ -1406,22 +1355,19 @@ void review(float* answer, int score) {
 	cout << "                             Ri        \n";
 	cout << "                             |         \n";
 	cout << "                            GND        \n";
-	cout << "                                       \n";
-	cout << "                     Figure 9\n";
+	cout << "                     Figure 9\n\n";
 	cout << "Given: Rf =220000 ohms, Ri =10000 ohms ,Vin = 5.0 V, Aol = 200000 , Zin = 2000000 ohms, Zout = 75 ohms.\n";
-	cout << "Determine the closed-loop voltage gain,Acl, the input and output impedances of the amplifier.\n";
+	cout << "Determine the closed-loop voltage gain,Acl, the input and output impedances of the amplifier.\n\n";
 	cout << "Your answer is       : " << setw(5) << answer[16] << setw(5) << right << ", " << setw(5) << right << answer[17]
-		<< setw(5) << right << answer[18] << endl;
+		<< ", " << setw(5) << right << answer[18] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[16] << setw(5) << right << ", " << setw(5) << right << checkans[17]
-		<< setw(5) << right << checkans[18] << right
-		<< setw(15) << "Score = " << checksection(answer, 16, 18) << endl;
-	cout << "\nQuestion 11 :\n";
-	cout << "\n---Inverting Amplifier,I---\n";
-	cout << "Circuit Diagram: \n";
+		<< ", " << setw(5) << right << checkans[18] << right
+		<< setw(15) << "Score = " << checksection(answer, 16, 18) << endl << endl;
+	cout << "Question 11: Inverting Amplifier,I.\n\n";
 	cout << "                                               \n";
 	cout << "                    _______Rf_______           \n";
-	cout << "                   |                |          \n";
-	cout << "                   |                |          \n";
+	cout << "                   |               |          \n";
+	cout << "                   |               |          \n";
 	cout << "                   |    |\\         |          \n";
 	cout << "                   |    | \\        |          \n";
 	cout << " Vin (~)------Ri------->|+ \\       |          \n";
@@ -1432,15 +1378,13 @@ void review(float* answer, int score) {
 	cout << "                |       |/                     \n";
 	cout << "               GND                             \n";
 	cout << "                                               \n";
-	cout << "                     Figure 10\n";
+	cout << "                     Figure 10\n\n";
 	cout << "Given: Rf =210000 ohms, Ri =10000 ohms.\n";
-	cout << "Determine the closed-loop voltage gain,Acl and the input impedance of the amplifier.\n";
+	cout << "Determine the closed-loop voltage gain,Acl and the input impedance of the amplifier.\n\n";
 	cout << "Your answer is       : " << setw(5) << answer[19] << setw(5) << right << ", " << setw(5) << right << answer[20] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[19] << setw(5) << right << ", " << setw(5) << right << checkans[20] << right
-		<< setw(15) << "Score = " << checksection(answer, 19, 20) << endl;
-	cout << "\nQuestion 12 :\n";
-	cout << "\n---Voltage Follower,VF---\n";
-	cout << "Circuit Diagram: \n";
+		<< setw(15) << "Score = " << checksection(answer, 19, 20) << endl << endl;
+	cout << "Question 12: Voltage Follower,VF.\n\n";
 	cout << "                                       \n";
 	cout << "                |\\                    \n";
 	cout << "                | \\                   \n";
@@ -1456,13 +1400,16 @@ void review(float* answer, int score) {
 	cout << "                             Ri        \n";
 	cout << "                             |         \n";
 	cout << "                            GND        \n";
-	cout << "                     Figure 11\n";
+	cout << "                     Figure 11\n\n";
 	cout << "Given: Rf =230000 ohms, Ri =10000 ohms , Aol = 200000 , Zin = 1000000 ohms, Zout = 70 ohms and B = 1.\n";
-	cout << "Determine the input and output impedances of the amplifier.\n";
+	cout << "Determine the input and output impedances of the amplifier.\n\n";
 	cout << "Your answer is       : " << setw(5) << answer[21] << setw(5) << right << ", " << setw(5) << right << answer[22] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[21] << setw(5) << right << ", " << setw(5) << right << checkans[22] << right
-		<< setw(15) << "Score = " << checksection(answer, 21, 22) << endl;
+		<< setw(15) << "Score = " << checksection(answer, 21, 22) << endl << endl;
 	cout << "Total score = " << score << "/" << ansnum << endl;
+	cin.ignore();
+	waitEnter("return menu");
+	system("cls");
 }
 
 void Test1_quizz(int index)
@@ -1813,7 +1760,261 @@ void LoadTest1()
 	}
 	inFile.close();
 }
-//add your calculator function here;
+//Trang edit comment fuction
+//menu
+void hostCommentMenu(Comment comments[], int& count) {
+	int choice;
+	do {
+		cout << "\n--- Host Comment Menu ---\n";
+		cout << "1. Show All Comments\n";
+		cout << "2. Create Notification\n";
+		cout << "3. Reply to Student Comment\n";
+		cout << "4. Delete Comment\n";
+		cout << "0. Return\n";
+		cout << "Choice (0~4): ";
+		cin >> choice;
+
+		switch (choice) {
+		case 0: cout << "Returning...\n"; break;
+		case 1: showAllComments(comments, count); break;
+		case 2: createNotification(comments, count); break;
+		case 3: replyToComment(comments, count); break;
+		case 4: deleteComment(comments, count); break;
+		default: cout << "Invalid choice.\n"; break;
+		}
+	} while (choice != 0);
+}
+void studentCommentMenu(Comment comments[], int& count, User Student[], int index)
+{
+	int option;
+	do {
+		cout << "\n--- Student Comment Menu ---\n";
+		cout << "1. Show All Comments and Reply\n";
+		cout << "2. Create a Comment\n";
+		cout << "0. Return\n";
+		cout << "Choice: ";
+		cin >> option;
+
+		switch (option) {
+		case 1: showAllComments(comments, count); break;
+		case 2:createStudentComment(comments, count, Student, index);
+		}
+	} while (option != 0);
+
+
+}
+//create
+void createNotification(Comment comments[], int& count) {
+	if (count >= MAX_COMMENTS) {
+		cout << "Comment list is full!" << endl;
+		return;
+	}
+	cin.ignore();
+	cout << "Enter your comment (as host): ";
+	getline(cin, comments[count].text);
+
+	comments[count].studentID = "";
+	comments[count].fromHost = true;
+	comments[count].hostReply = "";
+	comments[count].deleted = false;
+
+	cout << "Host comment saved!" << endl;
+	count++;
+	saveComments(comments, count);
+}
+void createStudentComment(Comment comments[], int& count, User Student[], int index) {
+	if (count >= MAX_COMMENTS) {
+		cout << "Comment list is full!" << endl;
+		return;
+	}
+	cin.ignore();
+	cout << "Enter your comment: ";
+	getline(cin, comments[count].text);
+
+	comments[count].studentID = Student[index].ID;
+	comments[count].fromHost = false;
+	comments[count].hostReply = "";
+	comments[count].deleted = false;
+
+	cout << "Comment saved! (Student ID: " << Student[index].ID << ")" << endl;//can save student id
+	count++;
+	saveComments(comments, count);
+}
+
+void showAllComments(Comment comments[], int count) {
+	cout << "\n======= Comment List =======\n";
+	if (count == 0) {
+		cout << "No comments yet.\n";
+		return;
+	}
+
+	for (int i = 0; i < count; i++) {
+		if (!comments[i].deleted) {
+			cout << "Comment #" << i << endl;
+			if (comments[i].fromHost) {
+				cout << " ------Notification------\n";
+				cout << "  Attention: " << comments[i].text << endl;
+			}
+			else {
+				cout << " [Student ID: " << comments[i].studentID << "]\n";
+				cout << "  Comment: " << comments[i].text << endl;
+			}
+
+			if (!comments[i].hostReply.empty())
+				cout << "--->Host Reply: " << comments[i].hostReply << endl;
+			cout << "----------------------------\n";
+		}
+	}
+	cout << "============================\n";
+}
+void replyToComment(Comment comments[], int count) {
+	if (count == 0) {
+		cout << "No comments to reply.\n";
+		return;
+	}
+
+	char reply = 'Y';
+	while (toupper(reply) == 'Y') {
+		showAllComments(comments, count);
+
+		int index;
+		cout << "Enter the comment number to reply: ";
+		cin >> index;
+
+		if (index < 0 || index >= count) {
+			cout << "Invalid comment index!\n";
+			return;
+		}
+
+		if (!comments[index].hostReply.empty()) {
+			cout << "Already replied.\n";
+		}
+		else {
+			cin.ignore();
+			cout << "Enter your reply: ";
+			getline(cin, comments[index].hostReply);
+
+			cout << "Reply added successfully.\n";
+			saveComments(comments, count);
+		}
+
+		while (true) {
+			cout << "Do you want to continue replying? (Y/N): ";
+			cin >> reply;
+
+			if (reply == 'Y' || reply == 'y' || reply == 'N' || reply == 'n') {
+				break;
+			}
+			else {
+				cout << "Invalid input. Please enter Y or N.\n";
+			}
+		}
+	}
+}
+
+//delete comment function
+void deleteComment(Comment comments[], int& count) {
+	if (count == 0) {
+		cout << "No comments to delete.\n";
+		return;
+	}
+
+	showAllComments(comments, count);
+
+	int index;
+	cout << "Enter the comment number to delete: ";
+	cin >> index;
+
+	if (index < 0 || index >= count) {
+		cout << "Invalid comment index!\n";
+		return;
+	}
+
+	cout << "\nWhat do you want to delete?\n";
+	cout << "1. Entire comment\n";
+	cout << "2. Host reply\n";
+	cout << "3. Cancel\n";
+	cout << "Choice: ";
+	int choice;
+	cin >> choice;
+
+	switch (choice) {
+	case 1:
+		deleteEntireComment(comments, count, index);
+		break;
+	case 2:
+		deleteHostReply(comments, count, index);
+		break;
+	case 3:
+		cout << "Delete cancelled.\n";
+		return;
+	default:
+		cout << "Invalid choice.\n";
+		return;
+	}
+}
+void deleteEntireComment(Comment comments[], int& count, int index) {
+	for (int i = index; i < count - 1; i++) {
+		comments[i] = comments[i + 1];
+	}
+	comments[count - 1] = {};
+	count--;
+	cout << "Comment deleted successfully.\n";
+	saveComments(comments, count);
+}
+void deleteHostReply(Comment comments[], int count, int index) {
+	if (!comments[index].hostReply.empty()) {
+		comments[index].hostReply.clear();
+		cout << "Host reply deleted successfully.\n";
+		saveComments(comments, count);
+	}
+	else {
+		cout << "This comment has no host reply.\n";
+	}
+}
+
+void saveComments(Comment comments[], int count) {
+	fstream file("Comments", ios::out);
+	if (!file.is_open()) {
+		cout << "Error saving comments.\n";
+		return;
+	}
+	for (int i = 0; i < count; i++) {
+		if (!comments[i].deleted) {
+
+			file << comments[i].fromHost << endl;
+			file << comments[i].studentID << endl;
+			file << comments[i].text << endl;
+			file << comments[i].hostReply << endl;
+		}
+	}
+	file.close();
+	cout << "Comments saved successfully." << endl;
+}
+void loadComments(Comment comments[], int& count) {
+	fstream file("Comments", ios::in);
+	if (!file.is_open()) {
+		cout << "Starting fresh.\n";
+		return;
+	}
+
+	string line;
+	count = 0;
+	while (getline(file, line)) {
+		if (line.empty()) continue;
+		comments[count].fromHost = (line == "1" || line == "true");
+
+		if (!getline(file, comments[count].studentID)) break;
+		if (!getline(file, comments[count].text)) break;
+		if (!getline(file, comments[count].hostReply)) break;
+
+		comments[count].deleted = false;
+		count++;
+		if (count >= MAX_COMMENTS) break;
+	}
+
+	file.close();
+}
 
 void clipper()
 {
@@ -3900,261 +4101,7 @@ void notes_OA() {
 }
 
 
-//Trang edit comment fuction
-//menu
-void hostCommentMenu(Comment comments[], int& count) {
-	int choice;
-	do {
-		cout << "\n--- Host Comment Menu ---\n";
-		cout << "1. Show All Comments\n";
-		cout << "2. Create Notification\n";
-		cout << "3. Reply to Student Comment\n";
-		cout << "4. Delete Comment\n";
-		cout << "0. Return\n";
-		cout << "Choice (0~4): ";
-		cin >> choice;
 
-		switch (choice) {
-		case 0: cout << "Returning...\n"; break;
-		case 1: showAllComments(comments, count); break;
-		case 2: createNotification(comments, count); break;
-		case 3: replyToComment(comments, count); break;
-		case 4: deleteComment(comments, count); break;
-		default: cout << "Invalid choice.\n"; break;
-		}
-	} while (choice != 0);
-}
-void studentCommentMenu(Comment comments[], int& count, User Student[], int index)
-{
-	int option;
-	do {
-		cout << "\n--- Student Comment Menu ---\n";
-		cout << "1. Show All Comments and Reply\n";
-		cout << "2. Create a Comment\n";
-		cout << "0. Return\n";
-		cout << "Choice: ";
-		cin >> option;
-
-		switch (option) {
-		case 1: showAllComments(comments, count); break;
-		case 2:createStudentComment(comments, count, Student, index);
-		}
-	} while (option != 0);
-
-
-}
-//create
-void createNotification(Comment comments[], int& count) {
-	if (count >= MAX_COMMENTS) {
-		cout << "Comment list is full!" << endl;
-		return;
-	}
-	cin.ignore();
-	cout << "Enter your comment (as host): ";
-	getline(cin, comments[count].text);
-
-	comments[count].studentID = "";
-	comments[count].fromHost = true;
-	comments[count].hostReply = "";
-	comments[count].deleted = false;
-
-	cout << "Host comment saved!" << endl;
-	count++;
-	saveComments(comments, count);
-}
-void createStudentComment(Comment comments[], int& count, User Student[], int index) {
-	if (count >= MAX_COMMENTS) {
-		cout << "Comment list is full!" << endl;
-		return;
-	}
-	cin.ignore();
-	cout << "Enter your comment: ";
-	getline(cin, comments[count].text);
-
-	comments[count].studentID = Student[index].ID;
-	comments[count].fromHost = false;
-	comments[count].hostReply = "";
-	comments[count].deleted = false;
-
-	cout << "Comment saved! (Student ID: " << Student[index].ID << ")" << endl;//can save student id
-	count++;
-	saveComments(comments, count);
-}
-
-void showAllComments(Comment comments[], int count) {
-	cout << "\n======= Comment List =======\n";
-	if (count == 0) {
-		cout << "No comments yet.\n";
-		return;
-	}
-
-	for (int i = 0; i < count; i++) {
-		if (!comments[i].deleted) {
-			cout << "Comment #" << i << endl;
-			if (comments[i].fromHost) {
-				cout << " ------Notification------\n";
-				cout << "  Attention: " << comments[i].text << endl;
-			}
-			else {
-				cout << " [Student ID: " << comments[i].studentID << "]\n";
-				cout << "  Comment: " << comments[i].text << endl;
-			}
-
-			if (!comments[i].hostReply.empty())
-				cout << "--->Host Reply: " << comments[i].hostReply << endl;
-			cout << "----------------------------\n";
-		}
-	}
-	cout << "============================\n";
-}
-void replyToComment(Comment comments[], int count) {
-	if (count == 0) {
-		cout << "No comments to reply.\n";
-		return;
-	}
-
-	char reply = 'Y';
-	while (toupper(reply) == 'Y') {
-		showAllComments(comments, count);
-
-		int index;
-		cout << "Enter the comment number to reply: ";
-		cin >> index;
-
-		if (index < 0 || index >= count) {
-			cout << "Invalid comment index!\n";
-			return;
-		}
-
-		if (!comments[index].hostReply.empty()) {
-			cout << "Already replied.\n";
-		}
-		else {
-			cin.ignore();
-			cout << "Enter your reply: ";
-			getline(cin, comments[index].hostReply);
-
-			cout << "Reply added successfully.\n";
-			saveComments(comments, count);
-		}
-
-		while (true) {
-			cout << "Do you want to continue replying? (Y/N): ";
-			cin >> reply;
-
-			if (reply == 'Y' || reply == 'y' || reply == 'N' || reply == 'n') {
-				break;
-			}
-			else {
-				cout << "Invalid input. Please enter Y or N.\n";
-			}
-		}
-	}
-}
-
-//delete comment function
-void deleteComment(Comment comments[], int& count) {
-	if (count == 0) {
-		cout << "No comments to delete.\n";
-		return;
-	}
-
-	showAllComments(comments, count);
-
-	int index;
-	cout << "Enter the comment number to delete: ";
-	cin >> index;
-
-	if (index < 0 || index >= count) {
-		cout << "Invalid comment index!\n";
-		return;
-	}
-
-	cout << "\nWhat do you want to delete?\n";
-	cout << "1. Entire comment\n";
-	cout << "2. Host reply\n";
-	cout << "3. Cancel\n";
-	cout << "Choice: ";
-	int choice;
-	cin >> choice;
-
-	switch (choice) {
-	case 1:
-		deleteEntireComment(comments, count, index);
-		break;
-	case 2:
-		deleteHostReply(comments, count, index);
-		break;
-	case 3:
-		cout << "Delete cancelled.\n";
-		return;
-	default:
-		cout << "Invalid choice.\n";
-		return;
-	}
-}
-void deleteEntireComment(Comment comments[], int& count, int index) {
-	for (int i = index; i < count - 1; i++) {
-		comments[i] = comments[i + 1];
-	}
-	comments[count - 1] = {};
-	count--;
-	cout << "Comment deleted successfully.\n";
-	saveComments(comments, count);
-}
-void deleteHostReply(Comment comments[], int count, int index) {
-	if (!comments[index].hostReply.empty()) {
-		comments[index].hostReply.clear();
-		cout << "Host reply deleted successfully.\n";
-		saveComments(comments, count);
-	}
-	else {
-		cout << "This comment has no host reply.\n";
-	}
-}
-
-void saveComments(Comment comments[], int count) {
-	fstream file("Comments", ios::out);
-	if (!file.is_open()) {
-		cout << "Error saving comments.\n";
-		return;
-	}
-	for (int i = 0; i < count; i++) {
-		if (!comments[i].deleted) {
-
-			file << comments[i].fromHost << endl;
-			file << comments[i].studentID << endl;
-			file << comments[i].text << endl;
-			file << comments[i].hostReply << endl;
-		}
-	}
-	file.close();
-	cout << "Comments saved successfully." << endl;
-}
-void loadComments(Comment comments[], int& count) {
-	fstream file("Comments", ios::in);
-	if (!file.is_open()) {
-		cout << "Starting fresh.\n";
-		return;
-	}
-
-	string line;
-	count = 0;
-	while (getline(file, line)) {
-		if (line.empty()) continue;
-		comments[count].fromHost = (line == "1" || line == "true");
-
-		if (!getline(file, comments[count].studentID)) break;
-		if (!getline(file, comments[count].text)) break;
-		if (!getline(file, comments[count].hostReply)) break;
-
-		comments[count].deleted = false;
-		count++;
-		if (count >= MAX_COMMENTS) break;
-	}
-
-	file.close();
-}
 
 void charValidation(char* option) {
 	while (toupper(*option) != 'Y' && toupper(*option) != 'N' || cin.fail()) {
