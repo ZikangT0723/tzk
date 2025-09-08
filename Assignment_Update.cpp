@@ -1,4 +1,4 @@
-﻿#include<iostream>
+#include<iostream>
 #include<string>
 #include<cmath>
 #include<iomanip>
@@ -3878,7 +3878,7 @@ void notes_FET()
 	cout << "Next, by providing a negative voltage to gate-to-source and sets a reverse-bias voltage between it and the pn junction become reverse biased." << endl << endl;
 
 	cout << "In short, A JFET works by using the gate voltage to widen or narrow the depletion layer," << endl;
-	cout << "which controls the channel�s width and therefore regulates the current flowing from drain to source." << endl << endl;
+	cout << "which controls the channels width and therefore regulates the current flowing from drain to source." << endl << endl;
 
 	waitEnter("continue");
 	system("cls");
@@ -4117,5 +4117,6 @@ void waitEnter(string action)
 	string dummy;
 	cout << "\nPress ENTER to " << action << " ~~~";
 	getline(cin, dummy);
+
 
 }
