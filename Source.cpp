@@ -44,6 +44,7 @@ void userlist(User[]);
 //USER FUNCTION
 bool userLogin(int* index);
 bool IDexist(string*);
+void userinfo(User[], int );
 void userMenu(int);
 //userMenu_function
 void note();
@@ -164,7 +165,8 @@ int main() {
 			break;
 		case '2':
 			if (userLogin(&index)) {
-				userlist(Student);
+				userinfo(Student, index);
+				//userlist(Student);
 				userMenu(index);
 			}
 
@@ -1044,6 +1046,11 @@ int getinfo(User Student[]) {
 	cout << "Enter your name:";
 	cin.ignore();
 	getline(cin, Student[userindex].Name);
+	while (Student[userindex].Name.length() == 0) {
+		cout << "Name too short\n";
+		cout << "Enter your name: ";
+		getline(cin, Student[userindex].Name);
+	}
 	do {
 		IDvalid = false, IDdigits = true, IDexists = false;
 		cout << "Enter your Student ID:";
@@ -1110,6 +1117,23 @@ void userlist(User Student[]) {
 	}
 }
 
+void userinfo(User Student[], int index) {
+	cout << "================================================\n";
+	cout << "          Basic Electronic UGEA1313 \n";
+	cout << "================================================\n";
+	for (int width = 0; width <= 78; width++) {
+		cout << "-";
+	}
+	cout << "\n";
+	cout << setw(3) << "Name: " << left << setw(20) << Student[index].Name <<
+		" | Student ID: " << setw(7) << Student[index].ID <<
+		" | Test 1: " << Student[index].result_Test1 <<
+		" | Test 2: " << Student[index].result_Test2 << endl;
+	for (int width = 0; width <= 78; width++) {
+		cout << "-";
+	}
+	cout << "\n";
+}
 
 
 void savefile(User* Student, string name) {
