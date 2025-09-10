@@ -1,4 +1,4 @@
-﻿#include<iostream>
+#include<iostream>
 #include<string>
 #include<cmath>
 #include<iomanip>
@@ -1424,7 +1424,7 @@ void Test1_quizz(int index)
 	}
 	Student[index].result_Test1 = (score / float(Test1Count)) * 7;
 	Student[index].attempt_Test1 = true;
-	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 
+	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << " ("
 		<< fixed << setprecision(2) << Student[index].result_Test1 << "." << endl;
 	savefile(Student, "Userlist");
 }
