@@ -31,7 +31,6 @@ void loaduserdata();
 void savefile(User*, string);
 
 int getinfo(User[]);
-bool checkopenfile(fstream&, string);
 int findslot(User[]);
 
 //HOST FUNCTION
@@ -135,15 +134,9 @@ int main() {
 	LoadTest1();
 	loadComments(comments, commentCount);
 	loaduserdata();
-	/*
-	fstream list;
-	list.open("Userlist", ios::app);
-	list.close();
-	if (!checkopenfile(list, "Userlist")) {
-		return 1; // Exit if file cannot be opened
-	}
-	*/
+
 	do {
+		system("cls");
 		cout << "=================================\n";
 		cout << "   WELCOME TO BASIC ELECTRONIC   \n";
 		cout << "=================================\n";
@@ -349,7 +342,7 @@ void userMenu(int index) {
 			else
 			{
 				cout << "You have submitted Test 1\n";
-				cout << "Result of test 1: " << Student[index].result_Test1 << " %\n\n";
+				cout << "Result of Test 1: " << Student[index].result_Test1 << " \n\n";
 			}
 			break;
 		case 2:
@@ -358,9 +351,6 @@ void userMenu(int index) {
 
 			}
 			else {
-				cout << "userindex(review):" << userindex << endl;
-				cout << "userindex(review):" << userindex << endl;
-				cout << "Test 2 review.\n";
 				review(Student[index].ans, Student[index].result_Test2);
 			}
 			break;
@@ -374,8 +364,9 @@ void userMenu(int index) {
 			studentCommentMenu(comments, commentCount, Student, index);
 			break;
 		case 0:
-			cout << "You have been logged out." << endl;
+			cout << "You have been logged out..." << endl;
 			saveComments(comments, commentCount);//Trang
+			Sleep(1000);
 			return;
 		default:
 			cout << "Invalid input try to choose again.(Input:1-5,0 to end)" << endl;
@@ -830,7 +821,6 @@ void Test2_quizz(float* answer, int index) {
 			break;
 		case 13:
 			system("cls");
-			cout << "You have submitted Test 2" << endl;
 			break;
 		default:
 			system("cls");
@@ -841,6 +831,7 @@ void Test2_quizz(float* answer, int index) {
 	check(answer, Student[index].result_Test2);
 	cout << "Score updated:" << Student[index].result_Test2 << endl;
 	Student[index].attempt_Test2 = true;
+	cout << "End of Quizz. Your total score is " << Student[index].result_Test2 << " Out of " << ansnum << "." << endl;
 	savefile(Student, "Userlist");
 }
 
@@ -951,26 +942,10 @@ void sim()
 
 }
 
-bool checkopenfile(fstream& file, string name) {
-	file.open(name, ios::in | ios::out | ios::app);
-	if (file.is_open()) {
-		cout << "File opened successfully: " << name << endl;
-		return true;
-	}
-	else {
-		cout << "Error opening file: " << name << endl;
-		return false;
-	}
-
-}
 
 void loaduserdata() {
 	userindex = 0;
 	fstream list = fstream("Userlist", ios::in);
-	if (!list.is_open()) {
-		cout << "Error opening user list file." << endl;
-		return;
-	}
 	string line;
 	string emptyspace;
 	while (userindex < Studentnum) {
@@ -1063,22 +1038,26 @@ void userlist(User Student[]) {
 		cout << "NO student registered yet.\n";
 	}
 	else {
-		for (int width = 0; width <= 78; width++) {
+		for (int width = 0; width <= 89; width++) {
 			cout << "-";
 		}
 		cout << "\n";
 		for (int i = 0; i < userindex; i++) {
 			cout << setw(3) << right << i + 1 << ". " << "Name: " << left << setw(20) << Student[i].Name <<
 				" | Student ID: " << setw(7) << Student[i].ID <<
-				" | Test 1: " << Student[i].result_Test1 <<
-				" | Test 2: " << Student[i].result_Test2 << endl;
+				" | Test 1: " << fixed << setprecision(2) << Student[i].result_Test1 << "/7.00" <<
+				" | Test 2: " << setw(2) << right << Student[i].result_Test2 << "/23" << endl;
 
 		}
-		for (int width = 0; width <= 78; width++) {
+		for (int width = 0; width <= 89; width++) {
 			cout << "-";
 		}
-		cout << "\n";
+
 	}
+	cout << "\n";
+	cin.ignore();
+	waitEnter("return menu");
+	system("cls");
 }
 
 
@@ -1124,7 +1103,6 @@ int check(float* answer, int& points) {
 				points++;
 			}
 		}
-
 	}
 	return points;
 }
@@ -1446,8 +1424,8 @@ void Test1_quizz(int index)
 	}
 	Student[index].result_Test1 = (score / float(Test1Count)) * 7;
 	Student[index].attempt_Test1 = true;
-	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << " ("
-		<< fixed << setprecision(2) << Student[index].result_Test1 << "%)." << endl;
+	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 
+		<< fixed << setprecision(2) << Student[index].result_Test1 << "." << endl;
 	savefile(Student, "Userlist");
 }
 
@@ -3878,7 +3856,7 @@ void notes_FET()
 	cout << "Next, by providing a negative voltage to gate-to-source and sets a reverse-bias voltage between it and the pn junction become reverse biased." << endl << endl;
 
 	cout << "In short, A JFET works by using the gate voltage to widen or narrow the depletion layer," << endl;
-	cout << "which controls the channel’s width and therefore regulates the current flowing from drain to source." << endl << endl;
+	cout << "which controls the channelÂ’s width and therefore regulates the current flowing from drain to source." << endl << endl;
 
 	waitEnter("continue");
 	system("cls");
@@ -4117,5 +4095,6 @@ void waitEnter(string action)
 	string dummy;
 	cout << "\nPress ENTER to " << action << " ~~~";
 	getline(cin, dummy);
+
 
 }
