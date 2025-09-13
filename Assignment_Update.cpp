@@ -7,12 +7,12 @@
 #include<windows.h> // for Sleep()
 using namespace std;
 // test validation
-void charValidation(char* option);
+void charValidation(char* input, int option);
 void waitEnter(string action);
 const int ansnum = 23;
 const int Studentnum = 100;
 const float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
-		10000, 200, 350 };
+		10000, 200, 350 }; //Answer for quizz 2
 struct User {
 	string Name;
 	string ID;
@@ -25,7 +25,7 @@ struct User {
 };
 User Student[Studentnum];
 int userindex = 0; //User count
-
+void ModeSelection();
 //Userlist file operation
 void loaduserdata();
 void savefile(User*, string);
@@ -129,12 +129,15 @@ void deleteHostReply(Comment[], int, int);
 
 
 int main() {
-	int index;
-	char choice;
 	LoadTest1();
 	loadComments(comments, commentCount);
 	loaduserdata();
-
+	ModeSelection();
+}
+void ModeSelection()
+{
+	int index;
+	char choice;
 	do {
 		system("cls");
 		cout << "=================================\n";
@@ -146,41 +149,36 @@ int main() {
 		cout << "3. Exit\n";
 		cout << "Choice (1~3): ";
 		cin >> choice;
-		system("cls");
 		switch (choice)
 		{
 		case '1':
 			if (hostLogin())
 				hostMenu();
-
 			break;
 		case '2':
 			if (userLogin(&index)) {
-				userlist(Student);
 				userMenu(index);
 			}
-
 			break;
 		case '3':
-			cout << "Exitting program..."; //can design
-			Sleep(1000);
-			return 0;
+			cout << "\nExitting program..."; //can design
 			break;
 		default:
 			cout << "Invalid input please enter 1 to 3." << endl;
+			cin.ignore(100, '\n');
+			Sleep(1000);
 		}
-	} while (choice != '3'); //debuged
-
-
+	} while (choice != '3');
 }
-
 //Pavan
 bool userLogin(int* index) {
 	int option;
 	int position;
 	string yourID;
 	string yourPassword;
-
+	system("cls");
+	cout << "User Login/Register\n";
+	cout << "===================\n";
 	cout << "Do you want to login or register [1 login, 2 register]";
 	cin >> option;
 
@@ -282,9 +280,9 @@ bool hostLogin() {
 void hostMenu()
 {
 	char option;
-	system("cls");
 	do
 	{
+		system("cls");
 		cout << "Host Menu\n";
 		cout << "=========\n";
 		cout << "1. Test1 Question List\n";
@@ -310,8 +308,8 @@ void hostMenu()
 			Sleep(1000);
 			break;
 		default:
-			system("cls");
 			cout << "Invalid input. Please Enter (1-4)." << endl;
+			Sleep(1000);
 		}
 	} while (option != '4');
 }
@@ -323,7 +321,9 @@ void userMenu(int index) {
 		cout << "ERROR! Invalid user index!" << endl;
 		return;
 	}
+	Sleep(1000);
 	while (true) {
+		system("cls");
 		cout << "User Menu\n";
 		cout << "=========\n";
 		cout << "1. Test 1\n";
@@ -333,26 +333,12 @@ void userMenu(int index) {
 		cout << "5. Student Comment Menu\n";
 		cout << "0. Logout:";
 		cin >> opt;
-		system("cls");
 		switch (opt) {
 		case 1:
-			if (!Student[index].attempt_Test1) {
-				Test1_quizz(index);
-			}
-			else
-			{
-				cout << "You have submitted Test 1\n";
-				cout << "Result of Test 1: " << Student[index].result_Test1 << " \n\n";
-			}
+			Test1_quizz(index);
 			break;
 		case 2:
-			if (!Student[index].attempt_Test2) {
-				Test2_quizz(Student[index].ans, index);
-
-			}
-			else {
-				review(Student[index].ans, Student[index].result_Test2);
-			}
+			Test2_quizz(Student[index].ans, index);
 			break;
 		case 3:
 			note();
@@ -370,6 +356,7 @@ void userMenu(int index) {
 			return;
 		default:
 			cout << "Invalid input try to choose again.(Input:1-5,0 to end)" << endl;
+			Sleep(1000);
 		}
 	}
 }
@@ -379,15 +366,28 @@ void Test2_quizz(float* answer, int index) {
 	bool same;
 	char option;//change name
 	answer[ansnum] = {};
+	system("cls");
+	cout << "Test 2\n";
+	cout << "======\n";
+	if (Student[index].attempt_Test2)
+	{
+		cout << "You have submitted the Test 2.Total score = " << Student[index].result_Test2 << "/" << ansnum << endl;
+		cout << "Do you wanna review your quention?(Y/N):";
+		cin >> option;
+		charValidation(&option, 1);
+		if (option == 'Y')
+			review(Student[index].ans, Student[index].result_Test2);
+		return;
+	}
 
 	do {
 		do {
 			same = false;
-			cout << "Test 2\n";
-			cout << "======\n";
 			cout << "Choose the question you want to answer (Input 1-12, 13 to submit Test 2):";
 			cin >> record[i];
 			system("cls");
+			cout << "Test 2\n";
+			cout << "======\n";
 			if (record[i] == 0) {
 				break;
 			}
@@ -424,7 +424,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					clipper();
 				}
@@ -454,7 +454,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					clamper();
 				}
@@ -487,7 +487,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					clamper();
 				}
@@ -525,7 +525,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					BJT_Voltage_divider();
 				}
@@ -560,7 +560,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					BJT_base();
 				}
@@ -602,7 +602,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					BJT_AC();
 				}
@@ -620,7 +620,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					jfet_DrainCurrent();
 				}
@@ -656,7 +656,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					jfet();
 				}
@@ -693,7 +693,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					mosfet();
 				}
@@ -730,7 +730,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					non_inverting();
 				}
@@ -769,7 +769,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					invertingAmplifier();
 				}
@@ -806,7 +806,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
 					VoltageFollower();
 				}
@@ -831,8 +831,9 @@ void Test2_quizz(float* answer, int index) {
 	check(answer, Student[index].result_Test2);
 	cout << "Score updated:" << Student[index].result_Test2 << endl;
 	Student[index].attempt_Test2 = true;
-	cout << "End of Quizz. Your total score is " << Student[index].result_Test2 << " Out of " << ansnum << "." << endl;
+	cout << "You have submitted the Test 2. Your total score is " << Student[index].result_Test2 << " Out of " << ansnum << "." << endl;
 	savefile(Student, "Userlist");
+	waitEnter("return menu");
 }
 
 void note() {
@@ -942,7 +943,6 @@ void sim()
 	} while (opt_simulator != '0');
 }
 
-
 void loaduserdata() {
 	userindex = 0;
 	fstream list = fstream("Userlist", ios::in);
@@ -996,7 +996,6 @@ void loaduserdata() {
 
 int getinfo(User Student[]) {
 	bool IDvalid, IDdigits;
-	loaduserdata();
 	cout << "Enter your name:";
 	cin.ignore();
 	getline(cin, Student[userindex].Name);
@@ -1031,6 +1030,7 @@ int getinfo(User Student[]) {
 	return userindex - 1;
 }
 void userlist(User Student[]) {
+	system("cls");
 	cout << "================================================\n";
 	cout << "     Basic Electronic UGEA1313: User List\n";
 	cout << "================================================\n";
@@ -1038,10 +1038,7 @@ void userlist(User Student[]) {
 		cout << "NO student registered yet.\n";
 	}
 	else {
-		for (int width = 0; width <= 89; width++) {
-			cout << "-";
-		}
-		cout << "\n";
+		cout << string(90, '-') << endl;
 		for (int i = 0; i < userindex; i++) {
 			cout << setw(3) << right << i + 1 << ". " << "Name: " << left << setw(20) << Student[i].Name <<
 				" | Student ID: " << setw(7) << Student[i].ID <<
@@ -1049,12 +1046,8 @@ void userlist(User Student[]) {
 				" | Test 2: " << setw(2) << right << Student[i].result_Test2 << "/23" << endl;
 
 		}
-		for (int width = 0; width <= 89; width++) {
-			cout << "-";
-		}
-
+		cout << string(90, '-') << endl;
 	}
-	cout << "\n";
 	cin.ignore();
 	waitEnter("return menu");
 	system("cls");
@@ -1382,10 +1375,8 @@ void review(float* answer, int score) {
 	cout << "Your answer is       : " << setw(5) << answer[21] << setw(5) << right << ", " << setw(5) << right << answer[22] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[21] << setw(5) << right << ", " << setw(5) << right << checkans[22] << right
 		<< setw(15) << "Score = " << checksection(answer, 21, 22) << endl << endl;
-	cout << "Total score = " << score << "/" << ansnum << endl;
 	cin.ignore();
-	waitEnter("return menu");
-	system("cls");
+	waitEnter("return to menu");
 }
 
 void Test1_quizz(int index)
@@ -1396,13 +1387,28 @@ void Test1_quizz(int index)
 	int sequence[MAX_Numbers] = { 1,2,3,4,5,6,7,8,9,10 };
 	int Num = 1, score = 0;
 	char ans;
-
-	shuffle(sequence, MAX_Numbers);
-	if (Test1Count == 0) {
-		cout << "There are no Question uploaded by Teacher." << endl;
+	system("cls");
+	cout << "Test 1 (Ojective: 7%)\n";
+	cout << "=====================\n";
+	if (Student[index].attempt_Test1)
+	{
+		cout << "You have submitted Test 1\n";
+		cout << "Result of Test 1: " << Student[index].result_Test1 << " \n";
+		cin.ignore();
+		waitEnter("return user menu");
 		return;
 	}
+	if (Test1Count == 0) {
+		cout << "There are no Question uploaded by Teacher." << endl;
+		cin.ignore();
+		waitEnter("return user menu");
+		return;
+	}
+	cout << "You only get ONE chance to answer. Are you ready?\n";
+	cin.ignore();
+	waitEnter("START");
 
+	shuffle(sequence, MAX_Numbers);
 
 	for (int i = 0; i < MAX_Numbers; i++) //i<10
 	{
@@ -1415,16 +1421,17 @@ void Test1_quizz(int index)
 			cout << "D: " << Quizz[sequence[i] - 1].objective_D << endl;
 			cout << "Enter your answer: ";
 			cin >> ans;
-			ans = toupper(ans);
+			charValidation(&ans, 2);
 			score += checkAns(ans, Quizz[sequence[i] - 1].ans);
 			cout << endl;
 		}
 	}
 	Student[index].result_Test1 = (score / float(Test1Count)) * 7;
 	Student[index].attempt_Test1 = true;
-	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << " ("
-		<< fixed << setprecision(2) << Student[index].result_Test1 << "." << endl;
+	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << endl;
 	savefile(Student, "Userlist");
+	cin.ignore();
+	waitEnter("return user menu");
 }
 
 void shuffle(int* temp, int Question_Numbers)//temporary storage for the sequence array
@@ -1462,7 +1469,7 @@ void Test1List()
 	char choice = 'N';
 	int option = 0;
 	system("cls");
-	while (true) {
+	do {
 		cout << "Test 1 Question list\n";
 		cout << "====================\n";
 
@@ -1471,12 +1478,13 @@ void Test1List()
 			cout << "Do you want to create a new Question for Test 1 (MCQ)\n";
 			cout << "'Y' for yes, 'N' to return menu:";
 			cin >> choice;
-			charValidation(&choice);
+			charValidation(&choice, 1);
 			if (toupper(choice) == 'Y')
 				createQuizz();
 			else
 			{
 				cout << "back to menu...\n";
+				Sleep(1000);
 				break;
 			}
 		}
@@ -1491,17 +1499,14 @@ void Test1List()
 				system("cls");
 				cout << "Invalid input, Please try again." << endl;
 			}
-			else if (option == 0) {
-				cout << "Cancel successfully, exit to menu..." << endl;
-				break;
-			}
+			else if (option == 0) break;
 			else if (option > 0 && option <= Test1Count)
 				editQuizz(option);
 			else
 				createQuizz();
 		}
-	}
-	Sleep(1000);
+	} while (option != 0);
+
 	system("cls");
 }
 bool showTest1()
@@ -1566,6 +1571,7 @@ void createQuizz()
 
 	cout << "Answer for the Question " << newQuizz.num << " : ";
 	cin >> newQuizz.ans;
+	charValidation(&newQuizz.ans, 2);
 	cin.ignore();
 
 	newQuizz.isDeleted = false;
@@ -1588,7 +1594,7 @@ void editQuizz(int number)
 		system("cls");
 		cout << "Edit Question Test 1\n";
 		cout << "====================\n";
-		cout << Quizz[number - 1].question << endl;
+		cout << number << ". " << Quizz[number - 1].question << endl;
 		cout << "A: " << Quizz[number - 1].objective_A << endl;
 		cout << "B: " << Quizz[number - 1].objective_B << endl;
 		cout << "C: " << Quizz[number - 1].objective_C << endl;
@@ -1611,11 +1617,7 @@ void editQuizz(int number)
 			deleteQuizz(number - 1);
 			break;
 		}
-		else if (option == '8')
-		{
-			cout << "\nReturning to the Test 1 List...\n";
-			break;
-		}
+		else if (option == '8') break;
 		else {
 			switch (option)
 			{
@@ -1653,20 +1655,19 @@ void editQuizz(int number)
 				cout << "\nAnswer: " << EditQuizz.ans << endl;
 				cout << "Enter your new Answer:" << endl;
 				cin >> EditQuizz.ans;
+				charValidation(&EditQuizz.ans, 2);
 				cin.ignore();
 				break;
 
 			default:
-				cout << "\nInvalid option, please Enter (1-8)";
+				cout << "\nInvalid option, please Enter (1-8)...";
 				Sleep(1000);
 			}
 			Quizz[number - 1] = EditQuizz;
 			Quizz[number - 1].isDeleted = false;
 			saveTest1();
-			cout << "Editted successfully..." << endl;
 		}
 	}
-	Sleep(500);
 	system("cls");
 }
 
@@ -1681,7 +1682,6 @@ void deleteQuizz(int num)
 	Quizz[Test1Count - 1] = {};
 	Test1Count--;
 	saveTest1();
-	cout << "The quizz was deleted successfully.\n";
 }
 
 void saveTest1()
@@ -1708,10 +1708,7 @@ void LoadTest1()
 {
 	Test1Count = 0;
 	ifstream inFile("Test1");
-	if (!inFile) {
-		cout << "Cann't find the File\n";
-		return;
-	}
+	if (!inFile) return;
 	string line;
 	Test1 tempQuizz;
 
@@ -1992,7 +1989,6 @@ void loadComments(Comment comments[], int& count) {
 	file.close();
 }
 
-//Case 1 (for simulator)
 void clipper()
 {
 	system("cls");
@@ -3169,6 +3165,7 @@ void invertingAmplifier()
 	}
 }
 
+
 void notes_Diode()
 {
 	system("cls");
@@ -3716,7 +3713,7 @@ void notes_FET()
 	cout << "The step to determine Vgs and Vds can be explained in JFET self biasing simulation." << endl;
 	cout << "\nDo you want jump to JFET simulation? (Y/N):";
 	cin >> option;
-	charValidation(&option);
+	charValidation(&option, 1);
 	if (toupper(option) == 'Y')
 		jfet();
 	cin.ignore();
@@ -3781,7 +3778,7 @@ void notes_FET()
 
 	cout << "\nDo you want jump to E-MOSFET simulation? (Y/N):";
 	cin >> option;
-	charValidation(&option);
+	charValidation(&option, 1);
 	if (toupper(option) == 'Y') // added by Daniel to debug
 		mosfet();
 
@@ -3895,18 +3892,36 @@ void notes_OA() {
 
 
 
-void charValidation(char* option) {
-	while (toupper(*option) != 'Y' && toupper(*option) != 'N' || cin.fail()) {
-		cin.clear();
-		cin.ignore(100, '\n');
-		cout << "Invalid input, please ENTER 'Y' or 'N':" << endl;
-		cin >> option;
+void charValidation(char* input, int option) {
+	char temInput = toupper(*input);
+	if (option == 1) //check Y/N
+	{
+		while (temInput != 'Y' && temInput != 'N') {
+			cin.clear();
+			cin.ignore(100, '\n');
+			cout << "Invalid input, please ENTER 'Y' or 'N':";
+			cin >> temInput;
+			temInput = toupper(temInput);
+		}
 	}
+	else//check A/B/C/D
+	{
+		while (temInput != 'A' && temInput != 'B' && temInput != 'C' && temInput != 'D') {
+			cin.clear();
+			cin.ignore(100, '\n');
+			cout << "Invalid input, please ENTER 'A' to 'D':";
+			cin >> temInput;
+			temInput = toupper(temInput);
+		}
+	}
+	*input = temInput;
 }
 
 void waitEnter(string action)
 {
 	string dummy;
-	cout << "\nPress ENTER to " << action << " ~~~";
+	cout << "\nPress ENTER to " << action << " ~~~\n\n";
 	getline(cin, dummy);
+
+
 }
