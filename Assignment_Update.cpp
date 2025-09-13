@@ -7,12 +7,12 @@
 #include<windows.h> // for Sleep()
 using namespace std;
 // test validation
-void charValidation(char* option);
+void charValidation(char* input, int option);
 void waitEnter(string action);
 const int ansnum = 23;
 const int Studentnum = 100;
 const float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
-		10000, 200, 350 };
+		10000, 200, 350 }; //Answer for quizz 2
 struct User {
 	string Name;
 	string ID;
@@ -25,7 +25,7 @@ struct User {
 };
 User Student[Studentnum];
 int userindex = 0; //User count
-
+void ModeSelection();
 //Userlist file operation
 void loaduserdata();
 void savefile(User*, string);
@@ -129,12 +129,15 @@ void deleteHostReply(Comment[], int, int);
 
 
 int main() {
-	int index;
-	char choice;
 	LoadTest1();
 	loadComments(comments, commentCount);
 	loaduserdata();
-
+	ModeSelection();
+}
+void ModeSelection()
+{
+	int index;
+	char choice;
 	do {
 		system("cls");
 		cout << "=================================\n";
@@ -146,41 +149,36 @@ int main() {
 		cout << "3. Exit\n";
 		cout << "Choice (1~3): ";
 		cin >> choice;
-		system("cls");
 		switch (choice)
 		{
 		case '1':
 			if (hostLogin())
 				hostMenu();
-
 			break;
 		case '2':
 			if (userLogin(&index)) {
-				userlist(Student);
 				userMenu(index);
 			}
-
 			break;
 		case '3':
-			cout << "Exitting program..."; //can design
-			Sleep(1000);
-			return 0;
+			cout << "\nExitting program..."; //can design
 			break;
 		default:
 			cout << "Invalid input please enter 1 to 3." << endl;
+			cin.ignore(100, '\n');
+			Sleep(1000);
 		}
-	} while (choice != '3'); //debuged
-
-
+	} while (choice != '3'); 
 }
-
 //Pavan
 bool userLogin(int* index) {
 	int option;
 	int position;
 	string yourID;
 	string yourPassword;
-
+	system("cls");
+	cout << "User Login/Register\n";
+	cout << "===================\n";
 	cout << "Do you want to login or register [1 login, 2 register]";
 	cin >> option;
 
@@ -282,9 +280,9 @@ bool hostLogin() {
 void hostMenu()
 {
 	char option;
-	system("cls");
 	do
 	{
+		system("cls");
 		cout << "Host Menu\n";
 		cout << "=========\n";
 		cout << "1. Test1 Question List\n";
@@ -310,8 +308,8 @@ void hostMenu()
 			Sleep(1000);
 			break;
 		default:
-			system("cls");
 			cout << "Invalid input. Please Enter (1-4)." << endl;
+			Sleep(1000);
 		}
 	} while (option != '4');
 }
@@ -323,7 +321,9 @@ void userMenu(int index) {
 		cout << "ERROR! Invalid user index!" << endl;
 		return;
 	}
+	Sleep(1000);
 	while (true) {
+		system("cls");
 		cout << "User Menu\n";
 		cout << "=========\n";
 		cout << "1. Test 1\n";
@@ -333,26 +333,12 @@ void userMenu(int index) {
 		cout << "5. Student Comment Menu\n";
 		cout << "0. Logout:";
 		cin >> opt;
-		system("cls");
 		switch (opt) {
 		case 1:
-			if (!Student[index].attempt_Test1) {
-				Test1_quizz(index);
-			}
-			else
-			{
-				cout << "You have submitted Test 1\n";
-				cout << "Result of Test 1: " << Student[index].result_Test1 << " \n\n";
-			}
+			Test1_quizz(index);
 			break;
 		case 2:
-			if (!Student[index].attempt_Test2) {
-				Test2_quizz(Student[index].ans, index);
-
-			}
-			else {
-				review(Student[index].ans, Student[index].result_Test2);
-			}
+			Test2_quizz(Student[index].ans, index);
 			break;
 		case 3:
 			note();
@@ -370,6 +356,7 @@ void userMenu(int index) {
 			return;
 		default:
 			cout << "Invalid input try to choose again.(Input:1-5,0 to end)" << endl;
+			Sleep(1000);
 		}
 	}
 }
@@ -379,15 +366,28 @@ void Test2_quizz(float* answer, int index) {
 	bool same;
 	char option;//change name
 	answer[ansnum] = {};
-
+	system("cls");
+	cout << "Test 2\n";
+	cout << "======\n";
+	if (Student[index].attempt_Test2)
+	{
+		cout << "You have submitted the Test 2.Total score = " << Student[index].result_Test2 << "/" << ansnum << endl;
+		cout << "Do you wanna review your quention?(Y/N):";
+		cin >> option;
+		charValidation(&option, 1);
+		if(option=='Y')
+		review(Student[index].ans, Student[index].result_Test2);
+		return;
+	}
+	
 	do {
 		do {
 			same = false;
-			cout << "Test 2\n";
-			cout << "======\n";
 			cout << "Choose the question you want to answer (Input 1-12, 13 to submit Test 2):";
 			cin >> record[i];
 			system("cls");
+			cout << "Test 2\n";
+			cout << "======\n";
 			if (record[i] == 0) {
 				break;
 			}
@@ -424,7 +424,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					clipper();
 				}
@@ -454,7 +454,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					clamper();
 				}
@@ -487,7 +487,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					clamper();
 				}
@@ -525,7 +525,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					BJT_Voltage_divider();
 				}
@@ -560,7 +560,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					BJT_base();
 				}
@@ -602,7 +602,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					BJT_AC();
 				}
@@ -620,7 +620,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					jfet_DrainCurrent();
 				}
@@ -656,7 +656,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					jfet();
 				}
@@ -693,7 +693,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					mosfet();
 				}
@@ -730,7 +730,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					non_inverting();
 				}
@@ -769,7 +769,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					invertingAmplifier();
 				}
@@ -806,7 +806,7 @@ void Test2_quizz(float* answer, int index) {
 			do {
 				cout << "\nDo you want to use a simulator? (Y/N):";
 				cin >> option;
-				charValidation(&option);
+				charValidation(&option,1);
 				if (toupper(option) == 'Y') {
 					VoltageFollower();
 				}
@@ -831,8 +831,9 @@ void Test2_quizz(float* answer, int index) {
 	check(answer, Student[index].result_Test2);
 	cout << "Score updated:" << Student[index].result_Test2 << endl;
 	Student[index].attempt_Test2 = true;
-	cout << "End of Quizz. Your total score is " << Student[index].result_Test2 << " Out of " << ansnum << "." << endl;
+	cout << "You have submitted the Test 2. Your total score is " << Student[index].result_Test2 << " Out of " << ansnum << "." << endl;
 	savefile(Student, "Userlist");
+	waitEnter("return menu");
 }
 
 void note() {
@@ -875,61 +876,60 @@ void note() {
 }
 void sim()
 {
-	char opt_simulator;
+	int opt_simulator;
 	do
 	{
-		system("cls");
-		cout << "\nSelect the type of simulator\na.Clipper\nb.Clamper\nc.DC(Voltage divider bias)\nd.DC(base bias)\ne.AC\nf.JFET Drain Current\n"
-			<< "g.JFET\nh.MOSFET\n" << "i.non inverting\nj.Voltage follower\nk.inverting amplifier\n0.return:";
+		cout << "Select the type of simulator\n1.Clipper\n2.Clamper\n3.DC(Voltage divider bias)\n4.DC(base bias)\n5.AC\n6.JFET Drain Current\n"
+			<< "7.JFET\n8.E-MOSFET\n" << "9.non inverting\n10.Voltage follower\n11.inverting amplifier\n0.return:";
 		cin >> opt_simulator;
-		opt_simulator = tolower(opt_simulator);
+		system("cls");
 		switch (opt_simulator)
 		{
-		case 'a':
+		case 1:
 			clipper();
 			break;
 
-		case 'b':
+		case 2:
 			clamper();
 			break;
 
-		case 'c':
+		case 3:
 			BJT_Voltage_divider();
 			break;
 
-		case 'd':
+		case 4:
 			BJT_base();
 			break;
 
-		case 'e':
+		case 5:
 			BJT_AC();
 			break;
 
-		case 'f':
+		case 6:
 			jfet_DrainCurrent();
 			break;
 
-		case 'g':
+		case 7:
 			jfet();
 			break;
 
-		case 'h':
+		case 8:
 			mosfet();
 			break;
 
-		case 'i':
+		case 9:
 			non_inverting();
 			break;
 
-		case 'j':
+		case 10:
 			VoltageFollower();
 			break;
 
-		case 'k':
+		case 11:
 			invertingAmplifier();
 			break;
 
-		case '0':
+		case 0:
 			system("cls");
 			cout << "You have returned to menu." << endl;
 			break;
@@ -939,9 +939,9 @@ void sim()
 			cout << "Invalid input try to choose again! Enter 1-11 and 0 to end only!" << endl;
 			break;
 		}
-	} while (opt_simulator != '0');
-}
+	} while (opt_simulator != 0);
 
+}
 
 void loaduserdata() {
 	userindex = 0;
@@ -996,7 +996,6 @@ void loaduserdata() {
 
 int getinfo(User Student[]) {
 	bool IDvalid, IDdigits;
-	loaduserdata();
 	cout << "Enter your name:";
 	cin.ignore();
 	getline(cin, Student[userindex].Name);
@@ -1031,6 +1030,7 @@ int getinfo(User Student[]) {
 	return userindex - 1;
 }
 void userlist(User Student[]) {
+	system("cls");
 	cout << "================================================\n";
 	cout << "     Basic Electronic UGEA1313: User List\n";
 	cout << "================================================\n";
@@ -1038,10 +1038,7 @@ void userlist(User Student[]) {
 		cout << "NO student registered yet.\n";
 	}
 	else {
-		for (int width = 0; width <= 89; width++) {
-			cout << "-";
-		}
-		cout << "\n";
+		cout << string(90,'-') <<endl;
 		for (int i = 0; i < userindex; i++) {
 			cout << setw(3) << right << i + 1 << ". " << "Name: " << left << setw(20) << Student[i].Name <<
 				" | Student ID: " << setw(7) << Student[i].ID <<
@@ -1049,12 +1046,8 @@ void userlist(User Student[]) {
 				" | Test 2: " << setw(2) << right << Student[i].result_Test2 << "/23" << endl;
 
 		}
-		for (int width = 0; width <= 89; width++) {
-			cout << "-";
-		}
-
+		cout << string(90, '-') << endl;
 	}
-	cout << "\n";
 	cin.ignore();
 	waitEnter("return menu");
 	system("cls");
@@ -1382,10 +1375,8 @@ void review(float* answer, int score) {
 	cout << "Your answer is       : " << setw(5) << answer[21] << setw(5) << right << ", " << setw(5) << right << answer[22] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[21] << setw(5) << right << ", " << setw(5) << right << checkans[22] << right
 		<< setw(15) << "Score = " << checksection(answer, 21, 22) << endl << endl;
-	cout << "Total score = " << score << "/" << ansnum << endl;
 	cin.ignore();
-	waitEnter("return menu");
-	system("cls");
+	waitEnter("return to menu");
 }
 
 void Test1_quizz(int index)
@@ -1396,13 +1387,28 @@ void Test1_quizz(int index)
 	int sequence[MAX_Numbers] = { 1,2,3,4,5,6,7,8,9,10 };
 	int Num = 1, score = 0;
 	char ans;
-
-	shuffle(sequence, MAX_Numbers);
-	if (Test1Count == 0) {
-		cout << "There are no Question uploaded by Teacher." << endl;
+	system("cls");
+	cout << "Test 1 (Ojective: 7%)\n";
+	cout << "=====================\n";
+	if (Student[index].attempt_Test1)
+	{
+		cout << "You have submitted Test 1\n";
+		cout << "Result of Test 1: " << Student[index].result_Test1 << " \n";
+		cin.ignore();
+		waitEnter("return user menu");
 		return;
 	}
+	if (Test1Count == 0) {
+		cout << "There are no Question uploaded by Teacher." << endl;
+		cin.ignore();
+		waitEnter("return user menu");
+		return;
+	}
+	cout << "You only get ONE chance to answer. Are you ready?\n";
+	cin.ignore();
+	waitEnter("START");
 
+	shuffle(sequence, MAX_Numbers);
 
 	for (int i = 0; i < MAX_Numbers; i++) //i<10
 	{
@@ -1415,16 +1421,17 @@ void Test1_quizz(int index)
 			cout << "D: " << Quizz[sequence[i] - 1].objective_D << endl;
 			cout << "Enter your answer: ";
 			cin >> ans;
-			ans = toupper(ans);
+			charValidation(&ans, 2);
 			score += checkAns(ans, Quizz[sequence[i] - 1].ans);
 			cout << endl;
 		}
 	}
 	Student[index].result_Test1 = (score / float(Test1Count)) * 7;
 	Student[index].attempt_Test1 = true;
-	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << " ("
-		<< fixed << setprecision(2) << Student[index].result_Test1 << "." << endl;
+	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << endl;
 	savefile(Student, "Userlist");
+	cin.ignore();
+	waitEnter("return user menu");
 }
 
 void shuffle(int* temp, int Question_Numbers)//temporary storage for the sequence array
@@ -1462,7 +1469,7 @@ void Test1List()
 	char choice = 'N';
 	int option = 0;
 	system("cls");
-	while (true) {
+	do {
 		cout << "Test 1 Question list\n";
 		cout << "====================\n";
 
@@ -1471,12 +1478,13 @@ void Test1List()
 			cout << "Do you want to create a new Question for Test 1 (MCQ)\n";
 			cout << "'Y' for yes, 'N' to return menu:";
 			cin >> choice;
-			charValidation(&choice);
+			charValidation(&choice,1);
 			if (toupper(choice) == 'Y')
 				createQuizz();
 			else
 			{
 				cout << "back to menu...\n";
+				Sleep(1000);
 				break;
 			}
 		}
@@ -1491,17 +1499,14 @@ void Test1List()
 				system("cls");
 				cout << "Invalid input, Please try again." << endl;
 			}
-			else if (option == 0) {
-				cout << "Cancel successfully, exit to menu..." << endl;
-				break;
-			}
+			else if (option == 0) break;
 			else if (option > 0 && option <= Test1Count)
 				editQuizz(option);
 			else
 				createQuizz();
 		}
-	}
-	Sleep(1000);
+	} while (option != 0);
+	
 	system("cls");
 }
 bool showTest1()
@@ -1566,6 +1571,7 @@ void createQuizz()
 
 	cout << "Answer for the Question " << newQuizz.num << " : ";
 	cin >> newQuizz.ans;
+	charValidation(&newQuizz.ans, 2);
 	cin.ignore();
 
 	newQuizz.isDeleted = false;
@@ -1588,7 +1594,7 @@ void editQuizz(int number)
 		system("cls");
 		cout << "Edit Question Test 1\n";
 		cout << "====================\n";
-		cout << Quizz[number - 1].question << endl;
+		cout << number << ". " << Quizz[number - 1].question << endl;
 		cout << "A: " << Quizz[number - 1].objective_A << endl;
 		cout << "B: " << Quizz[number - 1].objective_B << endl;
 		cout << "C: " << Quizz[number - 1].objective_C << endl;
@@ -1611,11 +1617,7 @@ void editQuizz(int number)
 			deleteQuizz(number - 1);
 			break;
 		}
-		else if (option == '8')
-		{
-			cout << "\nReturning to the Test 1 List...\n";
-			break;
-		}
+		else if (option == '8') break;
 		else {
 			switch (option)
 			{
@@ -1653,20 +1655,19 @@ void editQuizz(int number)
 				cout << "\nAnswer: " << EditQuizz.ans << endl;
 				cout << "Enter your new Answer:" << endl;
 				cin >> EditQuizz.ans;
+				charValidation(&EditQuizz.ans, 2);
 				cin.ignore();
 				break;
 
 			default:
-				cout << "\nInvalid option, please Enter (1-8)";
+				cout << "\nInvalid option, please Enter (1-8)...";
 				Sleep(1000);
 			}
 			Quizz[number - 1] = EditQuizz;
 			Quizz[number - 1].isDeleted = false;
 			saveTest1();
-			cout << "Editted successfully..." << endl;
 		}
 	}
-	Sleep(500);
 	system("cls");
 }
 
@@ -1681,7 +1682,6 @@ void deleteQuizz(int num)
 	Quizz[Test1Count - 1] = {};
 	Test1Count--;
 	saveTest1();
-	cout << "The quizz was deleted successfully.\n";
 }
 
 void saveTest1()
@@ -1708,10 +1708,7 @@ void LoadTest1()
 {
 	Test1Count = 0;
 	ifstream inFile("Test1");
-	if (!inFile) {
-		cout << "Cann't find the File\n";
-		return;
-	}
+	if (!inFile) return;
 	string line;
 	Test1 tempQuizz;
 
@@ -1992,13 +1989,12 @@ void loadComments(Comment comments[], int& count) {
 	file.close();
 }
 
-//Case 1 (for simulator)
 void clipper()
 {
-	system("cls");
+	char correct_option;
 	float Vin, Vd, Vout;
-	char polar, opt_clipper;
-
+	char polar;
+	int opt_clipper;
 	cout << "\n        Positive clipper                                 Negative clipper           \n";
 
 	cout << "   ------------------------------                   ------------------------------    \n";
@@ -2017,33 +2013,46 @@ void clipper()
 	cout << "         o                  o                                o             o \n";
 	cout << "         -       Vout       +                                -     Vout    + \n\n";
 
-	while (true)
+	do
 	{
 		do
 		{
-			cout << "Choose what you want to calculate for clipper: \nEnter '+' for positive\n'-' for negative\n'.' for return:\n";
+			cout << "Choose what you want to calculate for clipper (enter '+' for positive or '-' for negative): ";
 			cin >> polar;
-
-			if (polar != '+' && polar != '-' && polar != '.')
-				cout << "INPUT ERROR! Enter '+', '-' or '.' !";
-
-		} while (polar != '+' && polar != '-' && polar != '.');
+			if (polar != '+' && polar != '-')
+				cout << "INPUT ERROR! Enter '+' or '-'!";
+		} while (polar != '+' && polar != '-');
 
 		if (polar == '+')
 		{
 			cout << "\nPositive clipper. " << endl;
-			cout << "Choose what you want to calculate: \n1.Vout (Positive half cycle)\n2.Vout (Negative half cycle):\n";
+			cout << "Choose what you want to calculate [1.Vout (Positive half cycle), 2.Vout (Negative half cycle), 3. return]: ";
 			cin >> opt_clipper;
 			switch (opt_clipper)
 			{
-			case '1':
+			case 1:
 				cout << "\nDuring positive cycle, the diode is reverse biased.\n";
 				cout << "Vd = Vin \n";
+				do
+				{
+					cout << "Enter the value of Vin (in Volt): ";
+					cin >> Vin;
+					Vd = Vin;
+					Vout = Vin - Vd;
+					cout << "Vd = " << fixed << setprecision(2) << Vd << endl;
+					cout << "Vout = " << fixed << setprecision(2) << Vout << endl;
 
-				cout << "Enter the value of Vin (in Volt): ";
-				cin >> Vin;
-				Vd = Vin;
-				Vout = Vin - Vd;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+					while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+					{
+						cout << "Invalid input! Please ENTER 'Y' or 'N'!" << endl;
+						cout << "Is the data all be verified correctly? (Y/N): ";
+						cin >> correct_option;
+					}
+					if (toupper(correct_option) == 'N')
+						cout << "\tPlease Reenter the data." << endl;
+				} while (toupper(correct_option) == 'N');
 
 				cout << endl << " Result " << endl;
 				cout << "------------------------" << endl;
@@ -2052,86 +2061,115 @@ void clipper()
 				cout << "Vout = " << fixed << setprecision(2) << Vout << endl;
 				break;
 
-			case '2':
+			case 2:
 				cout << "\nDuring negative cycle, the diode is forward biased.\n";
-				cout << "Enter the value of Vin (in Volt): ";
-				cin >> Vin;
-				cout << "Enter the value of Vd (in Volt): ";
-				cin >> Vd;
-				Vout = -Vin + Vd;
+				do
+				{
+					cout << "Enter the value of Vin (in Volt): ";
+					cin >> Vin;
+					cout << "Enter the value of Vd (in Volt): ";
+					cin >> Vd;
+					cout << "Vout = -Vin + Vd \n";
+					Vout = -Vin + Vd;
 
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "Vout = -Vin + Vd \n";
+					cout << "Vout = " << fixed << setprecision(2) << Vout << endl;
+
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+					while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+					{
+						cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+						cout << "Is the data all be verified correctly? (Y/N): ";
+						cin >> correct_option;
+					}
+					if (toupper(correct_option) == 'N')
+						cout << "\tPlease Reenter the data." << endl;
+				} while (toupper(correct_option) == 'N');
+
 				cout << "Vout = " << fixed << setprecision(2) << Vout << endl;
 				break;
-
+			case 3:
+				cout << "You have returned." << endl;
+				break;
 			default:
-				cout << "\nINPUT ERROR! Enter integer 1 or 2!" << endl;
+				cout << "\nINPUT ERROR! Enter integer 1,2 or 3!" << endl;
 			}
-		}
-
-		else if (polar == '-')
-		{
-			cout << "\nNegative clipper. " << endl;
-			cout << "Choose what you want to calculate: \n1. Vout (Positive half cycle)\n2. Vout (Negative half cycle):\n";
-			cin >> opt_clipper;
-			switch (opt_clipper)
-			{
-			case '1':
-				cout << "\nDuring the positive cycle, the diode is forward biased.\n";
-				cout << "Enter the value of Vin (in Volt): ";
-				cin >> Vin;
-
-				cout << "Enter the value of Vd (in Volt): ";
-				cin >> Vd;
-				Vout = Vin - Vd;
-
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "Vout = Vin - Vd\n";
-				cout << "Vout = " << fixed << setprecision(2) << Vout << endl;
-				break;
-
-			case '2':
-				cout << "\nDuring the negative cycle, the diode is reverse biased.\n";
-				cout << "Vd = Vin \n";
-				cout << "Enter the value of Vin (in Volt): ";
-				cin >> Vin;
-				Vd = Vin;
-				Vout = Vin - Vd;
-
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "Vd = " << fixed << setprecision(2) << Vd << endl;
-				cout << "Vout = Vin - Vd \n";
-				cout << "Vout = " << fixed << setprecision(2) << Vout << endl;
-				break;
-
-			default:
-				cout << "\nINPUT ERROR! Enter integer 1 or 2!" << endl;
-				break;
-			}
-		}
-
-		else if (polar == '.')
-		{
-			cout << "Return to simulation option...\n";
-			Sleep(1000);
-			return;
 		}
 
 		else
-			cout << "\nINPUT ERROR! Enter '+', '-' or '.' !" << endl;
-	}
+		{
+			cout << "\nNegative clipper. " << endl;
+			cout << "Choose what you want to calculate [1. Vout (Positive half cycle), 2. Vout (Negative half cycle), 3. return]: ";
+			cin >> opt_clipper;
+			switch (opt_clipper)
+			{
+			case 1:
+				cout << "\nDuring the positive cycle, the diode is forward biased.\n";
+				do
+				{
+					cout << "Enter the value of Vin (in Volt): ";
+					cin >> Vin;
+					cout << "Enter the value of Vd (in Volt): ";
+					cin >> Vd;
+					cout << "Vout = Vin - Vd \n";
+					Vout = Vin - Vd;
+					cout << "Vout = " << fixed << setprecision(2) << Vout << endl;
+
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+					while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+					{
+						cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+						cout << "Is the data all be verified correctly? (Y/N): ";
+						cin >> correct_option;
+					}
+					if (toupper(correct_option) == 'N')
+						cout << "\tPlease Reenter the data." << endl;
+				} while (toupper(correct_option) == 'N');
+				cout << "Vout = " << fixed << setprecision(2) << Vout << endl;
+				break;
+
+			case 2:
+				cout << "\nDuring the negative cycle, the diode is reverse biased.\n";
+				cout << "Vd = Vin \n";
+				do
+				{
+					cout << "Enter the value of Vin (in Volt): ";
+					cin >> Vin;
+					Vd = Vin;
+					Vout = Vin - Vd;
+
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+					while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+					{
+						cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+						cout << "Is the data all be verified correctly? (Y/N): ";
+						cin >> correct_option;
+					}
+					if (toupper(correct_option) == 'N')
+						cout << "\tPlease Reenter the data." << endl;
+				} while (toupper(correct_option) == 'N');
+
+				cout << "Vd = " << fixed << setprecision(2) << Vd << endl;
+				cout << "Vout = Vin - Vd \n";
+				cout << "Vout = " << fixed << setprecision(2) << Vout << endl;
+				break;
+			case 3:
+				cout << "You have returned." << endl;
+				break;
+			default:
+				cout << "\nINPUT ERROR! Enter integer 1,2 or 3!" << endl;
+			}
+		}
+	} while (opt_clipper != 3);
 }
 
-//Case 2 (for simulator)
 void clamper()
 {
-	system("cls");
 	float Vin, Vc, Vd, Vbias, Vout;
-	char polar, opt_clamper;
+	char polar, correct_option;
+	int opt_clamper;
 	cout << "\n           Positive-biased clamper                                      Negative-biased clamper\n" << endl;
 	cout << "   -------)|--------------------------------o +                -------|(--------------------------------o +\n";
 	cout << "   |      Vc    |               |                              |      Vc    |               |\n";
@@ -2149,166 +2187,163 @@ void clamper()
 	cout << "   -------)|--------------------------------o +                -------|(--------------------------------o +\n";
 	cout << "   |      Vc    |               |                              |      Vc    |               |\n";
 	cout << "   |          -----             |                              |           ---              |\n";
-	cout << "   |           / \\  Vd          |                             |           \\ /  Vd         |" << endl;
+	cout << "   |           / \\  Vd          |                              |           \\ /  Vd          |" << endl;
 	cout << "   |           ---              |                              |          -----             |\n";
 	cout << "  Vin           |               RL         Vout               Vin           |               RL         Vout\n";
 	cout << "   |            |               |                              |            |               |\n";
 	cout << "   |            |               |                              |            |               |\n";
 	cout << "   -----------------------------------------o -                -----------------------------------------o -\n";
-
-	while (true)
+	do {
+		cout << "Choose what you want to calculate for clamper (enter '+' for posivite '-' for negative):";
+		cin >> polar;
+		if (polar != '+' && polar != '-') {
+			cout << "INPUT ERROR! Enter '+' or '-'! ";
+		}
+	} while (polar != '+' && polar != '-');
+	if (polar == '+')
 	{
 		do
 		{
-			cout << "Choose what you want to calculate for clamper: \nEnter '+' for positive\n'-' for negative\n'.' for return:\n";
-			cin >> polar;
-			if (polar != '+' && polar != '-' && polar != '.')
-			{
-				cout << "INPUT ERROR! Enter '+', '-' or '.' ! ";
-			}
-		} while (polar != '+' && polar != '-' && polar != '.');
-
-		if (polar == '+')
-		{
 			cout << "Positive clamper." << endl;
-			cout << "Choose what you want to calculate: \n1.Vc\n2.Vout(+ve half cycle)\n3.Vout(-ve half cycle):\n";
+			cout << "Choose what you want to calculate (1.Vc, 2.Vout(+ve half cycle), 3.Vout(-ve half cycle), 4. return):";
 			cin >> opt_clamper;
 			switch (opt_clamper)
 			{
-			case '1':
+			case 1:
 				cout << "Vc = Vin - Vd + Vbias" << endl;
-				cout << "Enter the value of Vin (in Volt):";
-				cin >> Vin;
+				do
+				{
+					cout << "Enter the value of Vin (in Volt):";
+					cin >> Vin;
+					cout << "Enter the value of Vd (in Volt):";
+					cin >> Vd;
+					cout << "Enter the value of Vbias (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
+					cin >> Vbias;
+					Vc = Vin - Vd + Vbias;
+					cout << "Vc = " << fixed << setprecision(2) << Vc << "V" << endl;
 
-				cout << "Enter the value of Vd (in Volt):";
-				cin >> Vd;
-
-				cout << "Enter the value of Vbias (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
-				cin >> Vbias;
-
-				Vc = Vin - Vd + Vbias;
-
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "Vc = Vin - Vd + Vbias\n";
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+					while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+					{
+						cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+						cout << "Is the data all be verified correctly? (Y/N): ";
+						cin >> correct_option;
+					}
+					if (toupper(correct_option) == 'N')
+						cout << "\tPlease Reenter the data." << endl;
+				} while (toupper(correct_option) == 'N');
 				cout << "Vc = " << fixed << setprecision(2) << Vc << "V" << endl;
 				break;
 
-			case '2':
+			case 2:
 				cout << "Vout(+ve half cycle) = Vc + Vin" << endl;
-				cout << "Enter the value of Vc (in Volt):";
-				cin >> Vc;
-				cout << "Enter the value of Vin (in Volt):";
-				cin >> Vin;
-				Vout = Vc + Vin;
+				do
+				{
+					cout << "Enter the value of Vc (in Volt):";
+					cin >> Vc;
+					cout << "Enter the value of Vin (in Volt):";
+					cin >> Vin;
+					Vout = Vc + Vin;
+					cout << "Vout(+ve half cycle) = " << fixed << setprecision(2) << Vout << "V" << endl;
 
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "Vout = Vc + Vin\n";
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+					while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+					{
+						cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+						cout << "Is the data all be verified correctly? (Y/N): ";
+						cin >> correct_option;
+					}
+					if (toupper(correct_option) == 'N')
+						cout << "\tPlease Reenter the data." << endl;
+				} while (toupper(correct_option) == 'N');
 				cout << "Vout(+ve half cycle) = " << fixed << setprecision(2) << Vout << "V" << endl;
 				break;
 
-			case '3':
+			case 3:
 				cout << "Vout(-ve half cycle) = -Vd + Vbias" << endl;
+				do
+				{
+					cout << "Enter the value of Vd (in Volt):";
+					cin >> Vd;
+					cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
+					cin >> Vbias;
+					Vout = -Vd + Vbias;
+					cout << "Vout(-ve half cycle) = " << fixed << setprecision(2) << Vout << "V" << endl;
 
-				cout << "Enter the value of Vd (in Volt):";
-				cin >> Vd;
-
-				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
-				cin >> Vbias;
-				Vout = -Vd + Vbias;
-
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "Vout = -Vd + Vbias\n";
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+					while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+					{
+						cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+						cout << "Is the data all be verified correctly? (Y/N): ";
+						cin >> correct_option;
+					}
+					if (toupper(correct_option) == 'N')
+						cout << "\tPlease Reenter the data." << endl;
+				} while (toupper(correct_option) == 'N');
 				cout << "Vout(-ve half cycle) = " << fixed << setprecision(2) << Vout << "V" << endl;
 				break;
-
+			case 4:
+				cout << "You have returned." << endl;
+				break;
 			default:
-				cout << "INPUT ERROR! Enter integer 1,2 or 3!" << endl;
+				cout << "INPUT ERROR! Enter integer 1,2,3 or 4!" << endl;
 
 			}
-		}
-		else if (polar == '-')
-		{
+		} while (opt_clamper != 4);
+
+	}
+	if (polar == '-') {
+		do {
 			cout << "Negative clamper." << endl;
-			cout << "Choose what you want to calculate: \n1.Vc\n2.Vout(+ve half cycle)\n3.Vout(-ve half cycle):\n";
+			cout << "Choose what you want to calculate [1.Vc, 2.Vout(+ve half cycle), 3.Vout(-ve half cycle), 4. return]:";
 			cin >> opt_clamper;
-			switch (opt_clamper)
-			{
-			case '1':
+			switch (opt_clamper) {
+			case 1:
 				cout << "Vc = Vin - Vd - Vbias" << endl;
 				cout << "Enter the value of Vin (in Volt):";
 				cin >> Vin;
-
 				cout << "Enter the value of Vd (in Volt):";
 				cin >> Vd;
-
 				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
 				cin >> Vbias;
-
 				Vc = Vin - Vd - Vbias;
-
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "Vc = Vin - Vd - Vbias\n";
 				cout << "Vc = " << fixed << setprecision(2) << Vc << "V" << endl;
 				break;
-
-			case '2':
+			case 2:
 				cout << "Vout(+ve half cycle) = Vd + Vbias" << endl;
 				cout << "Enter the value of Vd (in Volt):";
 				cin >> Vd;
-
 				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
 				cin >> Vbias;
-
 				Vout = Vd + Vbias;
-
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "Vout = Vd + Vbias\n";
 				cout << "Vout(+ve half cycle) = " << fixed << setprecision(2) << Vout << "V" << endl;
 				break;
-
-			case '3':
+			case 3:
 				cout << "Vout(-ve half cycle) = -Vc - Vin" << endl;
 				cout << "Enter the value of Vc (in Volt):";
 				cin >> Vc;
-
 				cout << "Enter the value of Vin (in Volt):";
 				cin >> Vin;
-
 				Vout = -Vc - Vin;
-
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "	Vout = -Vc - Vin\n";
 				cout << "Vout(-ve half cycle)= " << fixed << setprecision(2) << Vout << "V" << endl;
 				break;
-
+			case 4:
+				cout << "You have returned." << endl;
+				break;
 			default:
-				cout << "INPUT ERROR! Enter integer 1,2 or 3!" << endl;
+				cout << "INPUT ERROR! Enter integer 1,2,3 or 4!" << endl;
+
 			}
-		}
-
-		else if (polar == '.')
-		{
-			cout << "Return to simulation option...\n";
-			Sleep(1000);
-			return;
-		}
-
-		else
-			cout << "\nINPUT ERROR! Enter '+', '-' or '.' !" << endl;
+		} while (opt_clamper != 4);
 	}
 }
-
-//Case 3 (for simulator)
 void BJT_Voltage_divider()
 {
-	system("cls");
-	char calculate;
+	int calculate;
+	char correct_option;
 	double RIN_base, betaDC, RE, R2, R2_total, R1, VCC, VB, IC_mA, RC, VCE;
 	cout << "BJT volatge-divider biased configuration.\n\n";
 
@@ -2331,118 +2366,128 @@ void BJT_Voltage_divider()
 	cout << "               |\n";
 	cout << "              GND\n\n";
 
-	while (true)
+	cout << "\nChoose what you want to calculate:\n";
+	cout << "(1. RIN_base and R2_total, 2. VB, 3. IC, 4. VCE): ";
+	cin >> calculate;
+	cout << endl;
+
+	switch (calculate)
 	{
-		cout << "\nChoose what you want to calculate:\n";
-		cout << "1. RIN_base and R2_total\n2. VB\n3. IC\n4. VCE\n5. return:\n";
-		cin >> calculate;
-		cout << endl;
-
-		switch (calculate)
+	case 1:
+		do
 		{
-		case '1':
-			cout << "Enter the value of R2 (in Ohm): ";
-			cin >> R2;
-
-			cout << "Enter the value of RE (in Ohm): ";
-			cin >> RE;
-
-			cout << "Enter the value of betaDC: ";
-			cin >> betaDC;
-
+			cout << "Enter the value of R2 (in Ohm), RE (in Ohm) and betaDC: ";
+			cin >> R2 >> RE >> betaDC;
 			RIN_base = betaDC * RE;
 
 			if (RIN_base >= 10 * R2)
-			{
 				R2_total = R2;
-
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "R2_total = R2\n";
-				cout << "The value of R2_total is " << fixed << setprecision(2) << R2_total << " Ohm.\n";
-			}
-
 			else
-			{
 				R2_total = 1.0 / ((1.0 / R2) + (1.0 / RIN_base));
 
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "(RIN_base < 10 * R2), R2_total = 1.0 / ((1.0 / R2) + (1.0 / RIN_base))\n";
-				cout << "The value of R2_total is " << fixed << setprecision(2) << R2_total << " Ohm.\n";
+			cout << "The value of RIN_base is " << fixed << setprecision(2) << RIN_base << " Ohm.\n\n";
+			cout << "The value of R2_total is " << fixed << setprecision(2) << R2_total << " Ohm.\n\n";
+
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
+			while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+			{
+				cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
 			}
-			break;
+			if (toupper(correct_option) == 'N')
+				cout << "\tPlease Reenter the data." << endl;
+		} while (toupper(correct_option) == 'N');
 
-		case '2':
-			cout << "Enter the value of R1 (in Ohm): ";
-			cin >> R1;
+		cout << "\nRIN_base = betaDC * RE\n";
+		cout << "--> The value of RIN_base is " << fixed << setprecision(2) << RIN_base << " Ohm.\n\n";
 
-			cout << "Enter the value of R2_total (in Ohm): ";
-			cin >> R2_total;
+		cout << "\nif (RIN_base >= 10 * R2), R2_total = R2\n";
+		cout << "if (RIN_base < 10 * R2), R2_total = 1.0 / ((1.0 / R2) + (1.0 / RIN_base))\n";
+		cout << "--> The value of R2_total is " << fixed << setprecision(2) << R2_total << " Ohm.\n\n";
+		break;
 
-			cout << "Enter the value of VCC (in Volt): ";
-			cin >> VCC;
-
+	case 2:
+		do
+		{
+			cout << "Enter the value of R1 (in Ohm), R2_total (in Ohm) and VCC (in Volt): ";
+			cin >> R1 >> R2_total >> VCC;
 			VB = R2_total / (R1 + R2_total) * VCC;
+			cout << "\nVB = R2_total / (R1 + R2_total) * VCC\n";
 
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "VB = R2_total / (R1 + R2_total) * VCC\n";
-			cout << "The value of VB is " << fixed << setprecision(2) << VB << " V.\n";
-			break;
+			cout << "The value of VB is " << fixed << setprecision(2) << VB << " V.\n\n";
 
-		case '3':
-			cout << "Enter the value of VB (in Volt): ";
-			cin >> VB;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
+			while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+			{
+				cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+			}
+			if (toupper(correct_option) == 'N')
+				cout << "\tPlease Reenter the data." << endl;
+		} while (toupper(correct_option) == 'N');
 
-			cout << "Enter the value of RE (in Ohm): ";
-			cin >> RE;
+		cout << "--> The value of VB is " << fixed << setprecision(2) << VB << " V.\n\n";
+		break;
 
+	case 3:
+		do
+		{
+			cout << "Enter the value of VB (in Volt) and RE (in Ohm): ";
+			cin >> VB >> RE;
 			IC_mA = (VB - 0.7) / RE; //note that the IC_mA at here is in A
-
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "IC = (VB - 0.7) / RE\n";
 			cout << "The value of IC is " << fixed << setprecision(2) << IC_mA * 1000 << " mA.\n\n";
-			break;
 
-		case '4':
-			cout << "Enter the value of VCC (in Volt): ";
-			cin >> VCC;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
+			while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+			{
+				cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+			}
+			if (toupper(correct_option) == 'N')
+				cout << "\tPlease Reenter the data." << endl;
+		} while (toupper(correct_option) == 'N');
 
-			cout << "Enter the value of IC (in milli Ampere): ";
-			cin >> IC_mA;
+		cout << "\nIC = (VB - 0.7) / RE\n";
+		cout << "--> The value of IC is " << fixed << setprecision(2) << IC_mA * 1000 << " mA.\n\n";
+		break;
 
-			cout << "Enter the value of RC (in Ohm): ";
-			cin >> RC;
-
-			cout << "Enter the value of RE (in Ohm): ";
-			cin >> RE;
-
+	case 4:
+		do
+		{
+			cout << "Enter the value of VCC (in Volt), IC (in milli Ampere), RC (in Ohm) and RE (in Ohm): ";
+			cin >> VCC >> IC_mA >> RC >> RE;
 			VCE = VCC - (IC_mA / 1000 * (RC + RE));
-
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "VCE = VCC - IC * (RC + RE)\n";
 			cout << "The value of VCE is " << fixed << setprecision(2) << VCE << " V\n\n";
-			break;
 
-		case '5':
-			cout << "Return to simulation option...\n";
-			Sleep(1000);
-			return;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
+			while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+			{
+				cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+			}
+			if (toupper(correct_option) == 'N')
+				cout << "\tPlease Reenter the data." << endl;
+		} while (toupper(correct_option) == 'N');
 
-		default:
-			cout << "INPUT ERROR! Enter integer 1,2,3,4 or 5!" << endl;
-		}
+		cout << "\nVCE = VCC - IC * (RC + RE)\n";
+		cout << "--> The value of VCE is " << fixed << setprecision(2) << VCE << " V\n\n";
+		break;
+
+	default:
+		cout << "Invalid input! Please enter 1, 2, 3 or 4!\n\n";
 	}
 }
-
-//Case 4 (for simulator)
 void BJT_base()
 {
-	system("cls");
-	char calculate;
+	char correct_option;
 	double VCC, IC_mA, RC, VCE;
 
 	cout << "                       VCC\n";
@@ -2461,49 +2506,34 @@ void BJT_base()
 	cout << "                         |\n";
 	cout << "                        GND\n\n";
 
-	while (true)
+	do
 	{
-		cout << "\nChoose what you want to calculate:\n";
-		cout << "1. VCE\n2. return:\n";
-		cin >> calculate;
-		cout << endl;
+		cout << "Enter the value of VCC (in Volt), IC (in milli Ampere) and RC (in Ohm): ";
+		cin >> VCC >> IC_mA >> RC;
+		VCE = VCC - (IC_mA / 1000 * RC);
+		cout << "The value for VCE is " << fixed << setprecision(2) << VCE << "V\n";
 
-		switch (calculate)
+		cout << "Is the data all be verified correctly? (Y/N): ";
+		cin >> correct_option;
+		while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
 		{
-		case '1':
-			cout << "Enter the value of VCC (in Volt): ";
-			cin >> VCC;
-
-			cout << "Enter the value of IC (in milli Ampere): ";
-			cin >> IC_mA;
-
-			cout << "Enter the value of RC (in Ohm): ";
-			cin >> RC;
-
-			VCE = VCC - (IC_mA / 1000 * RC);
-
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "VCE = VCC - (IC * RC)\n";
-			cout << "The value for VCE is " << fixed << setprecision(2) << VCE << "V\n";
-			break;
-
-		case '2':
-			cout << "Return to simulation option...\n";
-			Sleep(1000);
-			return;
-
-		default:
-			cout << "INPUT ERROR! Enter integer 1 or 2!" << endl;
+			cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
 		}
-	}
+		if (toupper(correct_option) == 'N')
+			cout << "\tPlease Reenter the data." << endl;
+	} while (toupper(correct_option) == 'N');
+
+	cout << "\nVCE = VCC - (IC * RC)\n";
+	cout << "The value for VCE is " << fixed << setprecision(2) << VCE << "V\n";
+
 }
 
-//Case 5 (for simulator)
 void BJT_AC()
 {
-	system("cls");
-	char calculate;
+	char correct_option;
+	int calculate;
 	double R1, R2, VB, VCC, RC, RE, betaAC, Rin_base, Rin_total, IE_mA, re, AV;
 
 	cout << "                                         VCC\n";
@@ -2528,224 +2558,289 @@ void BJT_AC()
 	cout << "                                             |\n";
 	cout << "                                            GND\n\n";
 	cout << "                                         Figure 6\n\n\n";
-	cout << " Hint: This is the Common-Emitter (CE) Amplifier with bypass capacitor (C2) in the emitter, "
-		<< "without involving swapping process and no load resistance, RL.\n\n";
+	cout << " Hint: This is the Common-Emitter (CE) Amplifier with bypass capacitor (C2) in the emitter, not involving swapping process and no load resistance, RL.\n\n";
 
-	while (true)
+	cout << "\nChoose what you want to calculate:\n";
+	cout << "(1. Rin_base, 2. Rin_total, 3. VB, 4. IE, 5. re, 6. AV): ";
+	cin >> calculate;
+	cout << endl;
+
+	switch (calculate)
 	{
-		cout << "\nChoose what you want to calculate:\n";
-		cout << "1. Rin_base\n2. Rin_total\n3. VB\n4. IE\n5. re\n6. AV\n7. return:\n";
-		cin >> calculate;
-		cout << endl;
 
-		switch (calculate)
+	case 1:
+		do
 		{
-
-		case '1':
-
-			cout << "Enter the value of betaAC: ";
-			cin >> betaAC;
-
-			cout << "Enter the value of RE (in Ohm): ";
-			cin >> RE;
+			cout << "Enter the value of betaAC and RE (in Ohm): ";
+			cin >> betaAC >> RE;
 
 			Rin_base = betaAC * RE;
-
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "Rin_base = betaAC * RE\n";
 			cout << "The value for Rin_base is " << fixed << setprecision(2) << Rin_base << "Ohm\n";
-			break;
 
-		case '2':
-			cout << "Enter the value of Rin_base (in Ohm): ";
-			cin >> Rin_base;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
+			while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+			{
+				cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+			}
+			if (toupper(correct_option) == 'N')
+				cout << "\tPlease Reenter the data." << endl;
+		} while (toupper(correct_option) == 'N');
 
-			cout << "Enter the value of R1 (in Ohm): ";
-			cin >> R1;
+		cout << "Rin_base = betaAC * RE\n";
+		cout << "The value for Rin_base is " << fixed << setprecision(2) << Rin_base << "Ohm\n";
+		break;
 
-			cout << "Enter the value of R2 (in Ohm): ";
-			cin >> R2;
+	case 2:
+		do
+		{
+			cout << "Enter the value of Rin_base (in Ohm), R1 (in Ohm) and R2 (in Ohm): ";
+			cin >> Rin_base >> R1 >> R2;
 
 			if (Rin_base >= 10 * R2)
 			{
 				Rin_total = 1.0 / ((1.0 / R1) + (1.0 / R2));
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "Rin_total = 1.0 / ((1.0 / R1) + (1.0 / R2))\n";
-				cout << "The value for Rin_total is " << fixed << setprecision(2) << Rin_total << "Ohm\n";
 			}
 
 			else
 			{
 				Rin_total = 1.0 / ((1.0 / R1) + (1.0 / R2) + (1.0 / Rin_base));
-				cout << endl << " Result " << endl;
-				cout << "------------------------" << endl;
-				cout << "Rin_total = 1.0 / ((1.0 / R1) + (1.0 / R2) + (1.0 / Rin_base))\n";
-				cout << "The value for Rin_total is " << fixed << setprecision(2) << Rin_total << "Ohm\n";
 			}
-			break;
 
-		case '3':
-			cout << "Enter the value of R1(in Ohm): ";
-			cin >> R1;
+			cout << "The value for Rin_total is " << fixed << setprecision(2) << Rin_total << "Ohm\n";
 
-			cout << "Enter the value of R2(in Ohm): ";
-			cin >> R2;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
+			while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+			{
+				cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+			}
+			if (toupper(correct_option) == 'N')
+				cout << "\tPlease Reenter the data." << endl;
+		} while (toupper(correct_option) == 'N');
 
-			cout << "Enter the value of VCC (in Volt): ";
-			cin >> VCC;
+		cout << "\nif (Rin_base >= 10 * R2), Rin_total = 1.0 / ((1.0 / R1) + (1.0 / R2))";
+		cout << "\n(Rin_base < 10 * R2), Rin_total = 1.0 / ((1.0 / R1) + (1.0 / R2) + (1.0 / Rin_base))\n";
 
+		cout << "The value for Rin_total is " << fixed << setprecision(2) << Rin_total << "Ohm\n";
+		break;
+
+	case 3:
+		do
+		{
+			cout << "Enter the value of R1(in Ohm), R2(in Ohm) and VCC (in Volt): ";
+			cin >> R1 >> R2 >> VCC;
 			VB = R2 / (R1 + R2) * VCC;
 
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "VB = R2 / (R1 + R2) * VCC\n";
 			cout << "The value for VB is " << fixed << setprecision(2) << VB << "V\n";
-			break;
 
-		case '4':
-			cout << "Enter the value of VB (in Volt): ";
-			cin >> VB;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
+			while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+			{
+				cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+			}
+			if (toupper(correct_option) == 'N')
+				cout << "\tPlease Reenter the data." << endl;
+		} while (toupper(correct_option) == 'N');
 
-			cout << "Enter the value of RE (in Ohm): ";
-			cin >> RE;
+		cout << "VB = R2 / (R1 + R2) * VCC\n";
+		cout << "The value for VB is " << fixed << setprecision(2) << VB << "V\n";
+		break;
 
+	case 4:
+		do
+		{
+			cout << "Enter the value of VB (in Volt) and RE (in Ohm): ";
+			cin >> VB >> RE;
 			IE_mA = (VB - 0.7) / RE;
-
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "IE = (VB - 0.7) / RE\n";
 			cout << "The value for IE is " << fixed << setprecision(2) << IE_mA * 1000 << "mA\n";
-			break;
 
-		case '5':
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
+			while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+			{
+				cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+			}
+			if (toupper(correct_option) == 'N')
+				cout << "\tPlease Reenter the data." << endl;
+		} while (toupper(correct_option) == 'N');
+
+		cout << "IE = (VB - 0.7) / RE\n";
+		cout << "The value for IE is " << fixed << setprecision(2) << IE_mA * 1000 << "mA\n";
+		break;
+
+	case 5:
+		do
+		{
 			cout << "Enter the value of IE (in milli Ampere): ";
 			cin >> IE_mA;
-
 			re = 0.026 / (IE_mA / 1000);
-
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "re = 0.026 / IE\n";
 			cout << "The value for re is " << fixed << setprecision(2) << re << "Ohm\n";
-			break;
 
-		case '6':
-			cout << "Enter the value of RC (in Ohm): ";
-			cin >> RC;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
+			while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+			{
+				cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+			}
+			if (toupper(correct_option) == 'N')
+				cout << "\tPlease Reenter the data." << endl;
+		} while (toupper(correct_option) == 'N');
 
-			cout << "Enter the value of re (in Ohm): ";
-			cin >> re;
+		cout << "re = 0.026 / IE\n";
+		cout << "The value for re is " << fixed << setprecision(2) << re << "Ohm\n";
+		break;
 
+	case 6:
+		do
+		{
+			cout << "Enter the value of RC (in Ohm) and re (in Ohm): ";
+			cin >> RC >> re;
 			AV = -RC / re;
-
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "AV = -RC / re\n";
 			cout << "The value of AV is " << fixed << setprecision(2) << AV << endl;
-			break;
 
-		case '7':
-			cout << "Return to simulation option...\n";
-			Sleep(1000);
-			return;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
+			while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+			{
+				cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+			}
+			if (toupper(correct_option) == 'N')
+				cout << "\tPlease Reenter the data." << endl;
+		} while (toupper(correct_option) == 'N');
 
-		default:
-			cout << "INPUT ERROR! Enter integer 1,2,3,4,5,6 or 7!" << endl;
-		}
+		cout << "AV = -RC / re\n";
+		cout << "The value of AV is " << fixed << setprecision(2) << AV << endl;
+		break;
+
+	default:
+		cout << "Invalid input! Please enter 1, 2, 3, 4, 5 or 6!\n\n";
 	}
 }
 
 //Case 6 (for simulator)
 void jfet_DrainCurrent()
 {
-	system("cls");
-	char option;
+	int option;
+	char correct_option;
 	float Idss, Vgs_off, Vgs, Id;
 	float gm, gm_0;
 
-	while (true)
-	{
-		cout << "Enter the calculator you want to use: \n1. drain current\n2. transconductance\n3. return:\n";
+	while (true) {
+		cout << "Enter the calculator you want to use ('1' for draincurrent, '2' for transconductance, '999'to return):";
 		cin >> option;
-		switch (option)
-		{
-		case '1':
-			cout << "\n Tips:To calculate drain current, the equation for JFET transfer characteristic was applied." << endl;
+		switch (option) {
+		case 1:
+
+			cout << "\n Tips:To calculate drain current, the equation for JFET transfer characterustic was applied." << endl;
 			cout << " _________________________________" << endl;
 			cout << "| Id = Idss [1-(Vgs / Vgs_off)]^2 |" << endl;
 			cout << " ---------------------------------" << endl;
-			//key in data
 			do
 			{
-				cout << "Enter your data to calculate the value" << endl;
-				cout << "Idss (in milli Ampere) : ";
-				cin >> Idss;
+				//key in data
+				do
+				{
+					cout << "Enter your data to calculate the value" << endl;
+					cout << "Idss (in milli Ampere) : ";
+					cin >> Idss;
+					cout << "Vgs_off (in Volt) [it should be a -ve Voltage]: ";
+					cin >> Vgs_off;
+					cout << "Vgs (in Volt) [it should be a -ve Voltage]    : ";
+					cin >> Vgs;
+					if (Vgs_off > 0 || Vgs > 0)
+						cout << "Both Voltage should be a negative volatge." << endl
+						<< "Please rekey the data." << endl;
+				} while (Vgs_off > 0 || Vgs > 0);
 
-				cout << "Vgs_off (in Volt) [it should be a -ve Voltage]: ";
-				cin >> Vgs_off;
-
-				cout << "Vgs (in Volt) [it should be a -ve Voltage]    : ";
-				cin >> Vgs;
-
-				if (Vgs_off > 0 || Vgs > 0)
-					cout << "Both Voltage should be a negative voltage." << endl
-					<< "Please rekey the data." << endl;
-			} while (Vgs_off > 0 || Vgs > 0);
+				// print data
+				cout << "\n\nIdss    : " << setprecision(2) << fixed << Idss << " milli Ampere." << endl;
+				cout << "Vgs_off : " << setprecision(2) << fixed << Vgs_off << " Volt." << endl;
+				cout << "Vgs     : " << setprecision(2) << fixed << Vgs << " Volt." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+				while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+				{
+					cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+				}
+				if (toupper(correct_option) == 'N')
+					cout << "\tPlease Reenter the data." << endl;
+			} while (toupper(correct_option) == 'N');
 
 			//calculation
 			Id = Idss * (1 - (Vgs / Vgs_off)) * (1 - (Vgs / Vgs_off));
-
 			cout << endl << " Result " << endl;
 			cout << "------------------------" << endl;
-			cout << "Id = Idss * (1 - (Vgs / Vgs_off)) * (1 - (Vgs / Vgs_off))\n";
 			cout << "Id = " << Id << " mili-ampere." << endl << endl;
 			break;
 
-		case '2':
+		case 2:
+
 			cout << "\n Tips:Equation for forward transconductance, which is the slope of the transconductance curve." << endl;
 			cout << " ____________________________" << endl;
 			cout << "| gm = gm_0[1-(Vgs/Vgs_off)] |" << endl;
 			cout << " ----------------------------" << endl;
-
-			//key in data
 			do
 			{
-				cout << "Enter your data to calculate the value" << endl;
-				cout << "gm_0 (in micro_Siemens) : ";
-				cin >> gm_0;
+				//key in data
+				do
+				{
+					cout << "Enter your data to calculate the value" << endl;
+					cout << "gm_0 (in micro_Siemens) : ";
+					cin >> gm_0;
+					cout << "Vgs_off (in Volt) [it should be a -ve Voltage]: ";
+					cin >> Vgs_off;
+					cout << "Vgs (in Volt) [it should be a -ve Voltage]    : ";
+					cin >> Vgs;
+					if (Vgs_off > 0 || Vgs > 0)
+						cout << "Both Voltage should be a negative volatge." << endl
+						<< "Please rekey the data." << endl;
+				} while (Vgs_off > 0 || Vgs > 0);
 
-				cout << "Vgs_off (in Volt) [it should be a -ve Voltage]: ";
-				cin >> Vgs_off;
-
-				cout << "Vgs (in Volt) [it should be a -ve Voltage]    : ";
-				cin >> Vgs;
-
-				if (Vgs_off > 0 || Vgs > 0)
-					cout << "Both Voltage should be a negative voltage." << endl
-					<< "Please rekey the data." << endl;
-
-			} while (Vgs_off > 0 || Vgs > 0);
+				// print data
+				cout << "\n\ngm_0    : " << setprecision(2) << fixed << gm_0 << " micro-Siemens." << endl;
+				cout << "Vgs_off : " << setprecision(2) << fixed << Vgs_off << " Volt." << endl;
+				cout << "Vgs     : " << setprecision(2) << fixed << Vgs << " Volt." << endl;
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+				while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+				{
+					cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+				}
+				if (toupper(correct_option) == 'N')
+					cout << "\tPlease Reenter the data." << endl;
+			} while (toupper(correct_option) == 'N');
 
 			//calculation
 			gm = gm_0 * (1 - (Vgs / Vgs_off));
-
 			cout << endl << " Result " << endl;
 			cout << "------------------------" << endl;
-			cout << "gm = gm_0 * (1 - (Vgs / Vgs_off))";
 			cout << "gm = " << gm << " micro-Siemens ." << endl << endl;
 			break;
 
-		case '3':
-		{
-			cout << "Return to simulation option...\n";
+		case 999:
+			cout << "Return to simulation option...";
 			Sleep(1000);
 			return;
-		}
-
 		default:
-			cout << "INPUT ERROR! Enter integer 1,2 or 3!" << endl;
+			cout << "Invalid input, pls Enter 1 or 2 or 999 only:\n";
 		}
 	}
 }
@@ -2753,8 +2848,7 @@ void jfet_DrainCurrent()
 //Case 7 (for simulator)
 void jfet()
 {
-	system("cls");
-	char option;
+	char correct_option;
 	float Id, Vdd, Rg, Rd, Rs;  //for jFET
 
 	cout << "\n________________________________________" << endl;
@@ -2776,60 +2870,53 @@ void jfet()
 	cout << "   |             |" << endl;
 	cout << "  GND           GND" << endl;
 	cout << "_________________________________________________________________" << endl << endl;
-
-	while (true)
+	do
 	{
-		cout << "Enter the calculator you want to use: \n1. drain-source voltage\n2. return:\n";
-		cin >> option;
-		switch (option)
+		//key in data
+		cout << "Vdd (in Volt): ";
+		cin >> Vdd;
+		cout << "Rd (in Ohm): ";
+		cin >> Rd;
+		cout << "Rs (in Ohm): ";
+		cin >> Rs;
+		cout << "Rg (in mega Ohm): ";
+		cin >> Rg;
+		cout << "Id (in milli Ampere): ";
+		cin >> Id;
+
+		// print data
+		cout << "\n\nVdd : " << setprecision(2) << fixed << Vdd << " Volt." << endl;
+		cout << "Rd : " << setprecision(2) << fixed << Rd << " Ohm." << endl;
+		cout << "Rs : " << setprecision(2) << fixed << Rs << " Ohm." << endl;
+		cout << "Rg : " << setprecision(2) << fixed << Rg << " mega-Ohm." << endl;
+		cout << "Id : " << setprecision(2) << fixed << Id << " milli Ampere." << endl;
+		cout << "Is the data all be verified correctly? (Y/N): ";
+		cin >> correct_option;
+		while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
 		{
-		case '1':
-		{
-			//key in data
-			cout << "Vdd (in Volt): ";
-			cin >> Vdd;
-			cout << "Rd (in Ohm): ";
-			cin >> Rd;
-			cout << "Rs (in Ohm): ";
-			cin >> Rs;
-			cout << "Rg (in mega Ohm): ";
-			cin >> Rg;
-			cout << "Id (in milli Ampere): ";
-			cin >> Id;
-
-			// calculation
-			Id /= 1000; // convert Id from milli Ampere to amperes
-			cout << endl << " Result and calculation" << endl;
-			cout << "------------------------" << endl;
-			cout << "VGS = VG - VS, VG = 0" << endl;
-			cout << "    = 0 - Id * Rs" << endl;
-			cout << "    = " << -Id * Rs << " V" << endl << endl;
-
-			cout << "VDS = VD - VS" << endl;
-			cout << "    = Vdd - Id (Rd + Rs)" << endl;
-			cout << "    = " << Vdd - Id * (Rd + Rs) << " V" << endl << endl;
-			break;
+			cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
 		}
-
-		case '2':
-		{
-			cout << "Return to simulation option...\n";
-			Sleep(1000);
-			return;
-		}
-
-		default:
-			cout << "INPUT ERROR! Enter integer 1 or 2!" << endl;
-		}
-
-	}
+		if (toupper(correct_option) == 'N')
+			cout << "\tPlease Reenter the data." << endl;
+	} while (toupper(correct_option) == 'N');
+	// calculation
+	Id /= 1000; // convert Id from milli Ampere to amperes
+	cout << endl << " Result and calculation" << endl;
+	cout << "------------------------" << endl;
+	cout << "V_GS = V_G - V_S" << endl;
+	cout << "     = 0 - Id*Rs" << endl;
+	cout << "     = " << -Id * Rs << " V" << endl << endl;
+	cout << "V_DS = V_D - V_S" << endl;
+	cout << "     = Vdd - Id (Rd + Rs)" << endl;
+	cout << "     = " << Vdd - Id * (Rd + Rs) << " V" << endl << endl;
 }
 
 //Case 8 (for simulator)
 void mosfet()
 {
-	system("cls");
-	char option;
+	char correct_option;
 	float Id, Vdd, R1, R2, R12, Rd, Vgs_th, K;  //for MOSFET
 
 	cout << "\n_________________________________________________________" << endl;
@@ -2851,66 +2938,64 @@ void mosfet()
 	cout << "   |             |" << endl;
 	cout << "  GND           GND" << endl;
 	cout << "_________________________________________________________________" << endl << endl;
-
-	while (true)
+	do
 	{
-		cout << "Enter the calculator you want to use: \n1. drain-source voltage\n2. return:\n";
-		cin >> option;
-		switch (option)
-		{
-		case '1':
-		{
-			//key in data
-			cout << "Vdd (in Volt): ";
-			cin >> Vdd;
-			cout << "Rd (in Ohm): ";
-			cin >> Rd;
-			cout << "R1 (in kilo Ohm): ";
-			cin >> R1;
-			cout << "R2 (in kilo Ohm): ";
-			cin >> R2;
-			cout << "The thereshold Voltage Vgs_th (in Volt): ";
-			cin >> Vgs_th;
-			cout << "The devices pameter K (in milli Ampere/Volt^2): ";
-			cin >> K;
+		//key in data
+		cout << "Vdd (in Volt): ";
+		cin >> Vdd;
+		cout << "Rd (in Ohm): ";
+		cin >> Rd;
+		cout << "R1 (in kilo Ohm): ";
+		cin >> R1;
+		cout << "R2 (in kilo Ohm): ";
+		cin >> R2;
+		cout << "The thereshold Voltage Vgs_th (in Volt): ";
+		cin >> Vgs_th;
+		cout << "The devices pameter K (in milli Ampere/Volt^2): ";
+		cin >> K;
 
-			// calculation
-			R12 = R2 / (R1 + R2);
-			K /= 1000; // convert K from mA/V^2 to A/V^2
-			Id = K * (R12 * Vdd - Vgs_th); // Id in ampere
-
-			cout << endl << " Result and calculation" << endl;
-			cout << "------------------------" << endl;
-			cout << "VGS = [R2 / (R1+R2)] * Vdd" << endl;
-			cout << "    = " << R12 << " * " << Vdd << endl;
-			cout << "    = " << R12 * Vdd << " V" << endl << endl;
-			cout << "Id = K *( Vgs - Vgs_th)^2" << endl;
-			cout << "   = " << K << " * ( " << R12 * Vdd << " - " << Vgs_th << " )^2" << endl;
-			cout << "   = " << K * pow((R12 * Vdd - Vgs_th), 2) * 1000 << " mA" << endl << endl;
-			cout << "VDS = V_D - V_S" << endl;
-			cout << "    = Vdd - (Id * Rd)" << endl;
-			cout << "    = " << Vdd - (Id * Rd) << " V" << endl << endl;
-			break;
-		}
-
-		case '2':
+		// print data
+		cout << "\n\nVdd : " << setprecision(2) << fixed << Vdd << " Volt." << endl;
+		cout << "Rd : " << setprecision(2) << fixed << Rd << " Ohm." << endl;
+		//cout << "Rs : " << setprecision(2) << fixed << Rs << " Ohm." << endl;
+		cout << "R1 : " << setprecision(2) << fixed << R1 << " kilo Ohm." << endl;
+		cout << "R2 : " << setprecision(2) << fixed << R2 << " kilo Ohm." << endl;
+		cout << "Vgs_th : " << setprecision(2) << fixed << Vgs_th << " Volt." << endl;
+		cout << "K  : " << setprecision(2) << fixed << K << " mA/V^2." << endl;
+		cout << "Is the data all be verified correctly? (Y/N): ";
+		cin >> correct_option;
+		while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
 		{
-			cout << "Return to simulation option...\n";
-			Sleep(1000);
-			return;
+			cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+			cout << "Is the data all be verified correctly? (Y/N): ";
+			cin >> correct_option;
 		}
-		default:
-			cout << "INPUT ERROR! Enter integer 1 or 2!" << endl;
-		}
-	}
+		if (toupper(correct_option) == 'N')
+			cout << "\tPlease Reenter the data." << endl;
+	} while (toupper(correct_option) == 'N');
+	// calculation
+	R12 = R2 / (R1 + R2);
+	K /= 1000; // convert K from mA/V^2 to A/V^2
+	Id = K * (R12 * Vdd - Vgs_th); // Id in ampere
+	cout << endl << " Result and calculation" << endl;
+	cout << "------------------------" << endl;
+	cout << "V_GS = [R2 / (R1+R2)] * Vdd" << endl;
+	cout << "     = " << R12 << " * " << Vdd << endl;
+	cout << "     = " << R12 * Vdd << " V" << endl << endl;
+	cout << "Id = K *( Vgs - Vgs_th)^2" << endl;
+	cout << "   = " << K << " * ( " << R12 * Vdd << " - " << Vgs_th << " )^2" << endl;
+	cout << "   = " << K * pow((R12 * Vdd - Vgs_th), 2) * 1000 << " mA" << endl << endl;
+	cout << "V_DS = V_D - V_S" << endl;
+	cout << "     = Vdd - (Id * Rd)" << endl;
+	cout << "     = " << Vdd - (Id * Rd) << " V" << endl << endl;
 }
 
 //Case 9 (for simulator)
-void non_inverting()
+void non_inverting()//Trang
 {
-	system("cls");
+	char correct_option;
 	double Rf_NI, Ri_NI, Vin, Aol, Zin_NI, Zout_NI, Acl_NI, B, Zin, Zout;
-	char opt;
+	int opt;
 
 	cout << "\n---Non-Inverting Amplifier,NI---\n";
 	cout << "Circuit Diagram: \n";
@@ -2932,101 +3017,144 @@ void non_inverting()
 	cout << "                                       \n";
 	cout << "Given:Vin = 5.0V, Rf = 220000 Ohm,Ri = 10000 Ohm and Aol = 200000 , Zin = 2000000 Ohm, Zout = 75 Ohm.\n";
 	cout << "Determine the cloosed-loop Voltage gain,Acl, the input and output impedances of the amplifier.\n";
-
-	while (true)
+	do
 	{
 		cout << "\nFormula Option:\n";
 		cout << "1. Acl(NI) = 1 + (Rf/Ri) \n";
 		cout << "2.  B = Ri / (Ri + Rf)\n";
 		cout << "3. Zin(NI) = (1+ Aol*B) * Zin\n";
 		cout << "4. Zout(NI) =  Zout / (1 + Aol * B)\n";
-		cout << "5. Return.\n";
-		cout << "Enter your choice (1-5):\n";
+		cout << "5. Exit formula menu.\n";
+		cout << "Enter your choice (1-5): ";
 		cin >> opt;
 
-		if (opt == '1')
+		if (opt == 1)
 		{
-			cout << "1. Acl(NI) = 1 + (Rf/Ri) \n";
-			cout << "Enter the value of Rf (in Ohm): \n";
-			cin >> Rf_NI;
-			cout << "Enter the value of Ri (in Ohm): \n";
-			cin >> Ri_NI;
-			Acl_NI = 1 + (Rf_NI / Ri_NI);
+			do
+			{
+				cout << "1. Acl(NI) = 1 + (Rf/Ri) \n";
+				cout << "Enter the value of Rf (in Ohm): \n";
+				cin >> Rf_NI;
+				cout << "Enter the value of Ri (in Ohm): \n";
+				cin >> Ri_NI;
+				Acl_NI = 1 + (Rf_NI / Ri_NI);
+				cout << "Acl(NI) = " << fixed << setprecision(2) << Acl_NI << endl;
 
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "Acl(NI) = 1 + (Rf/Ri)\n";
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+				while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+				{
+					cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+				}
+				if (toupper(correct_option) == 'N')
+					cout << "\tPlease Reenter the data." << endl;
+			} while (toupper(correct_option) == 'N');
+
 			cout << "Acl(NI) = " << fixed << setprecision(2) << Acl_NI << endl;
 		}
-
-		else if (opt == '2')
+		else if (opt == 2)
 		{
-			cout << "2. B = Ri / (Ri + Rf)\n";
-			cout << "Enter the value of Rf (in Ohm): \n";
-			cin >> Rf_NI;
-			cout << "Enter the value of Ri (in Ohm): \n";
-			cin >> Ri_NI;
-			B = Ri_NI / (Ri_NI + Rf_NI);
+			do
+			{
+				cout << "2. B = Ri / (Ri + Rf)\n";
+				cout << "Enter the value of Rf (in Ohm): \n";
+				cin >> Rf_NI;
+				cout << "Enter the value of Ri (in Ohm): \n";
+				cin >> Ri_NI;
+				B = Ri_NI / (Ri_NI + Rf_NI);
+				cout << "B = " << fixed << setprecision(4) << B << endl;
 
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "B = Ri_NI / (Ri_NI + Rf_NI)\n";
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+				while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+				{
+					cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+				}
+				if (toupper(correct_option) == 'N')
+					cout << "\tPlease Reenter the data." << endl;
+			} while (toupper(correct_option) == 'N');
 			cout << "B = " << fixed << setprecision(4) << B << endl;
 		}
-		else if (opt == '3')
+		else if (opt == 3)
 		{
-			cout << "3. Zin(NI) = (1+ Aol*B) * Zin\n";
-			cout << "Enter the value of B : \n";
-			cin >> B;
-			cout << "Enter the value of Aol : \n";
-			cin >> Aol;
-			cout << "Enter the value of Zin (in Ohm): \n";
-			cin >> Zin;
-			Zin_NI = (1 + Aol * B) * Zin;
+			do
+			{
+				cout << "3. Zin(NI) = (1+ Aol*B) * Zin\n";
+				cout << "Enter the value of B : \n";
+				cin >> B;
+				cout << "Enter the value of Aol : \n";
+				cin >> Aol;
+				cout << "Enter the value of Zin (in Ohm): \n";
+				cin >> Zin;
+				Zin_NI = (1 + Aol * B) * Zin;
+				cout << "Zin(NI) = " << fixed << setprecision(2) << Zin_NI << " Ohm" << endl;
 
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "Zin_NI = (1 + Aol * B) * Zin\n";
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+				while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+				{
+					cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+				}
+				if (toupper(correct_option) == 'N')
+					cout << "\tPlease Reenter the data." << endl;
+			} while (toupper(correct_option) == 'N');
+
 			cout << "Zin(NI) = " << fixed << setprecision(2) << Zin_NI << " Ohm" << endl;
 		}
 
-		else if (opt == '4')
+		else if (opt == 4)
 		{
-			cout << "4.Zout(NI) =  Zout / (1 + Aol * B)\n";
-			cout << "Enter the value of Zout (in Ohm): \n";
-			cin >> Zout;
-			cout << "Enter the value of Aol: \n";
-			cin >> Aol;
-			cout << "Enter the value of B: \n";
-			cin >> B;
-			Zout_NI = Zout / (1 + Aol * B);
+			do
+			{
+				cout << "4.Zout(NI) =  Zout / (1 + Aol * B)\n";
+				cout << "Enter the value of Zout (in Ohm): \n";
+				cin >> Zout;
+				cout << "Enter the value of Aol: \n";
+				cin >> Aol;
+				cout << "Enter the value of B: \n";
+				cin >> B;
+				Zout_NI = Zout / (1 + Aol * B);
+				cout << "Zout(NI) = " << fixed << setprecision(2) << Zout_NI << " Ohm " << endl;
 
-			cout << endl << " Result " << endl;
-			cout << "------------------------" << endl;
-			cout << "Zout_NI = Zout / (1 + Aol * B)\n";
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+				while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+				{
+					cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+				}
+				if (toupper(correct_option) == 'N')
+					cout << "\tPlease Reenter the data." << endl;
+			} while (toupper(correct_option) == 'N');
+
 			cout << "Zout(NI) = " << fixed << setprecision(2) << Zout_NI << " Ohm " << endl;
 		}
-
-		else if (opt == '5')
+		else if (opt == 5)
 		{
-			cout << "Return to simulation option...\n";
-			Sleep(1000);
-			return;
+			cout << "Exiting formula menu...\n"; break;
 		}
 		else
 		{
-			cout << "INPUT ERROR! Enter integer 1,2,3,4 or 5!" << endl;
+			cout << "Invalid optional!!Please enter the valid option(1-5): ";
 		}
-	}
+	} while (true);
 }
 
 //Case 10 (for simulator)
-void VoltageFollower()
+void VoltageFollower()//Trang
 {
-	system("cls");
-	char opt;
+	char correct_option;
 	double Rf_VF, Ri_VF, Aol, Zin_VF, Zout_VF, B, Zin, Zout;
+	int opt;
 
+	cout << "\nQuestion 11 :\n";
 	cout << "\n---Voltage Follower,VF---\n";
 	cout << "Circuit Diagram: \n";
 	cout << "                                       \n";
@@ -3047,64 +3175,91 @@ void VoltageFollower()
 	cout << "                                       \n";
 	cout << "Given: Rf =230000 Ohm, Ri =10000 Ohm , Aol = 200000 , Zin = 1000000 Ohm, Zout = 70 Ohm and B = 1.\n";
 	cout << "Determine the input and output impedances of the amplifier.\n";
-
-	while (true)
+	do
 	{
 		cout << "\nFormula Option:\n";
 		cout << "1. Zin(VF) = (1+ Aol*B) * Zin\n";
 		cout << "2. Zout(VF) =  Zout / (1 + Aol)\n";
-		cout << "3. Return.\n";
-		cout << "Enter your choice (1-3):\n";
+		cout << "3. Exit formula menu.";
+		cout << "Enter your choice (1-3): ";
 		cin >> opt;
 
-		if (opt == '1')
+		if (opt == 1)
 		{
-			cout << "1. Zin(VF) = (1+ Aol*B) * Zin\n";
-			cout << "Enter the value of B: \n";
-			cin >> B;
-			cout << "Enter the value of Aol: \n";
-			cin >> Aol;
-			cout << "Enter the value of Zin (in Ohm): \n";
-			cin >> Zin;
-			Zin_VF = (1 + Aol * B) * Zin;
+			do
+			{
+				cout << "1. Zin(VF) = (1+ Aol*B) * Zin\n";
+				cout << "Enter the value of B: \n";
+				cin >> B;
+				cout << "Enter the value of Aol: \n";
+				cin >> Aol;
+				cout << "Enter the value of Zin (in Ohm): \n";
+				cin >> Zin;
+				Zin_VF = (1 + Aol * B) * Zin;
+				cout << "Zin(VF) = " << fixed << setprecision(2) << Zin_VF << " Ohm" << endl;
 
-			cout << "Zin_VF = (1 + Aol * B) * Zin\n";
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+				while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+				{
+					cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+				}
+				if (toupper(correct_option) == 'N')
+					cout << "\tPlease Reenter the data." << endl;
+			} while (toupper(correct_option) == 'N');
+
 			cout << "Zin(VF) = " << fixed << setprecision(2) << Zin_VF << " Ohm" << endl;
 		}
 
-		else if (opt == '2')
+		else if (opt == 2)
 		{
-			cout << "2.Zout(VF) =  Zout / (1 + Aol)\n";
-			cout << "Enter the value of Zout (in Ohm): \n";
-			cin >> Zout;
-			cout << "Enter the value of Aol: \n";
-			cin >> Aol;
-			Zout_VF = Zout / (1 + Aol);
+			do
+			{
+				cout << "2.Zout(VF) =  Zout / (1 + Aol)\n";
+				cout << "Enter the value of Zout (in Ohm): \n";
+				cin >> Zout;
+				cout << "Enter the value of Aol: \n";
+				cin >> Aol;
+				Zout_VF = Zout / (1 + Aol);
+				cout << "Zout(VF) = " << fixed << setprecision(2) << Zout_VF << " Ohm" << endl;
 
-			cout << "Zout_VF = Zout / (1 + Aol)\n";
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+				while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+				{
+					cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+				}
+				if (toupper(correct_option) == 'N')
+					cout << "\tPlease Reenter the data." << endl;
+			} while (toupper(correct_option) == 'N');
+
 			cout << "Zout(VF) = " << fixed << setprecision(2) << Zout_VF << " Ohm" << endl;
 		}
-		else if (opt == '3')
+		else if (opt == 3)
 		{
-			cout << "Return to simulation option...\n";
-			Sleep(1000);
-			return;
+			cout << "Exiting formula menu...\n"; break;
 		}
 
 		else
 		{
-			cout << "INPUT ERROR! Enter integer 1,2 or 3!" << endl;
+			cout << "Invalid optional!!Please enter the valid option(1-3): ";
 		}
-	}
+
+	} while (true);
 }
 
 //Case 11 (for simulator)
-void invertingAmplifier()
+void invertingAmplifier()//Trang
 {
-	system("cls");
-	char opt;
+	char correct_option;
 	double Rf_I, Ri_I, Acl_I;
+	int opt;
 
+	cout << "\nQuestion 12 :\n";
 	cout << "\n---Inverting Amplifier,I---\n";
 	cout << "Circuit Diagram: \n";
 	cout << "                                               \n";
@@ -3123,51 +3278,77 @@ void invertingAmplifier()
 	cout << "                                               \n";
 	cout << "Given: Rf =210000 Ohm, Ri =10000 Ohm.\n";
 	cout << "Determine the closed-loop Voltage gain,Acl and the input impedance of the amplifier.\n";
-
-	while (true)
+	do
 	{
 		cout << "\nFormula Option:\n";
 		cout << "1. Acl(I)= - (Rf/Ri)\n";
-		cout << "2. Zin(I) = Ri \n";
-		cout << "3. Return.\n";
-		cout << "Enter your choice (1-3):\n";
+		cout << "2. Zin(I) ? Ri \n";
+		cout << "3. Exit formula menu.";
+		cout << "Enter your choice (1-3): ";
 		cin >> opt;
 
-		if (opt == '1')
+		if (opt == 1)
 		{
-			cout << "1. Acl(I)= - (Rf/Ri)\n";
-			cout << "Enter the value of Rf (in Ohm): \n";
-			cin >> Rf_I;
-			cout << "Enter the value of Ri (in Ohm): \n";
-			cin >> Ri_I;
-			Acl_I = -(Rf_I / Ri_I);
+			do
+			{
+				cout << "1. Acl(I)= - (Rf/Ri)\n";
+				cout << "Enter the value of Rf (in Ohm): \n";
+				cin >> Rf_I;
+				cout << "Enter the value of Ri (in Ohm): \n";
+				cin >> Ri_I;
+				Acl_I = -(Rf_I / Ri_I);
+				cout << "Acl(I) = " << fixed << setprecision(2) << Acl_I << endl;
 
-			cout << "Acl_I = -(Rf_I / Ri_I)\n";
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+				while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+				{
+					cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+				}
+				if (toupper(correct_option) == 'N')
+					cout << "\tPlease Reenter the data." << endl;
+			} while (toupper(correct_option) == 'N');
+
 			cout << "Acl(I) = " << fixed << setprecision(2) << Acl_I << endl;
 		}
-		else if (opt == '2')
+		else if (opt == 2)
 		{
-			cout << "2. Zin(I) = Ri \n";
-			cout << "Enter the value of Ri: \n";
-			cin >> Ri_I;
+			do
+			{
+				cout << "2. Zin(I) = Ri \n";
+				cout << "Enter the value of Ri: \n";
+				cin >> Ri_I;
+				cout << "Zin(I) = " << fixed << setprecision(2) << Ri_I << " Ohm" << endl;
 
-			cout << "Zin(I) = Ri\n";
+				cout << "Is the data all be verified correctly? (Y/N): ";
+				cin >> correct_option;
+				while (toupper(correct_option) != 'Y' && toupper(correct_option) != 'N')
+				{
+					cout << "Invalid input, please ENTER 'Y' or 'N'." << endl;
+					cout << "Is the data all be verified correctly? (Y/N): ";
+					cin >> correct_option;
+				}
+				if (toupper(correct_option) == 'N')
+					cout << "\tPlease Reenter the data." << endl;
+			} while (toupper(correct_option) == 'N');
+
 			cout << "Zin(I) = " << fixed << setprecision(2) << Ri_I << " Ohm" << endl;
 		}
 
-		else if (opt == '3')
+		else if (opt == 3)
 		{
-			cout << "Return to simulation option...\n";
-			Sleep(1000);
-			return;
+			cout << "Exiting formula menu...\n"; break;
 		}
 
 		else
 		{
-			cout << "INPUT ERROR! Enter integer 1,2 or 3!" << endl;
+			cout << "Invalid optional!! Please enter the valid option(1-3): ";
 		}
-	}
+	} while (true);
 }
+
 
 void notes_Diode()
 {
@@ -3716,7 +3897,7 @@ void notes_FET()
 	cout << "The step to determine Vgs and Vds can be explained in JFET self biasing simulation." << endl;
 	cout << "\nDo you want jump to JFET simulation? (Y/N):";
 	cin >> option;
-	charValidation(&option);
+	charValidation(&option,1);
 	if (toupper(option) == 'Y')
 		jfet();
 	cin.ignore();
@@ -3781,7 +3962,7 @@ void notes_FET()
 
 	cout << "\nDo you want jump to E-MOSFET simulation? (Y/N):";
 	cin >> option;
-	charValidation(&option);
+	charValidation(&option,1);
 	if (toupper(option) == 'Y') // added by Daniel to debug
 		mosfet();
 
@@ -3895,18 +4076,36 @@ void notes_OA() {
 
 
 
-void charValidation(char* option) {
-	while (toupper(*option) != 'Y' && toupper(*option) != 'N' || cin.fail()) {
-		cin.clear();
-		cin.ignore(100, '\n');
-		cout << "Invalid input, please ENTER 'Y' or 'N':" << endl;
-		cin >> option;
+void charValidation(char* input, int option) {
+	char temInput = toupper(*input);
+	if (option == 1) //check Y/N
+	{
+		while (temInput != 'Y' && temInput != 'N' ) {
+			cin.clear();
+			cin.ignore(100, '\n');
+			cout << "Invalid input, please ENTER 'Y' or 'N':";
+			cin >> temInput;
+			temInput = toupper(temInput);
+		}
 	}
+	else//check A/B/C/D
+	{
+		while (temInput != 'A' && temInput != 'B'&& temInput != 'C' && temInput != 'D' ) {
+			cin.clear();
+			cin.ignore(100, '\n');
+			cout << "Invalid input, please ENTER 'A' to 'D':";
+			cin >> temInput;
+			temInput = toupper(temInput);
+		}
+	}
+	*input = temInput;
 }
 
 void waitEnter(string action)
 {
 	string dummy;
-	cout << "\nPress ENTER to " << action << " ~~~";
+	cout << "\nPress ENTER to " << action << " ~~~\n\n";
 	getline(cin, dummy);
+
+
 }
