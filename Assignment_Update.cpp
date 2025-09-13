@@ -6,13 +6,18 @@
 #include<cctype>
 #include<windows.h> // for Sleep()
 using namespace std;
-// test validation
-void charValidation(char* input, int option);
-void waitEnter(string action);
+// CONSTANT
 const int ansnum = 23;
-const int Studentnum = 100;
 const float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
 		10000, 200, 350 }; //Answer for quizz 2
+const int Studentnum = 100;
+const int MAX_Numbers = 10; //maximum number
+const int MAX_COMMENTS = 100;
+
+int userindex = 0; //User count
+int Test1Count = 0; //count question from file
+int commentCount = 0;
+
 struct User {
 	string Name;
 	string ID;
@@ -23,34 +28,6 @@ struct User {
 	bool attempt_Test2 = false;
 	float ans[ansnum] = {};
 };
-User Student[Studentnum];
-int userindex = 0; //User count
-void ModeSelection();
-//Userlist file operation
-void loaduserdata();
-void savefile(User*, string);
-
-int getinfo(User[]);
-int findslot(User[]);
-
-//HOST FUNCTION
-bool hostLogin();//Daniel
-void hostMenu();//Daniel
-//hostMenu_function
-void Test1List();
-void userlist(User[]);
-
-//USER FUNCTION
-bool userLogin(int* index);
-void userMenu(int);
-//userMenu_function
-void note();
-void sim();
-void Test1_quizz(int);
-void Test2_quizz(float*, int);
-
-
-// Test1_function
 struct Test1 {
 	int num = 0; //Qustion No.
 	string question;
@@ -61,28 +38,55 @@ struct Test1 {
 	char ans = ' ';
 	bool isDeleted = false;
 };
-Test1 Quizz[10]; //store 10 test1 questions
-int Test1Count = 0; //count question from file
-const int MAX_Numbers = 10; //maximum number
-// quizz function for user
+struct Comment
+{
+	string studentID = "";
+	string text;
+	string hostReply;
+	bool deleted = false;
+	bool fromHost = false;
+};
+
+User Student[Studentnum];
+Test1 Quizz[MAX_Numbers]; //store 10 test1 questions
+Comment comments[MAX_COMMENTS];
+
+// Accessibility modules
+void charValidation(char* input, int option);
+void waitEnter(string action);
+
+//--------------FILE OPERATION-------------
+void savefile(User*, string);
+void saveTest1();
+void saveComments();
+void loaduserdata();
+void LoadTest1();
+void loadComments();
+
+void ModeSelection();
+
+//-----------------USER FUNCTION-----------------
+bool userLogin(int* index);
+int getinfo(User[]);
+void userMenu(int);
+//Answer Test 1
+void Test1_quizz(int);
 int checkAns(char ans, char answer);
 void shuffle(int* temp, int Question_Numbers);//temporary storage for the sequence array
-//quizz function for host
-bool showTest1();
-void createQuizz();
-void editQuizz(int number);
-void deleteQuizz(int num);
-//file operation
-void saveTest1();
-void LoadTest1();
-
-//Check and review for Test2_quizz
+//Answer Test 2
+void Test2_quizz(float*, int);
 void checksubmit(float*, int);
 int check(float*, int&);
 int checksection(float*, int, int);
 void review(float*, int);
-
-// Simulator
+//Notes function
+void note();
+void notes_Diode();
+void notes_BJT();
+void notes_FET();
+void notes_OA();
+//Simulation funtion
+void sim();
 void clipper();
 void clamper();
 void BJT_base();
@@ -95,42 +99,33 @@ void non_inverting();
 void VoltageFollower();
 void invertingAmplifier();
 
-//Notes
-void notes_Diode();
-void notes_BJT();
-void notes_FET();
-void notes_OA();
+//----------HOST FUNCTION------------
+bool hostLogin();//Daniel
+void hostMenu();//Daniel
+//Test 1 List
+void Test1List();
+bool showTest1();
+void createQuizz();
+void editQuizz(int number);
+void deleteQuizz(int num);
+//User List
+void userlist();
 
-//Edit comment function by Trang
-struct Comment
-{
-	string studentID = "";
-	string text;
-	string hostReply;
-	bool deleted = false;
-	bool fromHost = false;
-};
-
-const int MAX_COMMENTS = 100;
-Comment comments[MAX_COMMENTS];
-int commentCount = 0;
-
-void saveComments(Comment[], int);
-void loadComments(Comment[], int&);
-void createNotification(Comment[], int&);
-void hostCommentMenu(Comment[], int&);
-void deleteComment(Comment[], int&);
-void replyToComment(Comment[], int);
-void showAllComments(Comment[], int);
-void createStudentComment(Comment[], int&, User[], int);
-void studentCommentMenu(Comment[], int&, User[], int);
-void deleteEntireComment(Comment[], int&, int);
-void deleteHostReply(Comment[], int, int);
+//---------COMMENT FUNCTION------------------
+void showAllComments();
+void hostCommentMenu();
+void studentCommentMenu(int);
+void createNotification();
+void deleteComment();
+void replyToComment();
+void createStudentComment(int);
+void deleteEntireComment(int);
+void deleteHostReply(int);
 
 
 int main() {
 	LoadTest1();
-	loadComments(comments, commentCount);
+	loadComments();
 	loaduserdata();
 	ModeSelection();
 }
@@ -298,10 +293,10 @@ void hostMenu()
 			break;
 		case '2':
 			//userlist
-			userlist(Student);
+			userlist();
 			break;
 		case '3':
-			hostCommentMenu(comments, commentCount);
+			hostCommentMenu();
 			break;//Trang
 		case '4':
 			cout << "Exiting to Welcoming Surface..." << endl;
@@ -346,11 +341,11 @@ void userMenu(int index) {
 			sim();
 			break;
 		case 5:
-			studentCommentMenu(comments, commentCount, Student, index);
+			studentCommentMenu(index);
 			break;
 		case 0:
 			cout << "You have been logged out..." << endl;
-			saveComments(comments, commentCount);//Trang
+			saveComments();//Trang
 			Sleep(1000);
 			return;
 		default:
@@ -832,6 +827,7 @@ void Test2_quizz(float* answer, int index) {
 	Student[index].attempt_Test2 = true;
 	cout << "You have submitted the Test 2. Your total score is " << Student[index].result_Test2 << " Out of " << ansnum << "." << endl;
 	savefile(Student, "Userlist");
+	cin.ignore();
 	waitEnter("return menu");
 }
 
@@ -882,6 +878,7 @@ void sim()
 		cout << "\nSelect the type of simulator\na.Clipper\nb.Clamper\nc.DC(Voltage divider bias)\nd.DC(base bias)\ne.AC\nf.JFET Drain Current\n"
 			<< "g.JFET\nh.MOSFET\n" << "i.non inverting\nj.Voltage follower\nk.inverting amplifier\n0.return:";
 		cin >> opt_simulator;
+		system("cls");
 		opt_simulator = tolower(opt_simulator);
 		switch (opt_simulator)
 		{
@@ -1028,7 +1025,7 @@ int getinfo(User Student[]) {
 	savefile(Student, "Userlist");
 	return userindex - 1;
 }
-void userlist(User Student[]) {
+void userlist() {
 	system("cls");
 	cout << "================================================\n";
 	cout << "     Basic Electronic UGEA1313: User List\n";
@@ -1037,12 +1034,13 @@ void userlist(User Student[]) {
 		cout << "NO student registered yet.\n";
 	}
 	else {
+		cout << setw(4) << right << "No." << setw(5) << right << "Name" << setw(29) << right <<
+			"| Student ID" << " | Test 1 (7.00)" << " | Test 2 (23)" << " | Total (30.00)" << endl;
 		cout << string(90, '-') << endl;
 		for (int i = 0; i < userindex; i++) {
-			cout << setw(3) << right << i + 1 << ". " << "Name: " << left << setw(20) << Student[i].Name <<
-				" | Student ID: " << setw(7) << Student[i].ID <<
-				" | Test 1: " << fixed << setprecision(2) << Student[i].result_Test1 << "/7.00" <<
-				" | Test 2: " << setw(2) << right << Student[i].result_Test2 << "/23" << endl;
+			cout << setw(3) << right << i + 1 << ". " << left << setw(20) << Student[i].Name <<
+				" | " << Student[i].ID << setw(6) << right << " | " << fixed << setprecision(2) << Student[i].result_Test1 << setw(12) << right <<
+				" | " << Student[i].result_Test2 << setw(13) << right << " | " << fixed << setprecision(2) << Student[i].result_Test1 + Student[i].result_Test2 << endl;
 
 		}
 		cout << string(90, '-') << endl;
@@ -1387,7 +1385,7 @@ void Test1_quizz(int index)
 	int Num = 1, score = 0;
 	char ans;
 	system("cls");
-	cout << "Test 1 (Ojective: 7%)\n";
+	cout << "Test 1 (Objective: 7%)\n";
 	cout << "=====================\n";
 	if (Student[index].attempt_Test1)
 	{
@@ -1734,157 +1732,141 @@ void LoadTest1()
 }
 //Trang edit comment fuction
 //menu
-void hostCommentMenu(Comment comments[], int& count) {
-	int choice;
+void hostCommentMenu() {
+	char choice;
 	system("cls");
 	do {
-		cout << "\n--- Host Comment Menu ---\n";
+		cout << "Host Comment Menu\n";
+		cout << "=================\n";
 		cout << "1. Show All Comments\n";
 		cout << "2. Create Notification\n";
 		cout << "3. Reply to Student Comment\n";
 		cout << "4. Delete Comment\n";
 		cout << "0. Return\n";
+		cout << "Choice (0~4): ";
+		cin >> choice;
 
-		while (true) {
-			cout << "Choice (0~4): ";
-			cin >> choice;
 
-			if (cin.fail()) {
-				cin.clear();
-				cin.ignore(100, '\n');
-				cout << "Invalid input! Please enter a number 0~4.\n";
-
-			}
-			else if (choice < 0 || choice > 4) {
-				cout << "Invalid choice! Please enter 0~4.\n";
-			}
-			else {
-				break;
-			}
-		}
 
 		switch (choice) {
-		case 0:
+		case '0':
 			cout << "Returning...";
 			Sleep(1000);
 			system("cls");
 			break;
-		case 1://done
+		case '1'://done
 			system("cls");
-			showAllComments(comments, count);
-
-			break;
-		case 2:
-			system("cls");
-			createNotification(comments, count);
+			showAllComments();
+			cin.ignore();
 			waitEnter("return menu");
 			system("cls");
 			break;
-		case 3:
+		case '2':
 			system("cls");
-			replyToComment(comments, count);
+			createNotification();
+			waitEnter("return menu");
 			system("cls");
 			break;
-		case 4:
+		case '3':
 			system("cls");
-			deleteComment(comments, count);
+			replyToComment();
+			system("cls");
 			break;
+		case '4':
+			system("cls");
+			deleteComment();
+			cin.ignore();
+			system("cls");
+			break;
+		default:
+			cout << "Invalid data please input (0-4).\n";
+			cin.ignore();
+			waitEnter("continue");
+			system("cls");
 		}
-	} while (choice != 0);
+	} while (choice != '0');
 }
-void studentCommentMenu(Comment comments[], int& count, User Student[], int index)
+void studentCommentMenu(int index)
 {
-	int option;
+	char option;
 	do {
 
 		cout << "\n--- Student Comment Menu ---\n";
-		cout << "1. Show All Comments and Reply\n";
+		cout << "1. Show All Comments\n";
 		cout << "2. Create a Comment\n";
 		cout << "0. Return\n";
 		cout << "Choice: ";
-
-		while (true) {
-			cout << "Choice (0~2): ";
-			cin >> option;
-
-			if (cin.fail()) {
-				cin.clear();
-				cin.ignore(100, '\n');
-				cout << "Invalid input! Please enter a number 0~2.\n";
-			}
-			else if (option < 0 || option > 2) {
-				cout << "Invalid choice! Please enter 0~2.\n";
-			}
-			else {
-				break;
-			}
-		}
-
+		cin >> option;
 		switch (option) {
-		case 1:
-			showAllComments(comments, count);
+		case '1':
+			showAllComments();
 			break;
-		case 2:
+		case '2':
 			system("cls");
-			createStudentComment(comments, count, Student, index);
+			createStudentComment(index);
 			waitEnter("return menu");
 			system("cls");
 			break;
-		case 0: cout << "Returning...\n";
+		case '0': cout << "Returning...\n";
 			Sleep(1000);
 			system("cls");
 			break;
+		default:
+			cout << "Invalid input! Please enter a number 0~2.\n";
 		}
-	} while (option != 0);
+	} while (option != '0');
 
 }
 //create
-void createNotification(Comment comments[], int& count) {
-	if (count >= MAX_COMMENTS) {
+void createNotification() {
+	cout << "Create notification\n";
+	cout << "===================\n";
+	if (commentCount >= MAX_COMMENTS) {
 		cout << "Comment list is full!" << endl;
 		return;
 	}
 	cin.ignore();
 	cout << "Enter your comment (as host): ";
-	getline(cin, comments[count].text);
+	getline(cin, comments[commentCount].text);
 
-	comments[count].studentID = "";
-	comments[count].fromHost = true;
-	comments[count].hostReply = "";
-	comments[count].deleted = false;
+	comments[commentCount].studentID = "";
+	comments[commentCount].fromHost = true;
+	comments[commentCount].hostReply = "";
+	comments[commentCount].deleted = false;
 
 	cout << "Host comment saved!" << endl;
-	count++;
-	saveComments(comments, count);
+	commentCount++;
+	saveComments();
 }
-void createStudentComment(Comment comments[], int& count, User Student[], int index) {
-	if (count >= MAX_COMMENTS) {
+void createStudentComment(int index) {
+	cout << "Create Student Comment\n";
+	cout << "======================\n";
+	if (commentCount >= MAX_COMMENTS) {
 		cout << "Comment list is full!" << endl;
 		return;
 	}
 	cin.ignore();
 	cout << "Enter your comment: ";
-	getline(cin, comments[count].text);
-
-	comments[count].studentID = Student[index].ID;
-	comments[count].fromHost = false;
-	comments[count].hostReply = "";
-	comments[count].deleted = false;
+	getline(cin, comments[commentCount].text);
+	comments[commentCount].studentID = Student[index].ID;
+	comments[commentCount].fromHost = false;
+	comments[commentCount].hostReply = "";
+	comments[commentCount].deleted = false;
 
 	cout << "Comment saved! (Student ID: " << Student[index].ID << ")" << endl;//can save student id
-	count++;
-	saveComments(comments, count);
+	commentCount++;
+	saveComments();
 }
 
-void showAllComments(Comment comments[], int count) {
-	cout << "\n======= Comment List =======\n";
-	if (count == 0) {
+void showAllComments() {
+	cout << "******* Comment List *******\n";
+	if (commentCount == 0) {
 		cout << "No comments yet.\n";
 	}
 
 	else
 	{
-		for (int i = 0; i < count; i++) {
+		for (int i = 0; i < commentCount; i++) {
 			if (!comments[i].deleted) {
 				cout << "Comment #" << i << endl;
 				if (comments[i].fromHost) {
@@ -1902,23 +1884,23 @@ void showAllComments(Comment comments[], int count) {
 			}
 		}
 	}
-	cout << "============================\n";
+	cout << string(28, '*') << "\n";
 }
-void replyToComment(Comment comments[], int count) {
-	if (count == 0) {
+void replyToComment() {
+	cout << "Reply Comment\n";
+	cout << "=============\n";
+	if (commentCount == 0) {
 		cout << "No comments to reply.\n";
 		waitEnter("return menu");
 		return;
 	}
 
-	char reply = 'Y';
-
-	while (toupper(reply) == 'Y') {
-		showAllComments(comments, count);
+	while (true) {
+		showAllComments();
 
 		int index;
 		while (true) {
-			cout << "Enter the comment number to reply: ";
+			cout << "Enter the comment number to reply (999 to cancel): ";
 			cin >> index;
 
 			if (cin.fail()) {
@@ -1927,13 +1909,14 @@ void replyToComment(Comment comments[], int count) {
 				cout << "Invalid input.Please enter a valid number.\n";
 				continue;
 			}
-			if (index < 0 || index >= count) {
+
+			if ((index < 0 || index >= commentCount) && index != 999) {
 				cout << "Invalid comment index! Please try again.\n";
 				continue;
 			}
 			break;
 		}
-
+		if (index == 999)break;
 		if (!comments[index].hostReply.empty()) {
 			cout << "Already replied.\n";
 		}
@@ -1943,10 +1926,11 @@ void replyToComment(Comment comments[], int count) {
 			getline(cin, comments[index].hostReply);
 
 			cout << "Reply added successfully.\n";
-			saveComments(comments, count);
+			saveComments();
 		}
 
 
+		/*
 		while (true) {
 
 			cout << "Do you want to continue replying? (Y/N): ";
@@ -1961,17 +1945,20 @@ void replyToComment(Comment comments[], int count) {
 			}
 
 		}
+		*/
 	}
 }
 
 //delete comment function
-void deleteComment(Comment comments[], int& count) {
-	if (count == 0) {
+void deleteComment() {
+	cout << "Delete Comment\n";
+	cout << "==============\n";
+	if (commentCount == 0) {
 		cout << "No comments to delete.\n";
 		return;
 	}
 
-	showAllComments(comments, count);
+	showAllComments();
 
 	int index;
 	while (true) {
@@ -1984,62 +1971,54 @@ void deleteComment(Comment comments[], int& count) {
 			cout << "Invalid input.Please enter a valid number.\n";
 			continue;
 		}
-		if (index < 0 || index >= count) {
+		if (index < 0 || index >= commentCount) {
 			cout << "Invalid comment index! Please try again.\n";
 			continue;
 		}
 		break;
 	}
 
-	int choice;
+	char choice;
 	cout << "\nWhat do you want to delete?\n";
 	cout << "1. Entire comment\n";
 	cout << "2. Host reply\n";
 	cout << "3. Cancel\n";
-	cout << "Choice (1~3): ";
-
-	while (true) {
+	do {
+		cout << "Choice (1~3): ";
 		cin >> choice;
-		if (cin.fail()) {
-			cin.clear();
-			cin.ignore(100, '\n');
-			cout << "Invalid input! Please enter a number 1~3.\n";
-			continue;
-		}
-		if (choice < 1 || choice > 3) {
-			cout << "Invalid choice! Please enter 1~3.\n";
-			continue;
-		}
-		break;
-	}
 
-	switch (choice) {
-	case 1:
-		deleteEntireComment(comments, count, index);
-		break;
-	case 2:
-		deleteHostReply(comments, count, index);
-		break;
-	case 3:
-		cout << "Delete cancelled.\n";
-		waitEnter("return menu");
-		break;
-	}
+		switch (choice) {
+		case '1':
+			deleteEntireComment(index);
+			break;
+		case '2':
+			deleteHostReply(index);
+			break;
+		case '3':
+			cout << "Delete cancelled.\n";
+			cin.ignore();
+			waitEnter("return menu");
+			break;
+		default:
+			cout << "Invalid input.Please Enter (1-3).\n";
+		}
+	} while (choice != '3');
+
 }
-void deleteEntireComment(Comment comments[], int& count, int index) {
-	for (int i = index; i < count - 1; i++) {
+void deleteEntireComment(int index) {
+	for (int i = index; i < commentCount - 1; i++) {
 		comments[i] = comments[i + 1];
 	}
-	comments[count - 1] = {};
-	count--;
+	comments[commentCount - 1] = {};
+	commentCount--;
 	cout << "Comment deleted successfully.\n";
-	saveComments(comments, count);
+	saveComments();
 }
-void deleteHostReply(Comment comments[], int count, int index) {
+void deleteHostReply(int index) {
 	if (!comments[index].hostReply.empty()) {
 		comments[index].hostReply.clear();
 		cout << "Host reply deleted successfully.\n";
-		saveComments(comments, count);
+		saveComments();
 	}
 	else {
 		cout << "This comment has no host reply.\n";
@@ -2047,13 +2026,13 @@ void deleteHostReply(Comment comments[], int count, int index) {
 	}
 }
 
-void saveComments(Comment comments[], int count) {
+void saveComments() {
 	fstream file("Comments", ios::out);
 	if (!file.is_open()) {
 		cout << "Error saving comments.\n";
 		return;
 	}
-	for (int i = 0; i < count; i++) {
+	for (int i = 0; i < commentCount; i++) {
 		if (!comments[i].deleted) {
 
 			file << comments[i].fromHost << endl;
@@ -2065,7 +2044,7 @@ void saveComments(Comment comments[], int count) {
 	file.close();
 	cout << "Comments saved successfully." << endl;
 }
-void loadComments(Comment comments[], int& count) {
+void loadComments() {
 	fstream file("Comments", ios::in);
 	if (!file.is_open()) {
 		cout << "Starting fresh.\n";
@@ -2073,18 +2052,18 @@ void loadComments(Comment comments[], int& count) {
 	}
 
 	string line;
-	count = 0;
+	commentCount = 0;
 	while (getline(file, line)) {
 		if (line.empty()) continue;
-		comments[count].fromHost = (line == "1" || line == "true");
+		comments[commentCount].fromHost = (line == "1" || line == "true");
 
-		if (!getline(file, comments[count].studentID)) break;
-		if (!getline(file, comments[count].text)) break;
-		if (!getline(file, comments[count].hostReply)) break;
+		if (!getline(file, comments[commentCount].studentID)) break;
+		if (!getline(file, comments[commentCount].text)) break;
+		if (!getline(file, comments[commentCount].hostReply)) break;
 
-		comments[count].deleted = false;
-		count++;
-		if (count >= MAX_COMMENTS) break;
+		comments[commentCount].deleted = false;
+		commentCount++;
+		if (commentCount >= MAX_COMMENTS) break;
 	}
 
 	file.close();
