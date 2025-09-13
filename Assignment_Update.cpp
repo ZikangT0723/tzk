@@ -838,7 +838,7 @@ void Test2_quizz(float* answer, int index) {
 
 void note() {
 	char chap;
-
+	system("cls");
 	do {
 		cout << "Notes Selection\n";
 		cout << "===============\n";
