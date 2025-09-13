@@ -179,7 +179,7 @@ bool userLogin(int* index) {
 	system("cls");
 	cout << "User Login/Register\n";
 	cout << "===================\n";
-	cout << "Do you want to login or register [1 login, 2 register]";
+	cout << "Do you want to login or register [1 login, 2 register]:";
 	cin >> option;
 
 	while (option != 1 && option != 2)
@@ -313,7 +313,6 @@ void hostMenu()
 		}
 	} while (option != '4');
 }
-
 
 void userMenu(int index) {
 	int opt;
@@ -1737,6 +1736,7 @@ void LoadTest1()
 //menu
 void hostCommentMenu(Comment comments[], int& count) {
 	int choice;
+	system("cls");
 	do {
 		cout << "\n--- Host Comment Menu ---\n";
 		cout << "1. Show All Comments\n";
@@ -1744,16 +1744,51 @@ void hostCommentMenu(Comment comments[], int& count) {
 		cout << "3. Reply to Student Comment\n";
 		cout << "4. Delete Comment\n";
 		cout << "0. Return\n";
-		cout << "Choice (0~4): ";
-		cin >> choice;
+
+		while (true) {
+			cout << "Choice (0~4): ";
+			cin >> choice;
+
+			if (cin.fail()) {
+				cin.clear();
+				cin.ignore(100, '\n');
+				cout << "Invalid input! Please enter a number 0~4.\n";
+
+			}
+			else if (choice < 0 || choice > 4) {
+				cout << "Invalid choice! Please enter 0~4.\n";
+			}
+			else {
+				break;
+			}
+		}
 
 		switch (choice) {
-		case 0: cout << "Returning...\n"; break;
-		case 1: showAllComments(comments, count); break;
-		case 2: createNotification(comments, count); break;
-		case 3: replyToComment(comments, count); break;
-		case 4: deleteComment(comments, count); break;
-		default: cout << "Invalid choice.\n"; break;
+		case 0:
+			cout << "Returning...";
+			Sleep(1000);
+			system("cls");
+			break;
+		case 1://done
+			system("cls");
+			showAllComments(comments, count);
+
+			break;
+		case 2:
+			system("cls");
+			createNotification(comments, count);
+			waitEnter("return menu");
+			system("cls");
+			break;
+		case 3:
+			system("cls");
+			replyToComment(comments, count);
+			system("cls");
+			break;
+		case 4:
+			system("cls");
+			deleteComment(comments, count);
+			break;
 		}
 	} while (choice != 0);
 }
@@ -1761,19 +1796,46 @@ void studentCommentMenu(Comment comments[], int& count, User Student[], int inde
 {
 	int option;
 	do {
+
 		cout << "\n--- Student Comment Menu ---\n";
 		cout << "1. Show All Comments and Reply\n";
 		cout << "2. Create a Comment\n";
 		cout << "0. Return\n";
 		cout << "Choice: ";
-		cin >> option;
+
+		while (true) {
+			cout << "Choice (0~2): ";
+			cin >> option;
+
+			if (cin.fail()) {
+				cin.clear();
+				cin.ignore(100, '\n');
+				cout << "Invalid input! Please enter a number 0~2.\n";
+			}
+			else if (option < 0 || option > 2) {
+				cout << "Invalid choice! Please enter 0~2.\n";
+			}
+			else {
+				break;
+			}
+		}
 
 		switch (option) {
-		case 1: showAllComments(comments, count); break;
-		case 2:createStudentComment(comments, count, Student, index);
+		case 1:
+			showAllComments(comments, count);
+			break;
+		case 2:
+			system("cls");
+			createStudentComment(comments, count, Student, index);
+			waitEnter("return menu");
+			system("cls");
+			break;
+		case 0: cout << "Returning...\n";
+			Sleep(1000);
+			system("cls");
+			break;
 		}
 	} while (option != 0);
-
 
 }
 //create
@@ -1818,24 +1880,26 @@ void showAllComments(Comment comments[], int count) {
 	cout << "\n======= Comment List =======\n";
 	if (count == 0) {
 		cout << "No comments yet.\n";
-		return;
 	}
 
-	for (int i = 0; i < count; i++) {
-		if (!comments[i].deleted) {
-			cout << "Comment #" << i << endl;
-			if (comments[i].fromHost) {
-				cout << " ------Notification------\n";
-				cout << "  Attention: " << comments[i].text << endl;
-			}
-			else {
-				cout << " [Student ID: " << comments[i].studentID << "]\n";
-				cout << "  Comment: " << comments[i].text << endl;
-			}
+	else
+	{
+		for (int i = 0; i < count; i++) {
+			if (!comments[i].deleted) {
+				cout << "Comment #" << i << endl;
+				if (comments[i].fromHost) {
+					cout << " ------Notification------\n";
+					cout << "  Attention: " << comments[i].text << endl;
+				}
+				else {
+					cout << " [Student ID: " << comments[i].studentID << "]\n";
+					cout << "  Comment: " << comments[i].text << endl;
+				}
 
-			if (!comments[i].hostReply.empty())
-				cout << "--->Host Reply: " << comments[i].hostReply << endl;
-			cout << "----------------------------\n";
+				if (!comments[i].hostReply.empty())
+					cout << "--->Host Reply: " << comments[i].hostReply << endl;
+				cout << "----------------------------\n";
+			}
 		}
 	}
 	cout << "============================\n";
@@ -1843,20 +1907,31 @@ void showAllComments(Comment comments[], int count) {
 void replyToComment(Comment comments[], int count) {
 	if (count == 0) {
 		cout << "No comments to reply.\n";
+		waitEnter("return menu");
 		return;
 	}
 
 	char reply = 'Y';
+
 	while (toupper(reply) == 'Y') {
 		showAllComments(comments, count);
 
 		int index;
-		cout << "Enter the comment number to reply: ";
-		cin >> index;
+		while (true) {
+			cout << "Enter the comment number to reply: ";
+			cin >> index;
 
-		if (index < 0 || index >= count) {
-			cout << "Invalid comment index!\n";
-			return;
+			if (cin.fail()) {
+				cin.clear();
+				cin.ignore(100, '\n');
+				cout << "Invalid input.Please enter a valid number.\n";
+				continue;
+			}
+			if (index < 0 || index >= count) {
+				cout << "Invalid comment index! Please try again.\n";
+				continue;
+			}
+			break;
 		}
 
 		if (!comments[index].hostReply.empty()) {
@@ -1871,16 +1946,20 @@ void replyToComment(Comment comments[], int count) {
 			saveComments(comments, count);
 		}
 
+
 		while (true) {
+
 			cout << "Do you want to continue replying? (Y/N): ";
 			cin >> reply;
 
 			if (reply == 'Y' || reply == 'y' || reply == 'N' || reply == 'n') {
+				system("cls");
 				break;
 			}
 			else {
 				cout << "Invalid input. Please enter Y or N.\n";
 			}
+
 		}
 	}
 }
@@ -1895,21 +1974,44 @@ void deleteComment(Comment comments[], int& count) {
 	showAllComments(comments, count);
 
 	int index;
-	cout << "Enter the comment number to delete: ";
-	cin >> index;
+	while (true) {
+		cout << "Enter the comment number to delete: ";
+		cin >> index;
 
-	if (index < 0 || index >= count) {
-		cout << "Invalid comment index!\n";
-		return;
+		if (cin.fail()) {
+			cin.clear();
+			cin.ignore(100, '\n');
+			cout << "Invalid input.Please enter a valid number.\n";
+			continue;
+		}
+		if (index < 0 || index >= count) {
+			cout << "Invalid comment index! Please try again.\n";
+			continue;
+		}
+		break;
 	}
 
+	int choice;
 	cout << "\nWhat do you want to delete?\n";
 	cout << "1. Entire comment\n";
 	cout << "2. Host reply\n";
 	cout << "3. Cancel\n";
-	cout << "Choice: ";
-	int choice;
-	cin >> choice;
+	cout << "Choice (1~3): ";
+
+	while (true) {
+		cin >> choice;
+		if (cin.fail()) {
+			cin.clear();
+			cin.ignore(100, '\n');
+			cout << "Invalid input! Please enter a number 1~3.\n";
+			continue;
+		}
+		if (choice < 1 || choice > 3) {
+			cout << "Invalid choice! Please enter 1~3.\n";
+			continue;
+		}
+		break;
+	}
 
 	switch (choice) {
 	case 1:
@@ -1920,10 +2022,8 @@ void deleteComment(Comment comments[], int& count) {
 		break;
 	case 3:
 		cout << "Delete cancelled.\n";
-		return;
-	default:
-		cout << "Invalid choice.\n";
-		return;
+		waitEnter("return menu");
+		break;
 	}
 }
 void deleteEntireComment(Comment comments[], int& count, int index) {
@@ -1943,6 +2043,7 @@ void deleteHostReply(Comment comments[], int count, int index) {
 	}
 	else {
 		cout << "This comment has no host reply.\n";
+		system("cls");
 	}
 }
 
