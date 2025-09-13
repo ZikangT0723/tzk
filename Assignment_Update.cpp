@@ -1991,7 +1991,6 @@ void loadComments(Comment comments[], int& count) {
 
 void clipper()
 {
-	system("cls");
 	float Vin, Vd, Vout;
 	char polar, opt_clipper;
 
@@ -2125,7 +2124,6 @@ void clipper()
 //Case 2 (for simulator)
 void clamper()
 {
-	system("cls");
 	float Vin, Vc, Vd, Vbias, Vout;
 	char polar, opt_clamper;
 	cout << "\n           Positive-biased clamper                                      Negative-biased clamper\n" << endl;
@@ -2303,7 +2301,6 @@ void clamper()
 //Case 3 (for simulator)
 void BJT_Voltage_divider()
 {
-	system("cls");
 	char calculate;
 	double RIN_base, betaDC, RE, R2, R2_total, R1, VCC, VB, IC_mA, RC, VCE;
 	cout << "BJT volatge-divider biased configuration.\n\n";
@@ -2437,7 +2434,6 @@ void BJT_Voltage_divider()
 //Case 4 (for simulator)
 void BJT_base()
 {
-	system("cls");
 	char calculate;
 	double VCC, IC_mA, RC, VCE;
 
@@ -2498,7 +2494,6 @@ void BJT_base()
 //Case 5 (for simulator)
 void BJT_AC()
 {
-	system("cls");
 	char calculate;
 	double R1, R2, VB, VCC, RC, RE, betaAC, Rin_base, Rin_total, IE_mA, re, AV;
 
@@ -2656,7 +2651,6 @@ void BJT_AC()
 //Case 6 (for simulator)
 void jfet_DrainCurrent()
 {
-	system("cls");
 	char option;
 	float Idss, Vgs_off, Vgs, Id;
 	float gm, gm_0;
@@ -2749,7 +2743,6 @@ void jfet_DrainCurrent()
 //Case 7 (for simulator)
 void jfet()
 {
-	system("cls");
 	char option;
 	float Id, Vdd, Rg, Rd, Rs;  //for jFET
 
@@ -2824,7 +2817,6 @@ void jfet()
 //Case 8 (for simulator)
 void mosfet()
 {
-	system("cls");
 	char option;
 	float Id, Vdd, R1, R2, R12, Rd, Vgs_th, K;  //for MOSFET
 
@@ -2904,8 +2896,7 @@ void mosfet()
 //Case 9 (for simulator)
 void non_inverting()
 {
-	system("cls");
-	double Rf_NI, Ri_NI, Vin, Aol, Zin_NI, Zout_NI, Acl_NI, B, Zin, Zout;
+	double Rf_NI, Ri_NI, Aol, Zin_NI, Zout_NI, Acl_NI, B, Zin, Zout;
 	char opt;
 
 	cout << "\n---Non-Inverting Amplifier,NI---\n";
@@ -3019,9 +3010,8 @@ void non_inverting()
 //Case 10 (for simulator)
 void VoltageFollower()
 {
-	system("cls");
 	char opt;
-	double Rf_VF, Ri_VF, Aol, Zin_VF, Zout_VF, B, Zin, Zout;
+	double Aol, Zin_VF, Zout_VF, B, Zin, Zout;
 
 	cout << "\n---Voltage Follower,VF---\n";
 	cout << "Circuit Diagram: \n";
@@ -3097,7 +3087,6 @@ void VoltageFollower()
 //Case 11 (for simulator)
 void invertingAmplifier()
 {
-	system("cls");
 	char opt;
 	double Rf_I, Ri_I, Acl_I;
 
