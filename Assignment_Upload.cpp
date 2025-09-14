@@ -6,18 +6,13 @@
 #include<cctype>
 #include<windows.h> // for Sleep()
 using namespace std;
-// CONSTANT
+// test validation
+void charValidation(char* input, int option);
+void waitEnter(string action);
 const int ansnum = 23;
+const int Studentnum = 100;
 const float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
 		10000, 200, 350 }; //Answer for quizz 2
-const int Studentnum = 100;
-const int MAX_Numbers = 10; //maximum number
-const int MAX_COMMENTS = 100;
-
-int userindex = 0; //User count
-int Test1Count = 0; //count question from file
-int commentCount = 0;
-
 struct User {
 	string Name;
 	string ID;
@@ -28,6 +23,34 @@ struct User {
 	bool attempt_Test2 = false;
 	float ans[ansnum] = {};
 };
+User Student[Studentnum];
+int userindex = 0; //User count
+void ModeSelection();
+//Userlist file operation
+void loaduserdata();
+void savefile(User*, string);
+
+int getinfo(User[]);
+int findslot(User[]);
+
+//HOST FUNCTION
+bool hostLogin();//Daniel
+void hostMenu();//Daniel
+//hostMenu_function
+void Test1List();
+void userlist(User[]);
+
+//USER FUNCTION
+bool userLogin(int* index);
+void userMenu(int);
+//userMenu_function
+void note();
+void sim();
+void Test1_quizz(int);
+void Test2_quizz(float*, int);
+
+
+// Test1_function
 struct Test1 {
 	int num = 0; //Qustion No.
 	string question;
@@ -38,57 +61,28 @@ struct Test1 {
 	char ans = ' ';
 	bool isDeleted = false;
 };
-struct Comment
-{
-	string studentID = "";
-	string text;
-	string hostReply;
-	bool deleted = false;
-	bool fromHost = false;
-};
-
-User Student[Studentnum];
-Test1 Quizz[MAX_Numbers]; //store 10 test1 questions
-Comment comments[MAX_COMMENTS];
-
-// Accessibility modules
-void charValidation(char* input, int option);
-void waitEnter(string action);
-
-//--------------FILE OPERATION-------------
-void savefile(User*, string);
-void saveTest1();
-void saveComments();
-void loaduserdata();
-void LoadTest1();
-void loadComments();
-
-void ModeSelection();
-
-//-----------------USER FUNCTION-----------------
-bool userLogin(int* index);
-bool IDexist(string*);
-void userinfo(User[], int);
-int getinfo(User[]);
-void userMenu(int);
-//Answer Test 1
-void Test1_quizz(int);
+Test1 Quizz[10]; //store 10 test1 questions
+int Test1Count = 0; //count question from file
+const int MAX_Numbers = 10; //maximum number
+// quizz function for user
 int checkAns(char ans, char answer);
 void shuffle(int* temp, int Question_Numbers);//temporary storage for the sequence array
-//Answer Test 2
-void Test2_quizz(float*, int);
+//quizz function for host
+bool showTest1();
+void createQuizz();
+void editQuizz(int number);
+void deleteQuizz(int num);
+//file operation
+void saveTest1();
+void LoadTest1();
+
+//Check and review for Test2_quizz
 void checksubmit(float*, int);
 int check(float*, int&);
 int checksection(float*, int, int);
 void review(float*, int);
-//Notes function
-void note();
-void notes_Diode();
-void notes_BJT();
-void notes_FET();
-void notes_OA();
-//Simulation funtion
-void sim();
+
+// Simulator
 void clipper();
 void clamper();
 void BJT_base();
@@ -101,33 +95,42 @@ void non_inverting();
 void VoltageFollower();
 void invertingAmplifier();
 
-//----------HOST FUNCTION------------
-bool hostLogin();//Daniel
-void hostMenu();//Daniel
-//Test 1 List
-void Test1List();
-bool showTest1();
-void createQuizz();
-void editQuizz(int number);
-void deleteQuizz(int num);
-//User List
-void userlist();
+//Notes
+void notes_Diode();
+void notes_BJT();
+void notes_FET();
+void notes_OA();
 
-//---------COMMENT FUNCTION------------------
-void showAllComments();
-void hostCommentMenu();
-void studentCommentMenu(int);
-void createNotification();
-void deleteComment();
-void replyToComment();
-void createStudentComment(int);
-void deleteEntireComment(int);
-void deleteHostReply(int);
+//Edit comment function by Trang
+struct Comment
+{
+	string studentID = "";
+	string text;
+	string hostReply;
+	bool deleted = false;
+	bool fromHost = false;
+};
+
+const int MAX_COMMENTS = 100;
+Comment comments[MAX_COMMENTS];
+int commentCount = 0;
+
+void saveComments(Comment[], int);
+void loadComments(Comment[], int&);
+void createNotification(Comment[], int&);
+void hostCommentMenu(Comment[], int&);
+void deleteComment(Comment[], int&);
+void replyToComment(Comment[], int);
+void showAllComments(Comment[], int);
+void createStudentComment(Comment[], int&, User[], int);
+void studentCommentMenu(Comment[], int&, User[], int);
+void deleteEntireComment(Comment[], int&, int);
+void deleteHostReply(Comment[], int, int);
 
 
 int main() {
 	LoadTest1();
-	loadComments();
+	loadComments(comments, commentCount);
 	loaduserdata();
 	ModeSelection();
 }
@@ -156,7 +159,6 @@ void ModeSelection()
 			if (userLogin(&index)) {
 				userMenu(index);
 			}
-			Sleep(1000);
 			break;
 		case '3':
 			cout << "\nExitting program..."; //can design
@@ -172,7 +174,6 @@ void ModeSelection()
 bool userLogin(int* index) {
 	int option;
 	int position;
-	int info;
 	string yourID;
 	string yourPassword;
 	system("cls");
@@ -191,75 +192,48 @@ bool userLogin(int* index) {
 	if (option == 1) {
 		cout << "Enter your student ID: ";
 		cin >> yourID;
-		if (IDexist(&yourID)) {
-			cout << "Enter your password: ";
-			cin >> yourPassword;
-			for (int i = 0; i < userindex; i++) {
-				if (yourID == Student[i].ID) {
-					position = i;
-					break;
-				}
-			}
-			if (yourPassword == Student[position].password) {
-				cout << "Login successful \n";
-				*index = position;
-				return true;
-			}
 
-			else {
-				for (int attempts = 2; attempts > 0; attempts--) {
-					system("cls");
-					cout << "Your ID: " << yourID << endl;
-					cout << "You have " << attempts << " left...\n";
-					cout << "Enter your correct password: ";
-					cin >> yourPassword;
-					if (yourPassword == Student[position].password) {
-						*index = position;
-						return true;
-					}
-				}
-				cout << "You have no attempts left, please contact your teacher for help...\n";
-				return false;
+		cout << "Enter your password: ";
+		cin >> yourPassword;
+		for (int i = 0; i < userindex; i++) {
+			if (yourID == Student[i].ID) {
+				position = i;
+				break;
 			}
 		}
-		else {
-			cout << "Your ID does not exist. Returning to home page...\n";
-			return false;
-		}
-
-	}
-
-	else if (option == 2) {
-		info = getinfo(Student);
-
-		if (info == -1)
-			return false;
-
-		if (userindex < Studentnum) {
-			*index = info;
+		if (yourPassword == Student[position].password) {
+			cout << "Login successful \n";
+			*index = position;
 			return true;
 		}
 
+
+		else {
+			for (int attempts = 2; attempts > 0; attempts--) {
+				cout << "Your ID: " << yourID << endl;
+				cout << "You have " << attempts << " left...\n";
+				cout << "Enter your correct password: ";
+				cin >> yourPassword;
+				if (yourPassword == Student[position].password) {
+					*index = position;
+					return true;
+				}
+			}
+			cout << "You have no attempts left, please contact your teacher for help...\n";
+			return false;
+		}
+	}
+	else if (option == 2) {
+		if (userindex < Studentnum) {
+			*index = getinfo(Student);
+			return true;
+		}
 		else {
 			cout << "The userlist is full." << endl;
 			return false;
 		}
 	}
 }
-
-bool IDexist(string* checkID) {
-	while (*checkID != "0") {
-		for (int exist = 0; exist < userindex; exist++) {
-			if (*checkID == Student[exist].ID) return true;
-		}
-		system("cls");
-		cout << "Your ID does not exist... \n";
-		cout << "Enter a valid ID (0 to go back): ";
-		cin >> *checkID;
-	}
-	return false;
-}
-
 //Daniel
 bool hostLogin() {
 	string hostID, hostPass;
@@ -324,10 +298,10 @@ void hostMenu()
 			break;
 		case '2':
 			//userlist
-			userlist();
+			userlist(Student);
 			break;
 		case '3':
-			hostCommentMenu();
+			hostCommentMenu(comments, commentCount);
 			break;//Trang
 		case '4':
 			cout << "Exiting to Welcoming Surface..." << endl;
@@ -350,8 +324,7 @@ void userMenu(int index) {
 	while (true) {
 		system("cls");
 		cout << "User Menu\n";
-		//cout << "=========\n";
-		userinfo(Student, index);
+		cout << "=========\n";
 		cout << "1. Test 1\n";
 		cout << "2. Test 2 \n";
 		cout << "3. Notes \n";
@@ -373,11 +346,11 @@ void userMenu(int index) {
 			sim();
 			break;
 		case 5:
-			studentCommentMenu(index);
+			studentCommentMenu(comments, commentCount, Student, index);
 			break;
 		case 0:
 			cout << "You have been logged out..." << endl;
-			saveComments();//Trang
+			saveComments(comments, commentCount);//Trang
 			Sleep(1000);
 			return;
 		default:
@@ -859,7 +832,6 @@ void Test2_quizz(float* answer, int index) {
 	Student[index].attempt_Test2 = true;
 	cout << "You have submitted the Test 2. Your total score is " << Student[index].result_Test2 << " Out of " << ansnum << "." << endl;
 	savefile(Student, "Userlist");
-	cin.ignore();
 	waitEnter("return menu");
 }
 
@@ -910,7 +882,6 @@ void sim()
 		cout << "\nSelect the type of simulator\na.Clipper\nb.Clamper\nc.DC(Voltage divider bias)\nd.DC(base bias)\ne.AC\nf.JFET Drain Current\n"
 			<< "g.JFET\nh.MOSFET\n" << "i.non inverting\nj.Voltage follower\nk.inverting amplifier\n0.return:";
 		cin >> opt_simulator;
-		system("cls");
 		opt_simulator = tolower(opt_simulator);
 		switch (opt_simulator)
 		{
@@ -1023,22 +994,14 @@ void loaduserdata() {
 }
 
 int getinfo(User Student[]) {
-	bool IDvalid, IDdigits, IDexists;
-	loaduserdata();
-	cout << "Enter your name :";
+	bool IDvalid, IDdigits;
+	cout << "Enter your name:";
 	cin.ignore();
 	getline(cin, Student[userindex].Name);
-	while (Student[userindex].Name.length() == 0) {
-		cout << "Name too short\n";
-		cout << "Enter your name: ";
-		getline(cin, Student[userindex].Name);
-	}
 	do {
-		IDvalid = false, IDdigits = true, IDexists = false;
-		cout << "Enter your Student ID [0 to return]: ";
+		IDvalid = false, IDdigits = true;
+		cout << "Enter your Student ID:";
 		getline(cin, Student[userindex].ID);
-		if (Student[userindex].ID == "0")
-			return -1;
 		if (Student[userindex].ID.length() != 7) {
 			cout << "Error: Student ID must be exactly 7 digits long.\n";
 			continue;
@@ -1057,16 +1020,6 @@ int getinfo(User Student[]) {
 			cout << "Error: Student ID must not be empty.\n";
 			continue;
 		}
-		for (int inList = 0; inList < userindex; inList++) {
-			if (Student[userindex].ID == Student[inList].ID) {
-				IDexists = true;
-				break;
-			}
-		}
-		if (IDexists) {
-			cout << "Error: Student ID already exists \n";
-			continue;
-		}
 		IDvalid = true;
 	} while (!IDvalid);
 	cout << "Enter your password: ";
@@ -1075,7 +1028,7 @@ int getinfo(User Student[]) {
 	savefile(Student, "Userlist");
 	return userindex - 1;
 }
-void userlist() {
+void userlist(User Student[]) {
 	system("cls");
 	cout << "================================================\n";
 	cout << "     Basic Electronic UGEA1313: User List\n";
@@ -1084,13 +1037,12 @@ void userlist() {
 		cout << "NO student registered yet.\n";
 	}
 	else {
-		cout << setw(4) << right << "No." << setw(5) << right << "Name" << setw(29) << right <<
-			"| Student ID" << " | Test 1 (7.00)" << " | Test 2 (23)" << " | Total (30.00)" << endl;
 		cout << string(90, '-') << endl;
 		for (int i = 0; i < userindex; i++) {
-			cout << setw(3) << right << i + 1 << ". " << left << setw(20) << Student[i].Name <<
-				" | " << Student[i].ID << setw(6) << right << " | " << fixed << setprecision(2) << Student[i].result_Test1 << setw(12) << right <<
-				" | " << Student[i].result_Test2 << setw(13) << right << " | " << fixed << setprecision(2) << Student[i].result_Test1 + Student[i].result_Test2 << endl;
+			cout << setw(3) << right << i + 1 << ". " << "Name: " << left << setw(20) << Student[i].Name <<
+				" | Student ID: " << setw(7) << Student[i].ID <<
+				" | Test 1: " << fixed << setprecision(2) << Student[i].result_Test1 << "/7.00" <<
+				" | Test 2: " << setw(2) << right << Student[i].result_Test2 << "/23" << endl;
 
 		}
 		cout << string(90, '-') << endl;
@@ -1098,20 +1050,6 @@ void userlist() {
 	cin.ignore();
 	waitEnter("return menu");
 	system("cls");
-}
-void userinfo(User Student[], int index) {
-	for (int width = 0; width <= 78; width++) {
-		cout << "-";
-	}
-	cout << "\n";
-	cout << setw(3) << "Name: " << left << setw(20) << Student[index].Name <<
-		" | Student ID: " << setw(7) << Student[index].ID <<
-		" | Test 1: " << Student[index].result_Test1 <<
-		" | Test 2: " << Student[index].result_Test2 << endl;
-	for (int width = 0; width <= 78; width++) {
-		cout << "-";
-	}
-	cout << "\n";
 }
 
 void savefile(User* Student, string name) {
@@ -1449,7 +1387,7 @@ void Test1_quizz(int index)
 	int Num = 1, score = 0;
 	char ans;
 	system("cls");
-	cout << "Test 1 (Objective: 7%)\n";
+	cout << "Test 1 (Ojective: 7%)\n";
 	cout << "=====================\n";
 	if (Student[index].attempt_Test1)
 	{
@@ -1796,141 +1734,157 @@ void LoadTest1()
 }
 //Trang edit comment fuction
 //menu
-void hostCommentMenu() {
-	char choice;
+void hostCommentMenu(Comment comments[], int& count) {
+	int choice;
 	system("cls");
 	do {
-		cout << "Host Comment Menu\n";
-		cout << "=================\n";
+		cout << "\n--- Host Comment Menu ---\n";
 		cout << "1. Show All Comments\n";
 		cout << "2. Create Notification\n";
 		cout << "3. Reply to Student Comment\n";
 		cout << "4. Delete Comment\n";
 		cout << "0. Return\n";
-		cout << "Choice (0~4): ";
-		cin >> choice;
 
+		while (true) {
+			cout << "Choice (0~4): ";
+			cin >> choice;
 
+			if (cin.fail()) {
+				cin.clear();
+				cin.ignore(100, '\n');
+				cout << "Invalid input! Please enter a number 0~4.\n";
+
+			}
+			else if (choice < 0 || choice > 4) {
+				cout << "Invalid choice! Please enter 0~4.\n";
+			}
+			else {
+				break;
+			}
+		}
 
 		switch (choice) {
-		case '0':
+		case 0:
 			cout << "Returning...";
 			Sleep(1000);
 			system("cls");
 			break;
-		case '1'://done
+		case 1://done
 			system("cls");
-			showAllComments();
-			cin.ignore();
+			showAllComments(comments, count);
+
+			break;
+		case 2:
+			system("cls");
+			createNotification(comments, count);
 			waitEnter("return menu");
 			system("cls");
 			break;
-		case '2':
+		case 3:
 			system("cls");
-			createNotification();
-			waitEnter("return menu");
-			system("cls");
-			break;
-		case '3':
-			system("cls");
-			replyToComment();
+			replyToComment(comments, count);
 			system("cls");
 			break;
-		case '4':
+		case 4:
 			system("cls");
-			deleteComment();
-			cin.ignore();
-			system("cls");
+			deleteComment(comments, count);
 			break;
-		default:
-			cout << "Invalid data please input (0-4).\n";
-			cin.ignore();
-			waitEnter("continue");
-			system("cls");
 		}
-	} while (choice != '0');
+	} while (choice != 0);
 }
-void studentCommentMenu(int index)
+void studentCommentMenu(Comment comments[], int& count, User Student[], int index)
 {
-	char option;
+	int option;
 	do {
 
 		cout << "\n--- Student Comment Menu ---\n";
-		cout << "1. Show All Comments\n";
+		cout << "1. Show All Comments and Reply\n";
 		cout << "2. Create a Comment\n";
 		cout << "0. Return\n";
 		cout << "Choice: ";
-		cin >> option;
+
+		while (true) {
+			cout << "Choice (0~2): ";
+			cin >> option;
+
+			if (cin.fail()) {
+				cin.clear();
+				cin.ignore(100, '\n');
+				cout << "Invalid input! Please enter a number 0~2.\n";
+			}
+			else if (option < 0 || option > 2) {
+				cout << "Invalid choice! Please enter 0~2.\n";
+			}
+			else {
+				break;
+			}
+		}
+
 		switch (option) {
-		case '1':
-			showAllComments();
+		case 1:
+			showAllComments(comments, count);
 			break;
-		case '2':
+		case 2:
 			system("cls");
-			createStudentComment(index);
+			createStudentComment(comments, count, Student, index);
 			waitEnter("return menu");
 			system("cls");
 			break;
-		case '0': cout << "Returning...\n";
+		case 0: cout << "Returning...\n";
 			Sleep(1000);
 			system("cls");
 			break;
-		default:
-			cout << "Invalid input! Please enter a number 0~2.\n";
 		}
-	} while (option != '0');
+	} while (option != 0);
 
 }
 //create
-void createNotification() {
-	cout << "Create notification\n";
-	cout << "===================\n";
-	if (commentCount >= MAX_COMMENTS) {
+void createNotification(Comment comments[], int& count) {
+	if (count >= MAX_COMMENTS) {
 		cout << "Comment list is full!" << endl;
 		return;
 	}
 	cin.ignore();
 	cout << "Enter your comment (as host): ";
-	getline(cin, comments[commentCount].text);
+	getline(cin, comments[count].text);
 
-	comments[commentCount].studentID = "";
-	comments[commentCount].fromHost = true;
-	comments[commentCount].hostReply = "";
-	comments[commentCount].deleted = false;
+	comments[count].studentID = "";
+	comments[count].fromHost = true;
+	comments[count].hostReply = "";
+	comments[count].deleted = false;
 
 	cout << "Host comment saved!" << endl;
-	commentCount++;
-	saveComments();
+	count++;
+	saveComments(comments, count);
 }
-void createStudentComment(int index) {
-	cout << "Create Student Comment\n";
-	cout << "======================\n";
-	if (commentCount >= MAX_COMMENTS) {
+void createStudentComment(Comment comments[], int& count, User Student[], int index) {
+	if (count >= MAX_COMMENTS) {
 		cout << "Comment list is full!" << endl;
 		return;
 	}
 	cin.ignore();
 	cout << "Enter your comment: ";
-	getline(cin, comments[commentCount].text);
-	comments[commentCount].studentID = Student[index].ID;
-	comments[commentCount].fromHost = false;
-	comments[commentCount].hostReply = "";
-	comments[commentCount].deleted = false;
+	getline(cin, comments[count].text);
+
+	comments[count].studentID = Student[index].ID;
+	comments[count].fromHost = false;
+	comments[count].hostReply = "";
+	comments[count].deleted = false;
 
 	cout << "Comment saved! (Student ID: " << Student[index].ID << ")" << endl;//can save student id
-	commentCount++;
-	saveComments();
+	count++;
+	saveComments(comments, count);
 }
 
-void showAllComments() {
-	cout << "******* Comment List *******\n";
-	if (commentCount == 0) {
+void showAllComments(Comment comments[], int count) {
+	cout << "\n======= Comment List =======\n";
+	if (count == 0) {
 		cout << "No comments yet.\n";
 	}
 
 	else
 	{
-		for (int i = 0; i < commentCount; i++) {
+		for (int i = 0; i < count; i++) {
 			if (!comments[i].deleted) {
 				cout << "Comment #" << i << endl;
 				if (comments[i].fromHost) {
@@ -1948,23 +1902,23 @@ void showAllComments() {
 			}
 		}
 	}
-	cout << string(28, '*') << "\n";
+	cout << "============================\n";
 }
-void replyToComment() {
-	cout << "Reply Comment\n";
-	cout << "=============\n";
-	if (commentCount == 0) {
+void replyToComment(Comment comments[], int count) {
+	if (count == 0) {
 		cout << "No comments to reply.\n";
 		waitEnter("return menu");
 		return;
 	}
 
-	while (true) {
-		showAllComments();
+	char reply = 'Y';
+
+	while (toupper(reply) == 'Y') {
+		showAllComments(comments, count);
 
 		int index;
 		while (true) {
-			cout << "Enter the comment number to reply (999 to cancel): ";
+			cout << "Enter the comment number to reply: ";
 			cin >> index;
 
 			if (cin.fail()) {
@@ -1973,14 +1927,13 @@ void replyToComment() {
 				cout << "Invalid input.Please enter a valid number.\n";
 				continue;
 			}
-
-			if ((index < 0 || index >= commentCount) && index != 999) {
+			if (index < 0 || index >= count) {
 				cout << "Invalid comment index! Please try again.\n";
 				continue;
 			}
 			break;
 		}
-		if (index == 999)break;
+
 		if (!comments[index].hostReply.empty()) {
 			cout << "Already replied.\n";
 		}
@@ -1990,11 +1943,10 @@ void replyToComment() {
 			getline(cin, comments[index].hostReply);
 
 			cout << "Reply added successfully.\n";
-			saveComments();
+			saveComments(comments, count);
 		}
 
 
-		/*
 		while (true) {
 
 			cout << "Do you want to continue replying? (Y/N): ";
@@ -2009,20 +1961,17 @@ void replyToComment() {
 			}
 
 		}
-		*/
 	}
 }
 
 //delete comment function
-void deleteComment() {
-	cout << "Delete Comment\n";
-	cout << "==============\n";
-	if (commentCount == 0) {
+void deleteComment(Comment comments[], int& count) {
+	if (count == 0) {
 		cout << "No comments to delete.\n";
 		return;
 	}
 
-	showAllComments();
+	showAllComments(comments, count);
 
 	int index;
 	while (true) {
@@ -2035,54 +1984,62 @@ void deleteComment() {
 			cout << "Invalid input.Please enter a valid number.\n";
 			continue;
 		}
-		if (index < 0 || index >= commentCount) {
+		if (index < 0 || index >= count) {
 			cout << "Invalid comment index! Please try again.\n";
 			continue;
 		}
 		break;
 	}
 
-	char choice;
+	int choice;
 	cout << "\nWhat do you want to delete?\n";
 	cout << "1. Entire comment\n";
 	cout << "2. Host reply\n";
 	cout << "3. Cancel\n";
-	do {
-		cout << "Choice (1~3): ";
+	cout << "Choice (1~3): ";
+
+	while (true) {
 		cin >> choice;
-
-		switch (choice) {
-		case '1':
-			deleteEntireComment(index);
-			break;
-		case '2':
-			deleteHostReply(index);
-			break;
-		case '3':
-			cout << "Delete cancelled.\n";
-			cin.ignore();
-			waitEnter("return menu");
-			break;
-		default:
-			cout << "Invalid input.Please Enter (1-3).\n";
+		if (cin.fail()) {
+			cin.clear();
+			cin.ignore(100, '\n');
+			cout << "Invalid input! Please enter a number 1~3.\n";
+			continue;
 		}
-	} while (choice != '3');
+		if (choice < 1 || choice > 3) {
+			cout << "Invalid choice! Please enter 1~3.\n";
+			continue;
+		}
+		break;
+	}
 
+	switch (choice) {
+	case 1:
+		deleteEntireComment(comments, count, index);
+		break;
+	case 2:
+		deleteHostReply(comments, count, index);
+		break;
+	case 3:
+		cout << "Delete cancelled.\n";
+		waitEnter("return menu");
+		break;
+	}
 }
-void deleteEntireComment(int index) {
-	for (int i = index; i < commentCount - 1; i++) {
+void deleteEntireComment(Comment comments[], int& count, int index) {
+	for (int i = index; i < count - 1; i++) {
 		comments[i] = comments[i + 1];
 	}
-	comments[commentCount - 1] = {};
-	commentCount--;
+	comments[count - 1] = {};
+	count--;
 	cout << "Comment deleted successfully.\n";
-	saveComments();
+	saveComments(comments, count);
 }
-void deleteHostReply(int index) {
+void deleteHostReply(Comment comments[], int count, int index) {
 	if (!comments[index].hostReply.empty()) {
 		comments[index].hostReply.clear();
 		cout << "Host reply deleted successfully.\n";
-		saveComments();
+		saveComments(comments, count);
 	}
 	else {
 		cout << "This comment has no host reply.\n";
@@ -2090,13 +2047,13 @@ void deleteHostReply(int index) {
 	}
 }
 
-void saveComments() {
+void saveComments(Comment comments[], int count) {
 	fstream file("Comments", ios::out);
 	if (!file.is_open()) {
 		cout << "Error saving comments.\n";
 		return;
 	}
-	for (int i = 0; i < commentCount; i++) {
+	for (int i = 0; i < count; i++) {
 		if (!comments[i].deleted) {
 
 			file << comments[i].fromHost << endl;
@@ -2108,7 +2065,7 @@ void saveComments() {
 	file.close();
 	cout << "Comments saved successfully." << endl;
 }
-void loadComments() {
+void loadComments(Comment comments[], int& count) {
 	fstream file("Comments", ios::in);
 	if (!file.is_open()) {
 		cout << "Starting fresh.\n";
@@ -2116,24 +2073,23 @@ void loadComments() {
 	}
 
 	string line;
-	commentCount = 0;
+	count = 0;
 	while (getline(file, line)) {
 		if (line.empty()) continue;
-		comments[commentCount].fromHost = (line == "1" || line == "true");
+		comments[count].fromHost = (line == "1" || line == "true");
 
-		if (!getline(file, comments[commentCount].studentID)) break;
-		if (!getline(file, comments[commentCount].text)) break;
-		if (!getline(file, comments[commentCount].hostReply)) break;
+		if (!getline(file, comments[count].studentID)) break;
+		if (!getline(file, comments[count].text)) break;
+		if (!getline(file, comments[count].hostReply)) break;
 
-		comments[commentCount].deleted = false;
-		commentCount++;
-		if (commentCount >= MAX_COMMENTS) break;
+		comments[count].deleted = false;
+		count++;
+		if (count >= MAX_COMMENTS) break;
 	}
 
 	file.close();
 }
 
-//Case 1 (for simulator)
 void clipper()
 {
 	float Vin, Vd, Vout;
@@ -2144,7 +2100,7 @@ void clipper()
 	cout << "   ------------------------------                   ------------------------------    \n";
 	cout << "   |                            |                   |                            |    \n";
 	cout << "   |                         -------                |                          -----  \n";
-	cout << "   |                           / \\  Vd             |                          \\  /   Vd\n";
+	cout << "   |                           / \\  Vd=0.7V        |                          \\  /   Vd\n";
 	cout << "   |                          /   \\                |                           \\/   \n";
 	cout << "  Vin                         -----                Vin                        ------- \n";
 	cout << "   |                            |                   |                            |    \n";
@@ -2161,7 +2117,7 @@ void clipper()
 	{
 		do
 		{
-			cout << "Choose what you want to calculate for clipper: \nEnter '+' for positive\n'-' for negative\n'.' for return: ";
+			cout << "Choose what you want to calculate for clipper: \nEnter '+' for positive\n'-' for negative\n'.' for return:\n";
 			cin >> polar;
 
 			if (polar != '+' && polar != '-' && polar != '.')
@@ -2172,7 +2128,7 @@ void clipper()
 		if (polar == '+')
 		{
 			cout << "\nPositive clipper. " << endl;
-			cout << "Choose what you want to calculate: \n1.Vout (Positive half cycle)\n2.Vout (Negative half cycle): ";
+			cout << "Choose what you want to calculate: \n1.Vout (Positive half cycle)\n2.Vout (Negative half cycle):\n";
 			cin >> opt_clipper;
 			switch (opt_clipper)
 			{
@@ -2214,7 +2170,7 @@ void clipper()
 		else if (polar == '-')
 		{
 			cout << "\nNegative clipper. " << endl;
-			cout << "Choose what you want to calculate: \n1. Vout (Positive half cycle)\n2. Vout (Negative half cycle): ";
+			cout << "Choose what you want to calculate: \n1. Vout (Positive half cycle)\n2. Vout (Negative half cycle):\n";
 			cin >> opt_clipper;
 			switch (opt_clipper)
 			{
@@ -2275,7 +2231,7 @@ void clamper()
 	cout << "   -------)|--------------------------------o +                -------|(--------------------------------o +\n";
 	cout << "   |      Vc    |               |                              |      Vc    |               |\n";
 	cout << "   |          -----             |                              |           ---              |\n";
-	cout << "   |           / \\  Vd         |                              |          \\ /  Vd          |" << endl;
+	cout << "   |           / \\  Vd          |                              |           \\ /  Vd          |" << endl;
 	cout << "   |           ---              |                              |          -----             |\n";
 	cout << "  Vin           |               RL         Vout               Vin           |               RL         Vout\n";
 	cout << "   |           ---              |                              |            -               |\n";
@@ -2288,7 +2244,7 @@ void clamper()
 	cout << "   -------)|--------------------------------o +                -------|(--------------------------------o +\n";
 	cout << "   |      Vc    |               |                              |      Vc    |               |\n";
 	cout << "   |          -----             |                              |           ---              |\n";
-	cout << "   |           / \\  Vd         |                              |          \\ /  Vd          |" << endl;
+	cout << "   |           / \\  Vd          |                             |           \\ /  Vd         |" << endl;
 	cout << "   |           ---              |                              |          -----             |\n";
 	cout << "  Vin           |               RL         Vout               Vin           |               RL         Vout\n";
 	cout << "   |            |               |                              |            |               |\n";
@@ -2299,7 +2255,7 @@ void clamper()
 	{
 		do
 		{
-			cout << "Choose what you want to calculate for clamper: \nEnter '+' for positive\n'-' for negative\n'.' for return: ";
+			cout << "Choose what you want to calculate for clamper: \nEnter '+' for positive\n'-' for negative\n'.' for return:\n";
 			cin >> polar;
 			if (polar != '+' && polar != '-' && polar != '.')
 			{
@@ -2310,19 +2266,19 @@ void clamper()
 		if (polar == '+')
 		{
 			cout << "Positive clamper." << endl;
-			cout << "Choose what you want to calculate: \n1.Vc\n2.Vout(+ve half cycle)\n3.Vout(-ve half cycle): ";
+			cout << "Choose what you want to calculate: \n1.Vc\n2.Vout(+ve half cycle)\n3.Vout(-ve half cycle):\n";
 			cin >> opt_clamper;
 			switch (opt_clamper)
 			{
 			case '1':
 				cout << "Vc = Vin - Vd + Vbias" << endl;
-				cout << "Enter the value of Vin (in Volt): ";
+				cout << "Enter the value of Vin (in Volt):";
 				cin >> Vin;
 
-				cout << "Enter the value of Vd (in Volt): ";
+				cout << "Enter the value of Vd (in Volt):";
 				cin >> Vd;
 
-				cout << "Enter the value of Vbias (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout): ";
+				cout << "Enter the value of Vbias (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
 				cin >> Vbias;
 
 				Vc = Vin - Vd + Vbias;
@@ -2335,9 +2291,9 @@ void clamper()
 
 			case '2':
 				cout << "Vout(+ve half cycle) = Vc + Vin" << endl;
-				cout << "Enter the value of Vc (in Volt): ";
+				cout << "Enter the value of Vc (in Volt):";
 				cin >> Vc;
-				cout << "Enter the value of Vin (in Volt): ";
+				cout << "Enter the value of Vin (in Volt):";
 				cin >> Vin;
 				Vout = Vc + Vin;
 
@@ -2350,10 +2306,10 @@ void clamper()
 			case '3':
 				cout << "Vout(-ve half cycle) = -Vd + Vbias" << endl;
 
-				cout << "Enter the value of Vd (in Volt): ";
+				cout << "Enter the value of Vd (in Volt):";
 				cin >> Vd;
 
-				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout): ";
+				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
 				cin >> Vbias;
 				Vout = -Vd + Vbias;
 
@@ -2371,19 +2327,19 @@ void clamper()
 		else if (polar == '-')
 		{
 			cout << "Negative clamper." << endl;
-			cout << "Choose what you want to calculate: \n1.Vc\n2.Vout(+ve half cycle)\n3.Vout(-ve half cycle): ";
+			cout << "Choose what you want to calculate: \n1.Vc\n2.Vout(+ve half cycle)\n3.Vout(-ve half cycle):\n";
 			cin >> opt_clamper;
 			switch (opt_clamper)
 			{
 			case '1':
 				cout << "Vc = Vin - Vd - Vbias" << endl;
-				cout << "Enter the value of Vin (in Volt): ";
+				cout << "Enter the value of Vin (in Volt):";
 				cin >> Vin;
 
-				cout << "Enter the value of Vd (in Volt): ";
+				cout << "Enter the value of Vd (in Volt):";
 				cin >> Vd;
 
-				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout): ";
+				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
 				cin >> Vbias;
 
 				Vc = Vin - Vd - Vbias;
@@ -2396,10 +2352,10 @@ void clamper()
 
 			case '2':
 				cout << "Vout(+ve half cycle) = Vd + Vbias" << endl;
-				cout << "Enter the value of Vd (in Volt): ";
+				cout << "Enter the value of Vd (in Volt):";
 				cin >> Vd;
 
-				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout): ";
+				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
 				cin >> Vbias;
 
 				Vout = Vd + Vbias;
@@ -2412,10 +2368,10 @@ void clamper()
 
 			case '3':
 				cout << "Vout(-ve half cycle) = -Vc - Vin" << endl;
-				cout << "Enter the value of Vc (in Volt): ";
+				cout << "Enter the value of Vc (in Volt):";
 				cin >> Vc;
 
-				cout << "Enter the value of Vin (in Volt): ";
+				cout << "Enter the value of Vin (in Volt):";
 				cin >> Vin;
 
 				Vout = -Vc - Vin;
@@ -2472,7 +2428,7 @@ void BJT_Voltage_divider()
 	while (true)
 	{
 		cout << "\nChoose what you want to calculate:\n";
-		cout << "1. RIN_base and R2_total\n2. VB\n3. IC\n4. VCE\n5. return: ";
+		cout << "1. RIN_base and R2_total\n2. VB\n3. IC\n4. VCE\n5. return:\n";
 		cin >> calculate;
 		cout << endl;
 
@@ -2601,7 +2557,7 @@ void BJT_base()
 	while (true)
 	{
 		cout << "\nChoose what you want to calculate:\n";
-		cout << "1. VCE\n2. return: ";
+		cout << "1. VCE\n2. return:\n";
 		cin >> calculate;
 		cout << endl;
 
@@ -2670,7 +2626,7 @@ void BJT_AC()
 	while (true)
 	{
 		cout << "\nChoose what you want to calculate:\n";
-		cout << "1. Rin_base\n2. Rin_total\n3. VB\n4. IE\n5. re\n6. AV\n7. return: ";
+		cout << "1. Rin_base\n2. Rin_total\n3. VB\n4. IE\n5. re\n6. AV\n7. return:\n";
 		cin >> calculate;
 		cout << endl;
 
@@ -2802,7 +2758,7 @@ void jfet_DrainCurrent()
 
 	while (true)
 	{
-		cout << "\nEnter the calculator you want to use: \n1. drain current\n2. transconductance\n3. return: ";
+		cout << "Enter the calculator you want to use: \n1. drain current\n2. transconductance\n3. return:\n";
 		cin >> option;
 		switch (option)
 		{
@@ -2821,7 +2777,7 @@ void jfet_DrainCurrent()
 				cout << "Vgs_off (in Volt) [it should be a -ve Voltage]: ";
 				cin >> Vgs_off;
 
-				cout << "Vgs (in Volt) [it should be a -ve Voltage]: ";
+				cout << "Vgs (in Volt) [it should be a -ve Voltage]    : ";
 				cin >> Vgs;
 
 				if (Vgs_off > 0 || Vgs > 0)
@@ -2854,7 +2810,7 @@ void jfet_DrainCurrent()
 				cout << "Vgs_off (in Volt) [it should be a -ve Voltage]: ";
 				cin >> Vgs_off;
 
-				cout << "Vgs (in Volt) [it should be a -ve Voltage]: ";
+				cout << "Vgs (in Volt) [it should be a -ve Voltage]    : ";
 				cin >> Vgs;
 
 				if (Vgs_off > 0 || Vgs > 0)
@@ -2913,7 +2869,7 @@ void jfet()
 
 	while (true)
 	{
-		cout << "Enter the calculator you want to use: \n1. drain-source voltage\n2. return: ";
+		cout << "Enter the calculator you want to use: \n1. drain-source voltage\n2. return:\n";
 		cin >> option;
 		switch (option)
 		{
@@ -2987,7 +2943,7 @@ void mosfet()
 
 	while (true)
 	{
-		cout << "Enter the calculator you want to use: \n1. drain-source voltage\n2. return: ";
+		cout << "Enter the calculator you want to use: \n1. drain-source voltage\n2. return:\n";
 		cin >> option;
 		switch (option)
 		{
@@ -3073,15 +3029,15 @@ void non_inverting()
 		cout << "3. Zin(NI) = (1+ Aol*B) * Zin\n";
 		cout << "4. Zout(NI) =  Zout / (1 + Aol * B)\n";
 		cout << "5. Return.\n";
-		cout << "Enter your choice (1-5): ";
+		cout << "Enter your choice (1-5):\n";
 		cin >> opt;
 
 		if (opt == '1')
 		{
 			cout << "1. Acl(NI) = 1 + (Rf/Ri) \n";
-			cout << "Enter the value of Rf (in Ohm): ";
+			cout << "Enter the value of Rf (in Ohm): \n";
 			cin >> Rf_NI;
-			cout << "Enter the value of Ri (in Ohm): ";
+			cout << "Enter the value of Ri (in Ohm): \n";
 			cin >> Ri_NI;
 			Acl_NI = 1 + (Rf_NI / Ri_NI);
 
@@ -3094,9 +3050,9 @@ void non_inverting()
 		else if (opt == '2')
 		{
 			cout << "2. B = Ri / (Ri + Rf)\n";
-			cout << "Enter the value of Rf (in Ohm): ";
+			cout << "Enter the value of Rf (in Ohm): \n";
 			cin >> Rf_NI;
-			cout << "Enter the value of Ri (in Ohm): ";
+			cout << "Enter the value of Ri (in Ohm): \n";
 			cin >> Ri_NI;
 			B = Ri_NI / (Ri_NI + Rf_NI);
 
@@ -3108,11 +3064,11 @@ void non_inverting()
 		else if (opt == '3')
 		{
 			cout << "3. Zin(NI) = (1+ Aol*B) * Zin\n";
-			cout << "Enter the value of B : ";
+			cout << "Enter the value of B : \n";
 			cin >> B;
-			cout << "Enter the value of Aol : ";
+			cout << "Enter the value of Aol : \n";
 			cin >> Aol;
-			cout << "Enter the value of Zin (in Ohm): ";
+			cout << "Enter the value of Zin (in Ohm): \n";
 			cin >> Zin;
 			Zin_NI = (1 + Aol * B) * Zin;
 
@@ -3125,11 +3081,11 @@ void non_inverting()
 		else if (opt == '4')
 		{
 			cout << "4.Zout(NI) =  Zout / (1 + Aol * B)\n";
-			cout << "Enter the value of Zout (in Ohm): ";
+			cout << "Enter the value of Zout (in Ohm): \n";
 			cin >> Zout;
-			cout << "Enter the value of Aol: ";
+			cout << "Enter the value of Aol: \n";
 			cin >> Aol;
-			cout << "Enter the value of B: ";
+			cout << "Enter the value of B: \n";
 			cin >> B;
 			Zout_NI = Zout / (1 + Aol * B);
 
@@ -3185,17 +3141,17 @@ void VoltageFollower()
 		cout << "1. Zin(VF) = (1+ Aol*B) * Zin\n";
 		cout << "2. Zout(VF) =  Zout / (1 + Aol)\n";
 		cout << "3. Return.\n";
-		cout << "Enter your choice (1-3): ";
+		cout << "Enter your choice (1-3):\n";
 		cin >> opt;
 
 		if (opt == '1')
 		{
 			cout << "1. Zin(VF) = (1+ Aol*B) * Zin\n";
-			cout << "Enter the value of B: ";
+			cout << "Enter the value of B: \n";
 			cin >> B;
-			cout << "Enter the value of Aol: ";
+			cout << "Enter the value of Aol: \n";
 			cin >> Aol;
-			cout << "Enter the value of Zin (in Ohm): ";
+			cout << "Enter the value of Zin (in Ohm): \n";
 			cin >> Zin;
 			Zin_VF = (1 + Aol * B) * Zin;
 
@@ -3206,9 +3162,9 @@ void VoltageFollower()
 		else if (opt == '2')
 		{
 			cout << "2.Zout(VF) =  Zout / (1 + Aol)\n";
-			cout << "Enter the value of Zout (in Ohm): ";
+			cout << "Enter the value of Zout (in Ohm): \n";
 			cin >> Zout;
-			cout << "Enter the value of Aol: ";
+			cout << "Enter the value of Aol: \n";
 			cin >> Aol;
 			Zout_VF = Zout / (1 + Aol);
 
@@ -3260,15 +3216,15 @@ void invertingAmplifier()
 		cout << "1. Acl(I)= - (Rf/Ri)\n";
 		cout << "2. Zin(I) = Ri \n";
 		cout << "3. Return.\n";
-		cout << "Enter your choice (1-3): ";
+		cout << "Enter your choice (1-3):\n";
 		cin >> opt;
 
 		if (opt == '1')
 		{
 			cout << "1. Acl(I)= - (Rf/Ri)\n";
-			cout << "Enter the value of Rf (in Ohm): ";
+			cout << "Enter the value of Rf (in Ohm): \n";
 			cin >> Rf_I;
-			cout << "Enter the value of Ri (in Ohm): ";
+			cout << "Enter the value of Ri (in Ohm): \n";
 			cin >> Ri_I;
 			Acl_I = -(Rf_I / Ri_I);
 
@@ -3278,7 +3234,7 @@ void invertingAmplifier()
 		else if (opt == '2')
 		{
 			cout << "2. Zin(I) = Ri \n";
-			cout << "Enter the value of Ri: ";
+			cout << "Enter the value of Ri: \n";
 			cin >> Ri_I;
 
 			cout << "Zin(I) = Ri\n";
@@ -3299,7 +3255,7 @@ void invertingAmplifier()
 	}
 }
 
-//notes for chapter 1
+
 void notes_Diode()
 {
 	system("cls");
@@ -3452,7 +3408,7 @@ void notes_Diode()
 	system("cls");
 }
 
-// notes for chapter 2
+// note for chapter 2
 void notes_BJT()
 {
 	char study_analysis;
@@ -3922,7 +3878,7 @@ void notes_FET()
 	system("cls");
 }
 
-//notes for chapter 4
+
 void notes_OA() {
 	system("cls");
 	cout << "\n --------------------------------------" << endl;
@@ -4023,6 +3979,9 @@ void notes_OA() {
 	system("cls");
 }
 
+
+
+
 void charValidation(char* input, int option) {
 	char temInput = toupper(*input);
 	if (option == 1) //check Y/N
@@ -4053,4 +4012,6 @@ void waitEnter(string action)
 	string dummy;
 	cout << "\nPress ENTER to " << action << " ~~~\n\n";
 	getline(cin, dummy);
+
+
 }
