@@ -226,7 +226,7 @@ bool userLogin(int* index) {
 			cout << "Your ID does not exist. Returning to home page...\n";
 			return false;
 		}
-	
+
 	}
 
 	else if (option == 2) {
@@ -2133,6 +2133,7 @@ void loadComments() {
 	file.close();
 }
 
+//Case 1 (for simulator)
 void clipper()
 {
 	float Vin, Vd, Vout;
@@ -2143,7 +2144,7 @@ void clipper()
 	cout << "   ------------------------------                   ------------------------------    \n";
 	cout << "   |                            |                   |                            |    \n";
 	cout << "   |                         -------                |                          -----  \n";
-	cout << "   |                           / \\  Vd=0.7V        |                          \\  /   Vd\n";
+	cout << "   |                           / \\  Vd             |                          \\  /   Vd\n";
 	cout << "   |                          /   \\                |                           \\/   \n";
 	cout << "  Vin                         -----                Vin                        ------- \n";
 	cout << "   |                            |                   |                            |    \n";
@@ -2160,18 +2161,19 @@ void clipper()
 	{
 		do
 		{
-			cout << "Choose what you want to calculate for clipper: \nEnter '+' for positive\n'-' for negative\n'.' for return:\n";
+			while (cin.peek() != '/n') { cin.ignore(1); }
+			cout << "Choose what you want to calculate for clipper: \nEnter '+' for positive\n'-' for negative\n'.' for return: ";
 			cin >> polar;
 
 			if (polar != '+' && polar != '-' && polar != '.')
 				cout << "INPUT ERROR! Enter '+', '-' or '.' !";
-
+			
 		} while (polar != '+' && polar != '-' && polar != '.');
 
 		if (polar == '+')
 		{
 			cout << "\nPositive clipper. " << endl;
-			cout << "Choose what you want to calculate: \n1.Vout (Positive half cycle)\n2.Vout (Negative half cycle):\n";
+			cout << "Choose what you want to calculate: \n1.Vout (Positive half cycle)\n2.Vout (Negative half cycle): ";
 			cin >> opt_clipper;
 			switch (opt_clipper)
 			{
@@ -2213,7 +2215,7 @@ void clipper()
 		else if (polar == '-')
 		{
 			cout << "\nNegative clipper. " << endl;
-			cout << "Choose what you want to calculate: \n1. Vout (Positive half cycle)\n2. Vout (Negative half cycle):\n";
+			cout << "Choose what you want to calculate: \n1. Vout (Positive half cycle)\n2. Vout (Negative half cycle): ";
 			cin >> opt_clipper;
 			switch (opt_clipper)
 			{
@@ -2274,7 +2276,7 @@ void clamper()
 	cout << "   -------)|--------------------------------o +                -------|(--------------------------------o +\n";
 	cout << "   |      Vc    |               |                              |      Vc    |               |\n";
 	cout << "   |          -----             |                              |           ---              |\n";
-	cout << "   |           / \\  Vd          |                              |           \\ /  Vd          |" << endl;
+	cout << "   |           / \\  Vd         |                              |          \\ /  Vd          |" << endl;
 	cout << "   |           ---              |                              |          -----             |\n";
 	cout << "  Vin           |               RL         Vout               Vin           |               RL         Vout\n";
 	cout << "   |           ---              |                              |            -               |\n";
@@ -2287,7 +2289,7 @@ void clamper()
 	cout << "   -------)|--------------------------------o +                -------|(--------------------------------o +\n";
 	cout << "   |      Vc    |               |                              |      Vc    |               |\n";
 	cout << "   |          -----             |                              |           ---              |\n";
-	cout << "   |           / \\  Vd          |                             |           \\ /  Vd         |" << endl;
+	cout << "   |           / \\  Vd         |                              |          \\ /  Vd          |" << endl;
 	cout << "   |           ---              |                              |          -----             |\n";
 	cout << "  Vin           |               RL         Vout               Vin           |               RL         Vout\n";
 	cout << "   |            |               |                              |            |               |\n";
@@ -2298,7 +2300,7 @@ void clamper()
 	{
 		do
 		{
-			cout << "Choose what you want to calculate for clamper: \nEnter '+' for positive\n'-' for negative\n'.' for return:\n";
+			cout << "Choose what you want to calculate for clamper: \nEnter '+' for positive\n'-' for negative\n'.' for return: ";
 			cin >> polar;
 			if (polar != '+' && polar != '-' && polar != '.')
 			{
@@ -2309,19 +2311,19 @@ void clamper()
 		if (polar == '+')
 		{
 			cout << "Positive clamper." << endl;
-			cout << "Choose what you want to calculate: \n1.Vc\n2.Vout(+ve half cycle)\n3.Vout(-ve half cycle):\n";
+			cout << "Choose what you want to calculate: \n1.Vc\n2.Vout(+ve half cycle)\n3.Vout(-ve half cycle): ";
 			cin >> opt_clamper;
 			switch (opt_clamper)
 			{
 			case '1':
 				cout << "Vc = Vin - Vd + Vbias" << endl;
-				cout << "Enter the value of Vin (in Volt):";
+				cout << "Enter the value of Vin (in Volt): ";
 				cin >> Vin;
 
-				cout << "Enter the value of Vd (in Volt):";
+				cout << "Enter the value of Vd (in Volt): ";
 				cin >> Vd;
 
-				cout << "Enter the value of Vbias (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
+				cout << "Enter the value of Vbias (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout): ";
 				cin >> Vbias;
 
 				Vc = Vin - Vd + Vbias;
@@ -2334,9 +2336,9 @@ void clamper()
 
 			case '2':
 				cout << "Vout(+ve half cycle) = Vc + Vin" << endl;
-				cout << "Enter the value of Vc (in Volt):";
+				cout << "Enter the value of Vc (in Volt): ";
 				cin >> Vc;
-				cout << "Enter the value of Vin (in Volt):";
+				cout << "Enter the value of Vin (in Volt): ";
 				cin >> Vin;
 				Vout = Vc + Vin;
 
@@ -2349,10 +2351,10 @@ void clamper()
 			case '3':
 				cout << "Vout(-ve half cycle) = -Vd + Vbias" << endl;
 
-				cout << "Enter the value of Vd (in Volt):";
+				cout << "Enter the value of Vd (in Volt): ";
 				cin >> Vd;
 
-				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
+				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout): ";
 				cin >> Vbias;
 				Vout = -Vd + Vbias;
 
@@ -2370,19 +2372,19 @@ void clamper()
 		else if (polar == '-')
 		{
 			cout << "Negative clamper." << endl;
-			cout << "Choose what you want to calculate: \n1.Vc\n2.Vout(+ve half cycle)\n3.Vout(-ve half cycle):\n";
+			cout << "Choose what you want to calculate: \n1.Vc\n2.Vout(+ve half cycle)\n3.Vout(-ve half cycle): ";
 			cin >> opt_clamper;
 			switch (opt_clamper)
 			{
 			case '1':
 				cout << "Vc = Vin - Vd - Vbias" << endl;
-				cout << "Enter the value of Vin (in Volt):";
+				cout << "Enter the value of Vin (in Volt): ";
 				cin >> Vin;
 
-				cout << "Enter the value of Vd (in Volt):";
+				cout << "Enter the value of Vd (in Volt): ";
 				cin >> Vd;
 
-				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
+				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout): ";
 				cin >> Vbias;
 
 				Vc = Vin - Vd - Vbias;
@@ -2395,10 +2397,10 @@ void clamper()
 
 			case '2':
 				cout << "Vout(+ve half cycle) = Vd + Vbias" << endl;
-				cout << "Enter the value of Vd (in Volt):";
+				cout << "Enter the value of Vd (in Volt): ";
 				cin >> Vd;
 
-				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout):";
+				cout << "Enter the value of Vbias (in Volt) (add a negative sign, e.g., -2, if the polarity of the battery is opposite to Vout): ";
 				cin >> Vbias;
 
 				Vout = Vd + Vbias;
@@ -2411,10 +2413,10 @@ void clamper()
 
 			case '3':
 				cout << "Vout(-ve half cycle) = -Vc - Vin" << endl;
-				cout << "Enter the value of Vc (in Volt):";
+				cout << "Enter the value of Vc (in Volt): ";
 				cin >> Vc;
 
-				cout << "Enter the value of Vin (in Volt):";
+				cout << "Enter the value of Vin (in Volt): ";
 				cin >> Vin;
 
 				Vout = -Vc - Vin;
@@ -2471,7 +2473,7 @@ void BJT_Voltage_divider()
 	while (true)
 	{
 		cout << "\nChoose what you want to calculate:\n";
-		cout << "1. RIN_base and R2_total\n2. VB\n3. IC\n4. VCE\n5. return:\n";
+		cout << "1. RIN_base and R2_total\n2. VB\n3. IC\n4. VCE\n5. return: ";
 		cin >> calculate;
 		cout << endl;
 
@@ -2600,7 +2602,7 @@ void BJT_base()
 	while (true)
 	{
 		cout << "\nChoose what you want to calculate:\n";
-		cout << "1. VCE\n2. return:\n";
+		cout << "1. VCE\n2. return: ";
 		cin >> calculate;
 		cout << endl;
 
@@ -2669,7 +2671,7 @@ void BJT_AC()
 	while (true)
 	{
 		cout << "\nChoose what you want to calculate:\n";
-		cout << "1. Rin_base\n2. Rin_total\n3. VB\n4. IE\n5. re\n6. AV\n7. return:\n";
+		cout << "1. Rin_base\n2. Rin_total\n3. VB\n4. IE\n5. re\n6. AV\n7. return: ";
 		cin >> calculate;
 		cout << endl;
 
@@ -2801,7 +2803,7 @@ void jfet_DrainCurrent()
 
 	while (true)
 	{
-		cout << "Enter the calculator you want to use: \n1. drain current\n2. transconductance\n3. return:\n";
+		cout << "\nEnter the calculator you want to use: \n1. drain current\n2. transconductance\n3. return: ";
 		cin >> option;
 		switch (option)
 		{
@@ -2820,7 +2822,7 @@ void jfet_DrainCurrent()
 				cout << "Vgs_off (in Volt) [it should be a -ve Voltage]: ";
 				cin >> Vgs_off;
 
-				cout << "Vgs (in Volt) [it should be a -ve Voltage]    : ";
+				cout << "Vgs (in Volt) [it should be a -ve Voltage]: ";
 				cin >> Vgs;
 
 				if (Vgs_off > 0 || Vgs > 0)
@@ -2853,7 +2855,7 @@ void jfet_DrainCurrent()
 				cout << "Vgs_off (in Volt) [it should be a -ve Voltage]: ";
 				cin >> Vgs_off;
 
-				cout << "Vgs (in Volt) [it should be a -ve Voltage]    : ";
+				cout << "Vgs (in Volt) [it should be a -ve Voltage]: ";
 				cin >> Vgs;
 
 				if (Vgs_off > 0 || Vgs > 0)
@@ -2912,7 +2914,7 @@ void jfet()
 
 	while (true)
 	{
-		cout << "Enter the calculator you want to use: \n1. drain-source voltage\n2. return:\n";
+		cout << "Enter the calculator you want to use: \n1. drain-source voltage\n2. return: ";
 		cin >> option;
 		switch (option)
 		{
@@ -2986,7 +2988,7 @@ void mosfet()
 
 	while (true)
 	{
-		cout << "Enter the calculator you want to use: \n1. drain-source voltage\n2. return:\n";
+		cout << "Enter the calculator you want to use: \n1. drain-source voltage\n2. return: ";
 		cin >> option;
 		switch (option)
 		{
@@ -3072,15 +3074,15 @@ void non_inverting()
 		cout << "3. Zin(NI) = (1+ Aol*B) * Zin\n";
 		cout << "4. Zout(NI) =  Zout / (1 + Aol * B)\n";
 		cout << "5. Return.\n";
-		cout << "Enter your choice (1-5):\n";
+		cout << "Enter your choice (1-5): ";
 		cin >> opt;
 
 		if (opt == '1')
 		{
 			cout << "1. Acl(NI) = 1 + (Rf/Ri) \n";
-			cout << "Enter the value of Rf (in Ohm): \n";
+			cout << "Enter the value of Rf (in Ohm): ";
 			cin >> Rf_NI;
-			cout << "Enter the value of Ri (in Ohm): \n";
+			cout << "Enter the value of Ri (in Ohm): ";
 			cin >> Ri_NI;
 			Acl_NI = 1 + (Rf_NI / Ri_NI);
 
@@ -3093,9 +3095,9 @@ void non_inverting()
 		else if (opt == '2')
 		{
 			cout << "2. B = Ri / (Ri + Rf)\n";
-			cout << "Enter the value of Rf (in Ohm): \n";
+			cout << "Enter the value of Rf (in Ohm): ";
 			cin >> Rf_NI;
-			cout << "Enter the value of Ri (in Ohm): \n";
+			cout << "Enter the value of Ri (in Ohm): ";
 			cin >> Ri_NI;
 			B = Ri_NI / (Ri_NI + Rf_NI);
 
@@ -3107,11 +3109,11 @@ void non_inverting()
 		else if (opt == '3')
 		{
 			cout << "3. Zin(NI) = (1+ Aol*B) * Zin\n";
-			cout << "Enter the value of B : \n";
+			cout << "Enter the value of B : ";
 			cin >> B;
-			cout << "Enter the value of Aol : \n";
+			cout << "Enter the value of Aol : ";
 			cin >> Aol;
-			cout << "Enter the value of Zin (in Ohm): \n";
+			cout << "Enter the value of Zin (in Ohm): ";
 			cin >> Zin;
 			Zin_NI = (1 + Aol * B) * Zin;
 
@@ -3124,11 +3126,11 @@ void non_inverting()
 		else if (opt == '4')
 		{
 			cout << "4.Zout(NI) =  Zout / (1 + Aol * B)\n";
-			cout << "Enter the value of Zout (in Ohm): \n";
+			cout << "Enter the value of Zout (in Ohm): ";
 			cin >> Zout;
-			cout << "Enter the value of Aol: \n";
+			cout << "Enter the value of Aol: ";
 			cin >> Aol;
-			cout << "Enter the value of B: \n";
+			cout << "Enter the value of B: ";
 			cin >> B;
 			Zout_NI = Zout / (1 + Aol * B);
 
@@ -3184,17 +3186,17 @@ void VoltageFollower()
 		cout << "1. Zin(VF) = (1+ Aol*B) * Zin\n";
 		cout << "2. Zout(VF) =  Zout / (1 + Aol)\n";
 		cout << "3. Return.\n";
-		cout << "Enter your choice (1-3):\n";
+		cout << "Enter your choice (1-3): ";
 		cin >> opt;
 
 		if (opt == '1')
 		{
 			cout << "1. Zin(VF) = (1+ Aol*B) * Zin\n";
-			cout << "Enter the value of B: \n";
+			cout << "Enter the value of B: ";
 			cin >> B;
-			cout << "Enter the value of Aol: \n";
+			cout << "Enter the value of Aol: ";
 			cin >> Aol;
-			cout << "Enter the value of Zin (in Ohm): \n";
+			cout << "Enter the value of Zin (in Ohm): ";
 			cin >> Zin;
 			Zin_VF = (1 + Aol * B) * Zin;
 
@@ -3205,9 +3207,9 @@ void VoltageFollower()
 		else if (opt == '2')
 		{
 			cout << "2.Zout(VF) =  Zout / (1 + Aol)\n";
-			cout << "Enter the value of Zout (in Ohm): \n";
+			cout << "Enter the value of Zout (in Ohm): ";
 			cin >> Zout;
-			cout << "Enter the value of Aol: \n";
+			cout << "Enter the value of Aol: ";
 			cin >> Aol;
 			Zout_VF = Zout / (1 + Aol);
 
@@ -3259,15 +3261,15 @@ void invertingAmplifier()
 		cout << "1. Acl(I)= - (Rf/Ri)\n";
 		cout << "2. Zin(I) = Ri \n";
 		cout << "3. Return.\n";
-		cout << "Enter your choice (1-3):\n";
+		cout << "Enter your choice (1-3): ";
 		cin >> opt;
 
 		if (opt == '1')
 		{
 			cout << "1. Acl(I)= - (Rf/Ri)\n";
-			cout << "Enter the value of Rf (in Ohm): \n";
+			cout << "Enter the value of Rf (in Ohm): ";
 			cin >> Rf_I;
-			cout << "Enter the value of Ri (in Ohm): \n";
+			cout << "Enter the value of Ri (in Ohm): ";
 			cin >> Ri_I;
 			Acl_I = -(Rf_I / Ri_I);
 
@@ -3277,7 +3279,7 @@ void invertingAmplifier()
 		else if (opt == '2')
 		{
 			cout << "2. Zin(I) = Ri \n";
-			cout << "Enter the value of Ri: \n";
+			cout << "Enter the value of Ri: ";
 			cin >> Ri_I;
 
 			cout << "Zin(I) = Ri\n";
@@ -3298,7 +3300,7 @@ void invertingAmplifier()
 	}
 }
 
-
+//notes for chapter 1
 void notes_Diode()
 {
 	system("cls");
@@ -3451,7 +3453,7 @@ void notes_Diode()
 	system("cls");
 }
 
-// note for chapter 2
+// notes for chapter 2
 void notes_BJT()
 {
 	char study_analysis;
@@ -3921,7 +3923,7 @@ void notes_FET()
 	system("cls");
 }
 
-
+//notes for chapter 4
 void notes_OA() {
 	system("cls");
 	cout << "\n --------------------------------------" << endl;
@@ -4022,9 +4024,6 @@ void notes_OA() {
 	system("cls");
 }
 
-
-
-
 void charValidation(char* input, int option) {
 	char temInput = toupper(*input);
 	if (option == 1) //check Y/N
@@ -4055,6 +4054,4 @@ void waitEnter(string action)
 	string dummy;
 	cout << "\nPress ENTER to " << action << " ~~~\n\n";
 	getline(cin, dummy);
-
-
 }
