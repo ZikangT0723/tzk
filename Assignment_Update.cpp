@@ -2161,13 +2161,12 @@ void clipper()
 	{
 		do
 		{
-			while (cin.peek() != '/n') { cin.ignore(1); }
 			cout << "Choose what you want to calculate for clipper: \nEnter '+' for positive\n'-' for negative\n'.' for return: ";
 			cin >> polar;
 
 			if (polar != '+' && polar != '-' && polar != '.')
 				cout << "INPUT ERROR! Enter '+', '-' or '.' !";
-			
+
 		} while (polar != '+' && polar != '-' && polar != '.');
 
 		if (polar == '+')
