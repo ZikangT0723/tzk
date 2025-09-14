@@ -67,6 +67,8 @@ void ModeSelection();
 
 //-----------------USER FUNCTION-----------------
 bool userLogin(int* index);
+bool IDexist(string*);
+void userinfo(User[], int);
 int getinfo(User[]);
 void userMenu(int);
 //Answer Test 1
@@ -154,6 +156,7 @@ void ModeSelection()
 			if (userLogin(&index)) {
 				userMenu(index);
 			}
+			Sleep(1000);
 			break;
 		case '3':
 			cout << "\nExitting program..."; //can design
@@ -169,6 +172,7 @@ void ModeSelection()
 bool userLogin(int* index) {
 	int option;
 	int position;
+	int info;
 	string yourID;
 	string yourPassword;
 	system("cls");
@@ -187,48 +191,75 @@ bool userLogin(int* index) {
 	if (option == 1) {
 		cout << "Enter your student ID: ";
 		cin >> yourID;
-
-		cout << "Enter your password: ";
-		cin >> yourPassword;
-		for (int i = 0; i < userindex; i++) {
-			if (yourID == Student[i].ID) {
-				position = i;
-				break;
-			}
-		}
-		if (yourPassword == Student[position].password) {
-			cout << "Login successful \n";
-			*index = position;
-			return true;
-		}
-
-
-		else {
-			for (int attempts = 2; attempts > 0; attempts--) {
-				cout << "Your ID: " << yourID << endl;
-				cout << "You have " << attempts << " left...\n";
-				cout << "Enter your correct password: ";
-				cin >> yourPassword;
-				if (yourPassword == Student[position].password) {
-					*index = position;
-					return true;
+		if (IDexist(&yourID)) {
+			cout << "Enter your password: ";
+			cin >> yourPassword;
+			for (int i = 0; i < userindex; i++) {
+				if (yourID == Student[i].ID) {
+					position = i;
+					break;
 				}
 			}
-			cout << "You have no attempts left, please contact your teacher for help...\n";
+			if (yourPassword == Student[position].password) {
+				cout << "Login successful \n";
+				*index = position;
+				return true;
+			}
+
+			else {
+				for (int attempts = 2; attempts > 0; attempts--) {
+					system("cls");
+					cout << "Your ID: " << yourID << endl;
+					cout << "You have " << attempts << " left...\n";
+					cout << "Enter your correct password: ";
+					cin >> yourPassword;
+					if (yourPassword == Student[position].password) {
+						*index = position;
+						return true;
+					}
+				}
+				cout << "You have no attempts left, please contact your teacher for help...\n";
+				return false;
+			}
+		}
+		else {
+			cout << "Your ID does not exist. Returning to home page...\n";
 			return false;
 		}
+	
 	}
+
 	else if (option == 2) {
+		info = getinfo(Student);
+
+		if (info == -1)
+			return false;
+
 		if (userindex < Studentnum) {
-			*index = getinfo(Student);
+			*index = info;
 			return true;
 		}
+
 		else {
 			cout << "The userlist is full." << endl;
 			return false;
 		}
 	}
 }
+
+bool IDexist(string* checkID) {
+	while (*checkID != "0") {
+		for (int exist = 0; exist < userindex; exist++) {
+			if (*checkID == Student[exist].ID) return true;
+		}
+		system("cls");
+		cout << "Your ID does not exist... \n";
+		cout << "Enter a valid ID (0 to go back): ";
+		cin >> *checkID;
+	}
+	return false;
+}
+
 //Daniel
 bool hostLogin() {
 	string hostID, hostPass;
@@ -319,7 +350,8 @@ void userMenu(int index) {
 	while (true) {
 		system("cls");
 		cout << "User Menu\n";
-		cout << "=========\n";
+		//cout << "=========\n";
+		userinfo(Student, index);
 		cout << "1. Test 1\n";
 		cout << "2. Test 2 \n";
 		cout << "3. Notes \n";
@@ -991,14 +1023,22 @@ void loaduserdata() {
 }
 
 int getinfo(User Student[]) {
-	bool IDvalid, IDdigits;
-	cout << "Enter your name:";
+	bool IDvalid, IDdigits, IDexists;
+	loaduserdata();
+	cout << "Enter your name :";
 	cin.ignore();
 	getline(cin, Student[userindex].Name);
+	while (Student[userindex].Name.length() == 0) {
+		cout << "Name too short\n";
+		cout << "Enter your name: ";
+		getline(cin, Student[userindex].Name);
+	}
 	do {
-		IDvalid = false, IDdigits = true;
-		cout << "Enter your Student ID:";
+		IDvalid = false, IDdigits = true, IDexists = false;
+		cout << "Enter your Student ID [0 to return]: ";
 		getline(cin, Student[userindex].ID);
+		if (Student[userindex].ID == "0")
+			return -1;
 		if (Student[userindex].ID.length() != 7) {
 			cout << "Error: Student ID must be exactly 7 digits long.\n";
 			continue;
@@ -1015,6 +1055,16 @@ int getinfo(User Student[]) {
 		}
 		if (Student[userindex].ID == "0000000") {
 			cout << "Error: Student ID must not be empty.\n";
+			continue;
+		}
+		for (int inList = 0; inList < userindex; inList++) {
+			if (Student[userindex].ID == Student[inList].ID) {
+				IDexists = true;
+				break;
+			}
+		}
+		if (IDexists) {
+			cout << "Error: Student ID already exists \n";
 			continue;
 		}
 		IDvalid = true;
@@ -1048,6 +1098,20 @@ void userlist() {
 	cin.ignore();
 	waitEnter("return menu");
 	system("cls");
+}
+void userinfo(User Student[], int index) {
+	for (int width = 0; width <= 78; width++) {
+		cout << "-";
+	}
+	cout << "\n";
+	cout << setw(3) << "Name: " << left << setw(20) << Student[index].Name <<
+		" | Student ID: " << setw(7) << Student[index].ID <<
+		" | Test 1: " << Student[index].result_Test1 <<
+		" | Test 2: " << Student[index].result_Test2 << endl;
+	for (int width = 0; width <= 78; width++) {
+		cout << "-";
+	}
+	cout << "\n";
 }
 
 void savefile(User* Student, string name) {
