@@ -7,14 +7,14 @@
 #include<windows.h> // for Sleep()
 using namespace std;
 // CONSTANT
-const int ansnum = 23;
-const float checkans[ansnum] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
+const int MAX_Test2 = 23;
+const float checkans[MAX_Test2] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
 		10000, 200, 350 }; //Answer for quizz 2
-const int Studentnum = 100;
-const int MAX_Numbers = 10; //maximum number
-const int MAX_COMMENTS = 100;
+const int MAX_Students = 100;
+const int MAX_Test1 = 15; //maximum number
+const int MAX_Comments = 100;
 
-int userindex = 0; //User count
+int userCount = 0; //User count
 int Test1Count = 0; //count question from file
 int commentCount = 0;
 
@@ -26,7 +26,7 @@ struct User {
 	int result_Test2 = 0; //23%
 	bool attempt_Test1 = false;
 	bool attempt_Test2 = false;
-	float ans[ansnum] = {};
+	float ans[MAX_Test2] = {};
 };
 struct Test1 {
 	int num = 0; //Qustion No.
@@ -47,21 +47,21 @@ struct Comment
 	bool fromHost = false;
 };
 
-User Student[Studentnum];
-Test1 Quizz[MAX_Numbers]; //store 10 test1 questions
-Comment comments[MAX_COMMENTS];
+User Student[MAX_Students];
+Test1 Quizz[MAX_Test1]; //store 15 test1 questions
+Comment comments[MAX_Comments];
 
 // Accessibility modules
 void charValidation(char* input, int option);
 void waitEnter(string action);
 
-void LoadFileOperation();
 //--------------FILE OPERATION-------------
-void savefile(User*, string);
+void LoadFileOperation();
+void saveUserdata(User*, string);
 void saveTest1();
 void saveComments();
-void loaduserdata();
-void LoadTest1();
+void loadUserdata();
+void loadTest1();
 void loadComments();
 
 void ModeSelection();
@@ -69,12 +69,12 @@ void ModeSelection();
 //-----------------USER FUNCTION-----------------
 bool userLogin(int* index);
 bool IDexist(string*);
-void userinfo(int);
-int getinfo();
+void userInfo(int);
+int userRegister();
 void userMenu(int);
 //Answer Test 1
 void Test1_quizz(int);
-int checkAns(char ans, char answer);
+int Test1_checkAns(char ans, char answer);
 void shuffle(int* temp, int Question_Numbers);//temporary storage for the sequence array
 //Answer Test 2
 void Test2_quizz(float*, int);
@@ -83,24 +83,24 @@ int check(float*, int&);
 int checksection(float*, int, int);
 void review(float*, int);
 //Notes function
-void note();
+void notesMenu();
 void notes_Diode();
 void notes_BJT();
 void notes_FET();
 void notes_OA();
 //Simulation funtion
-void sim();
-void clipper();
-void clamper();
+void simulatorMenu();
+void Diodes_clipper();
+void Diodes_clamper();
 void BJT_base();
 void BJT_AC();
 void BJT_Voltage_divider();
-void jfet(); //Daniel
-void mosfet(); //Daniel
-void jfet_DrainCurrent();//Daniel
-void non_inverting();
-void VoltageFollower();
-void invertingAmplifier();
+void FET_DrainCurrent();
+void FET_jfet();
+void FET_mosfet();
+void OpAmp_nonInvert();
+void OpAmp_voltageFollower();
+void OpAmp_Invert();
 
 //----------HOST FUNCTION------------
 bool hostLogin();//Daniel
@@ -112,7 +112,7 @@ void createQuizz();
 void editQuizz(int number);
 void deleteQuizz(int num);
 //User List
-void userlist();
+void userList();
 
 //---------COMMENT FUNCTION------------------
 void showAllComments();
@@ -131,9 +131,9 @@ int main() {
 	ModeSelection();
 }
 void LoadFileOperation() {
-	LoadTest1();
+	loadTest1();
 	loadComments();
-	loaduserdata();
+	loadUserdata();
 }
 void ModeSelection()
 {
@@ -165,7 +165,7 @@ void ModeSelection()
 			if (userLogin(&index)) {
 				userMenu(index);
 			}
-			Sleep(1000);
+
 			break;
 		case '3':
 			cout << "\nExitting program..."; //can design
@@ -184,6 +184,7 @@ bool userLogin(int* index) {
 	int info;
 	string yourID;
 	string yourPassword;
+
 	system("cls");
 	cout << "User Login/Register\n";
 	cout << "===================\n";
@@ -203,7 +204,7 @@ bool userLogin(int* index) {
 		if (IDexist(&yourID)) {
 			cout << "Enter your password: ";
 			cin >> yourPassword;
-			for (int i = 0; i < userindex; i++) {
+			for (int i = 0; i < userCount; i++) {
 				if (yourID == Student[i].ID) {
 					position = i;
 					break;
@@ -218,8 +219,10 @@ bool userLogin(int* index) {
 			else {
 				for (int attempts = 2; attempts > 0; attempts--) {
 					system("cls");
+					cout << "User Login\n";
+					cout << "==========\n";
 					cout << "Your ID: " << yourID << endl;
-					cout << "You have " << attempts << " left...\n";
+					cout << "Wrong Password! You have " << attempts << " left...\n";
 					cout << "Enter your correct password: ";
 					cin >> yourPassword;
 					if (yourPassword == Student[position].password) {
@@ -228,6 +231,8 @@ bool userLogin(int* index) {
 					}
 				}
 				cout << "You have no attempts left, please contact your teacher for help...\n";
+				cin.ignore();
+				waitEnter("return mode selection");
 				return false;
 			}
 		}
@@ -240,12 +245,12 @@ bool userLogin(int* index) {
 	}
 
 	else if (option == '2') {
-		info = getinfo();
+		info = userRegister();
 
 		if (info == -1)
 			return false;
 
-		if (userindex < Studentnum) {
+		if (userCount < MAX_Students) {
 			*index = info;
 			cout << "\n\nRegister successful... \n";
 			return true;
@@ -260,7 +265,7 @@ bool userLogin(int* index) {
 
 bool IDexist(string* checkID) {
 	while (*checkID != "0") {
-		for (int exist = 0; exist < userindex; exist++) {
+		for (int exist = 0; exist < userCount; exist++) {
 			if (*checkID == Student[exist].ID) return true;
 		}
 		system("cls");
@@ -344,7 +349,7 @@ void hostMenu()
 			break;
 		case '2':
 			//userlist
-			userlist();
+			userList();
 			break;
 		case '3':
 			hostCommentMenu();
@@ -369,7 +374,7 @@ void userMenu(int index) {
 		system("cls");
 		cout << "User Menu\n";
 		//cout << "=========\n";
-		userinfo(index);
+		userInfo(index);
 		cout << "1. Test 1\n";
 		cout << "2. Test 2 \n";
 		cout << "3. Notes \n";
@@ -390,10 +395,10 @@ void userMenu(int index) {
 			Test2_quizz(Student[index].ans, index);
 			break;
 		case '3':
-			note();
+			notesMenu();
 			break;
 		case '4':
-			sim();
+			simulatorMenu();
 			break;
 		case '5':
 			studentCommentMenu(index);
@@ -414,13 +419,13 @@ void Test2_quizz(float* answer, int index) {
 	int i = 0, points = 0, record[12] = {};
 	bool same;
 	char option;
-	answer[ansnum] = {};
+	answer[MAX_Test2] = {};
 	system("cls");
 	cout << "Test 2\n";
 	cout << "======\n";
 	if (Student[index].attempt_Test2)
 	{
-		cout << "You have submitted the Test 2.Total score = " << Student[index].result_Test2 << "/" << ansnum << endl;
+		cout << "You have submitted the Test 2.Total score = " << Student[index].result_Test2 << "/" << MAX_Test2 << endl;
 		cout << "Do you wanna review your quention?(Y/N):";
 		cin >> option;
 		charValidation(&option, 1);
@@ -475,7 +480,7 @@ void Test2_quizz(float* answer, int index) {
 				cin >> option;
 				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
-					clipper();
+					Diodes_clipper();
 				}
 			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for Vout peak (in V):";
@@ -505,7 +510,7 @@ void Test2_quizz(float* answer, int index) {
 				cin >> option;
 				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
-					clamper();
+					Diodes_clamper();
 				}
 			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for Vout (+ve, in V):";
@@ -538,7 +543,7 @@ void Test2_quizz(float* answer, int index) {
 				cin >> option;
 				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
-					clamper();
+					Diodes_clamper();
 				}
 			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for Vout (+ve, in V):";
@@ -671,7 +676,7 @@ void Test2_quizz(float* answer, int index) {
 				cin >> option;
 				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
-					jfet_DrainCurrent();
+					FET_DrainCurrent();
 				}
 			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for Id (in mille-amperes):";
@@ -707,7 +712,7 @@ void Test2_quizz(float* answer, int index) {
 				cin >> option;
 				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
-					jfet();
+					FET_jfet();
 				}
 			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for V_DS (in V and round to two decimals):";
@@ -744,7 +749,7 @@ void Test2_quizz(float* answer, int index) {
 				cin >> option;
 				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
-					mosfet();
+					FET_mosfet();
 				}
 			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for V_DS (in V and round to two decimals):";
@@ -781,7 +786,7 @@ void Test2_quizz(float* answer, int index) {
 				cin >> option;
 				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
-					non_inverting();
+					OpAmp_nonInvert();
 				}
 			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for closed-loop voltage gain, Acl:";
@@ -820,7 +825,7 @@ void Test2_quizz(float* answer, int index) {
 				cin >> option;
 				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
-					invertingAmplifier();
+					OpAmp_Invert();
 				}
 			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for closed-loop voltage gain,Acl:";
@@ -857,7 +862,7 @@ void Test2_quizz(float* answer, int index) {
 				cin >> option;
 				charValidation(&option, 1);
 				if (toupper(option) == 'Y') {
-					VoltageFollower();
+					OpAmp_voltageFollower();
 				}
 			} while (toupper(option) == 'Y');
 			cout << "Enter the answer for the input impedance (in Giga ohms):";
@@ -881,13 +886,13 @@ void Test2_quizz(float* answer, int index) {
 	check(answer, Student[index].result_Test2);
 	cout << "Score updated:" << Student[index].result_Test2 << endl;
 	Student[index].attempt_Test2 = true;
-	cout << "You have submitted the Test 2. Your total score is " << Student[index].result_Test2 << " Out of " << ansnum << "." << endl;
-	savefile(Student, "Userlist");
+	cout << "You have submitted the Test 2. Your total score is " << Student[index].result_Test2 << " Out of " << MAX_Test2 << "." << endl;
+	saveUserdata(Student, "Userlist");
 	cin.ignore();
 	waitEnter("return menu");
 }
 
-void note() {
+void notesMenu() {
 	char chap;
 	bool validInput = true;
 	do {
@@ -924,7 +929,7 @@ void note() {
 		}
 	} while (chap != '0');
 }
-void sim()
+void simulatorMenu()
 {
 	char opt_simulator;
 	do
@@ -940,11 +945,11 @@ void sim()
 		switch (opt_simulator)
 		{
 		case 'a':
-			clipper();
+			Diodes_clipper();
 			break;
 
 		case 'b':
-			clamper();
+			Diodes_clamper();
 			break;
 
 		case 'c':
@@ -960,27 +965,27 @@ void sim()
 			break;
 
 		case 'f':
-			jfet_DrainCurrent();
+			FET_DrainCurrent();
 			break;
 
 		case 'g':
-			jfet();
+			FET_jfet();
 			break;
 
 		case 'h':
-			mosfet();
+			FET_mosfet();
 			break;
 
 		case 'i':
-			non_inverting();
+			OpAmp_nonInvert();
 			break;
 
 		case 'j':
-			VoltageFollower();
+			OpAmp_voltageFollower();
 			break;
 
 		case 'k':
-			invertingAmplifier();
+			OpAmp_Invert();
 			break;
 
 		case '0':
@@ -996,87 +1001,87 @@ void sim()
 	} while (opt_simulator != '0');
 }
 
-void loaduserdata() {
-	userindex = 0;
+void loadUserdata() {
+	userCount = 0;
 	fstream list = fstream("Userlist", ios::in);
 	string line;
 	string emptyspace;
-	while (userindex < Studentnum) {
+	while (userCount < MAX_Students) {
 
 		if (!getline(list, line, '|')) {
 			break;
 		}
-		Student[userindex].Name = line;
+		Student[userCount].Name = line;
 
 		if (getline(list, line, '|')) {
-			Student[userindex].ID = line;
+			Student[userCount].ID = line;
 		}
 		if (getline(list, line, '|')) {
-			Student[userindex].password = line;
+			Student[userCount].password = line;
 		}
 		if (getline(list, line, '|')) {
-			Student[userindex].result_Test1 = stof(line);
+			Student[userCount].result_Test1 = stof(line);
 		}
 		if (getline(list, line, '|'))
 		{
-			Student[userindex].result_Test2 = stoi(line);
+			Student[userCount].result_Test2 = stoi(line);
 		}
 		if (getline(list, line, '|')) {
-			Student[userindex].attempt_Test1 = stoi(line);
+			Student[userCount].attempt_Test1 = stoi(line);
 		}
 		if (getline(list, line, '\n'))
 		{
-			Student[userindex].attempt_Test2 = stoi(line);
+			Student[userCount].attempt_Test2 = stoi(line);
 		}
 
-		for (int j = 0; j < ansnum; j++) {
+		for (int j = 0; j < MAX_Test2; j++) {
 			if (getline(list, line, ','))
 			{
-				Student[userindex].ans[j] = stof(line);
+				Student[userCount].ans[j] = stof(line);
 			}
 			else {
 				break; // Stop if no more lines to read
 			}
 		}
 		getline(list, line);
-		userindex++;
+		userCount++;
 
-		if (userindex >= Studentnum) break; //break if exceed the limit
+		if (userCount >= MAX_Students) break; //break if exceed the limit
 
 	}
 	list.close();
 }
 
-int getinfo() {
+int userRegister() {
 	bool IDvalid, IDdigits, IDexists;
-	loaduserdata();
+	loadUserdata();
 	cout << "Enter your name :";
 	cin.ignore();
-	getline(cin, Student[userindex].Name);
-	while (Student[userindex].Name.length() == 0) {
+	getline(cin, Student[userCount].Name);
+	while (Student[userCount].Name.length() == 0) {
 		system("cls");
 		cout << "Name too short\n";
 		cout << "Enter your name: ";
-		getline(cin, Student[userindex].Name);
+		getline(cin, Student[userCount].Name);
 	}
 	do {
 		Sleep(1000);
 		system("cls");
 		cout << "User Login/Register\n";
 		cout << "===================\n";
-		cout << "Name: " << Student[userindex].Name << endl;
+		cout << "Name: " << Student[userCount].Name << endl;
 		IDvalid = false, IDdigits = true, IDexists = false;
 
 		cout << "Enter your Student ID [0 to return]: ";
-		getline(cin, Student[userindex].ID);
-		if (Student[userindex].ID == "0")
+		getline(cin, Student[userCount].ID);
+		if (Student[userCount].ID == "0")
 			return -1;
-		if (Student[userindex].ID.length() != 7) {
+		if (Student[userCount].ID.length() != 7) {
 			cout << "Error: Student ID must be exactly 7 digits long.\n";
 			continue;
 		}
-		for (int i = 0; i < Student[userindex].ID.length(); i++) {
-			if (!isdigit(Student[userindex].ID[i])) {
+		for (int i = 0; i < Student[userCount].ID.length(); i++) {
+			if (!isdigit(Student[userCount].ID[i])) {
 				IDdigits = false;
 				break;
 			}
@@ -1085,12 +1090,12 @@ int getinfo() {
 			cout << "Error: Student ID must contain only digits (0-9).\n";
 			continue;
 		}
-		if (Student[userindex].ID == "0000000") {
+		if (Student[userCount].ID == "0000000") {
 			cout << "Error: Student ID must not be empty.\n";
 			continue;
 		}
-		for (int inList = 0; inList < userindex; inList++) {
-			if (Student[userindex].ID == Student[inList].ID) {
+		for (int inList = 0; inList < userCount; inList++) {
+			if (Student[userCount].ID == Student[inList].ID) {
 				IDexists = true;
 				break;
 			}
@@ -1104,27 +1109,27 @@ int getinfo() {
 	system("cls");
 	cout << "User Login/Register\n";
 	cout << "===================\n";
-	cout << "Name: " << Student[userindex].Name << endl;
-	cout << "Student ID: " << Student[userindex].ID << endl;
+	cout << "Name: " << Student[userCount].Name << endl;
+	cout << "Student ID: " << Student[userCount].ID << endl;
 	cout << "Enter your password: ";
-	getline(cin, Student[userindex].password);
-	userindex++;
-	savefile(Student, "Userlist");
-	return userindex - 1;
+	getline(cin, Student[userCount].password);
+	userCount++;
+	saveUserdata(Student, "Userlist");
+	return userCount - 1;
 }
-void userlist() {
+void userList() {
 	system("cls");
 	cout << "================================================\n";
 	cout << "     Basic Electronic UGEA1313: User List\n";
 	cout << "================================================\n";
-	if (userindex == 0 && Student[userindex].Name == "") {
+	if (userCount == 0 && Student[userCount].Name == "") {
 		cout << "NO student registered yet.\n";
 	}
 	else {
 		cout << setw(4) << right << "No." << setw(5) << right << "Name" << setw(29) << right <<
 			"| Student ID" << " | Test 1 (7.00)" << " | Test 2 (23)" << " | Total (30.00)" << endl;
 		cout << string(90, '-') << endl;
-		for (int i = 0; i < userindex; i++) {
+		for (int i = 0; i < userCount; i++) {
 			cout << setw(3) << right << i + 1 << ". " << left << setw(20) << Student[i].Name <<
 				" | " << Student[i].ID << setw(6) << right << " | " << fixed << setprecision(2) << Student[i].result_Test1 << setw(12) << right <<
 				" | " << Student[i].result_Test2 << setw(13) << right << " | " << fixed << setprecision(2) << Student[i].result_Test1 + Student[i].result_Test2 << endl;
@@ -1136,7 +1141,7 @@ void userlist() {
 	waitEnter("return menu");
 	system("cls");
 }
-void userinfo(int index) {
+void userInfo(int index) {
 	for (int width = 0; width <= 78; width++) {
 		cout << "-";
 	}
@@ -1151,7 +1156,7 @@ void userinfo(int index) {
 	cout << "\n";
 }
 
-void savefile(User* Student, string name) {
+void saveUserdata(User* Student, string name) {
 	fstream list = fstream("Userlist", ios::out);
 	if (!list.is_open()) {
 		cout << "Error opening file for saving: " << name << endl;
@@ -1159,7 +1164,7 @@ void savefile(User* Student, string name) {
 	}
 
 
-	for (int i = 0; i < userindex; i++) {
+	for (int i = 0; i < userCount; i++) {
 
 		list << Student[i].Name << "|"
 			<< Student[i].ID << "|"
@@ -1168,7 +1173,7 @@ void savefile(User* Student, string name) {
 			<< Student[i].result_Test2 << "|"
 			<< Student[i].attempt_Test1 << "|"
 			<< Student[i].attempt_Test2 << "\n";
-		for (int j = 0; j < ansnum; j++) {
+		for (int j = 0; j < MAX_Test2; j++) {
 			list << Student[i].ans[j] << ",";
 		}
 		list << "\n";
@@ -1482,7 +1487,7 @@ void Test1_quizz(int index)
 	/* this function is to let user answer 10 question made
 	by host and each user the sequence will be shuffled*/
 
-	int sequence[MAX_Numbers] = { 1,2,3,4,5,6,7,8,9,10 };
+	int sequence[MAX_Test1] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 	int Num = 1, score = 0;
 	char ans;
 	system("cls");
@@ -1506,9 +1511,9 @@ void Test1_quizz(int index)
 	cin.ignore();
 	waitEnter("START");
 
-	shuffle(sequence, MAX_Numbers);
+	shuffle(sequence, MAX_Test1);
 
-	for (int i = 0; i < MAX_Numbers; i++) //i<10
+	for (int i = 0; i < MAX_Test1; i++) //i<15
 	{
 		if (!Quizz[sequence[i] - 1].question.empty() && (!Quizz[sequence[i] - 1].isDeleted)) {
 			cout << "Question " << Num++ << ": " << endl;
@@ -1520,14 +1525,14 @@ void Test1_quizz(int index)
 			cout << "Enter your answer: ";
 			cin >> ans;
 			charValidation(&ans, 2);
-			score += checkAns(ans, Quizz[sequence[i] - 1].ans);
+			score += Test1_checkAns(ans, Quizz[sequence[i] - 1].ans);
 			cout << endl;
 		}
 	}
 	Student[index].result_Test1 = (score / float(Test1Count)) * 7;
 	Student[index].attempt_Test1 = true;
 	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << endl;
-	savefile(Student, "Userlist");
+	saveUserdata(Student, "Userlist");
 	cin.ignore();
 	waitEnter("return user menu");
 }
@@ -1547,7 +1552,7 @@ void shuffle(int* temp, int Question_Numbers)//temporary storage for the sequenc
 	}
 }
 
-int checkAns(char response, char answer)
+int Test1_checkAns(char response, char answer)
 {
 	int score = 0;
 	if (response == answer)
@@ -1802,7 +1807,7 @@ void saveTest1()
 	outputFile.close();
 }
 
-void LoadTest1()
+void loadTest1()
 {
 	Test1Count = 0;
 	ifstream inFile("Test1");
@@ -1826,7 +1831,7 @@ void LoadTest1()
 		tempQuizz.isDeleted = false;
 		Quizz[Test1Count++] = tempQuizz;
 
-		if (Test1Count >= MAX_Numbers) break; //break if exceed the limit
+		if (Test1Count >= MAX_Test1) break; //break if exceed the limit
 		if (line.empty()) break;
 	}
 	inFile.close();
@@ -1925,7 +1930,7 @@ void studentCommentMenu(int index)
 void createNotification() {
 	cout << "Create notification\n";
 	cout << "===================\n";
-	if (commentCount >= MAX_COMMENTS) {
+	if (commentCount >= MAX_Comments) {
 		cout << "Comment list is full!" << endl;
 		return;
 	}
@@ -1948,7 +1953,7 @@ void createNotification() {
 void createStudentComment(int index) {
 	cout << "Create Student Comment\n";
 	cout << "======================\n";
-	if (commentCount >= MAX_COMMENTS) {
+	if (commentCount >= MAX_Comments) {
 		cout << "Comment list is full!" << endl;
 		return;
 	}
@@ -2163,14 +2168,14 @@ void loadComments() {
 
 		comments[commentCount].deleted = false;
 		commentCount++;
-		if (commentCount >= MAX_COMMENTS) break;
+		if (commentCount >= MAX_Comments) break;
 	}
 
 	file.close();
 }
 
 //Case a (for simulator)
-void clipper()
+void Diodes_clipper()
 {
 	float Vin, Vd, Vout;
 	char polar, opt_clipper;
@@ -2304,7 +2309,7 @@ void clipper()
 }
 
 //Case b (for simulator)
-void clamper()
+void Diodes_clamper()
 {
 	float Vin, Vc, Vd, Vbias, Vout;
 	char polar, opt_clamper;
@@ -2833,7 +2838,7 @@ void BJT_AC()
 }
 
 //Case f (for simulator)
-void jfet_DrainCurrent()
+void FET_DrainCurrent()
 {
 	char option;
 	float Idss, Vgs_off, Vgs, Id;
@@ -2925,7 +2930,7 @@ void jfet_DrainCurrent()
 }
 
 //Case g (for simulator)
-void jfet()
+void FET_jfet()
 {
 	char option;
 	float Id, Vdd, Rg, Rd, Rs;  //for jFET
@@ -2999,7 +3004,7 @@ void jfet()
 }
 
 //Case h (for simulator)
-void mosfet()
+void FET_mosfet()
 {
 	char option;
 	float Id, Vdd, R1, R2, R12, Rd, Vgs_th, K;  //for MOSFET
@@ -3078,7 +3083,7 @@ void mosfet()
 }
 
 //Case i (for simulator)
-void non_inverting()
+void OpAmp_nonInvert()
 {
 	double Rf_NI, Ri_NI, Aol, Zin_NI, Zout_NI, Acl_NI, B, Zin, Zout;
 	char opt;
@@ -3192,7 +3197,7 @@ void non_inverting()
 }
 
 //Case j (for simulator)
-void VoltageFollower()
+void OpAmp_voltageFollower()
 {
 	char opt;
 	double Aol, Zin_VF, Zout_VF, B, Zin, Zout;
@@ -3269,7 +3274,7 @@ void VoltageFollower()
 }
 
 //Case k (for simulator)
-void invertingAmplifier()
+void OpAmp_Invert()
 {
 	char opt;
 	double Rf_I, Ri_I, Acl_I;
