@@ -55,6 +55,7 @@ Comment comments[MAX_COMMENTS];
 void charValidation(char* input, int option);
 void waitEnter(string action);
 
+void LoadFileOperation();
 //--------------FILE OPERATION-------------
 void savefile(User*, string);
 void saveTest1();
@@ -126,10 +127,13 @@ void deleteHostReply(int);
 
 
 int main() {
+	LoadFileOperation();
+	ModeSelection();
+}
+void LoadFileOperation() {
 	LoadTest1();
 	loadComments();
 	loaduserdata();
-	ModeSelection();
 }
 void ModeSelection()
 {
@@ -207,7 +211,6 @@ bool userLogin(int* index) {
 			}
 			if (yourPassword == Student[position].password) {
 				cout << "\n\nLogin successful... \n";
-				Sleep(1000);
 				*index = position;
 				return true;
 			}
