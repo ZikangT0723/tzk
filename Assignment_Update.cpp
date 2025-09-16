@@ -3388,14 +3388,14 @@ void Test1List()
 		if (!showTest1())
 		{
 			cout << "Do you want to create a new Question for Test 1 (MCQ)\n";
-			cout << "'Y' for yes, 'N' to return menu:";
+			cout << "'Y' for yes, 'N' to return host menu:";
 			cin >> choice;
 			charValidation(&choice, 1);
-			if (toupper(choice) == 'Y')
+			if (choice == 'Y')
 				createQuizz();
 			else
 			{
-				cout << "back to menu...\n";
+				cout << "back to host menu...\n";
 				Sleep(1000);
 				break;
 			}
@@ -3424,7 +3424,6 @@ void Test1List()
 
 bool showTest1()
 {
-	cout << "Test1Count= " << Test1Count << endl; //testing pls delete
 	if (Test1Count == 0)
 	{
 		cout << "There are no Question insert." << endl;
@@ -4110,4 +4109,5 @@ void waitEnter(string action)
 	string dummy;
 	cout << "\nPress ENTER to " << action << " ~~~\n\n";
 	getline(cin, dummy);
+
 }
