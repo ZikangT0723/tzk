@@ -198,6 +198,7 @@ bool userLoginSurface(int* index) {
 	{
 		cout << "Invalid input please enter 1 or 2." << endl;
 		cout << "Enter your choice: ";
+		cin.ignore(100, '\n');
 		cin >> option;
 	}
 
@@ -231,7 +232,7 @@ int userRegister() {
 	bool IDvalid, IDdigits, IDexists;
 	loadUserdata();
 	cout << "Enter your name :";
-	cin.ignore();
+	cin.ignore(100, '\n');
 	getline(cin, Student[userCount].Name);
 	while (Student[userCount].Name.length() == 0) {
 		system("cls");
@@ -298,6 +299,7 @@ bool userLogin(int** index) {
 	string yourPassword;
 	int position;
 	cout << "Enter your student ID: ";
+	cin.ignore(100, '\n');
 	cin >> yourID;
 	if (IDexist(&yourID)) {
 		cout << "Enter your password: ";
@@ -2159,11 +2161,11 @@ void Diodes_clipper()
 			cout << "Choose what you want to calculate for clipper: \nEnter '+' for positive\n'-' for negative\n'Q' for return: ";
 			cin >> polar;
 
-			if (polar != '+' && polar != '-' && polar != 'Q') {
+			if (polar != '+' && polar != '-' && toupper(polar) != 'Q') {
 				cin.ignore();
 				cout << "INPUT ERROR! Enter '+', '-' or 'Q' !";
 			}
-		} while (polar != '+' && polar != '-' && polar != 'Q');
+		} while (polar != '+' && polar != '-' && toupper(polar) != 'Q');
 
 		if (polar == '+')
 		{
@@ -2250,7 +2252,7 @@ void Diodes_clipper()
 			}
 		}
 
-		else if (polar == 'Q')
+		else if (toupper(polar) == 'Q')
 		{
 			cout << "Return to simulation option...\n";
 			Sleep(1000);
@@ -2294,14 +2296,14 @@ void Diodes_clamper()
 	{
 		do
 		{
-			cout << "Choose what you want to calculate for clamper: \nEnter '+' for positive\n'-' for negative\n'.' for return: ";
+			cout << "Choose what you want to calculate for clamper: \nEnter '+' for positive\n'-' for negative\n'Q' for return: ";
 			cin >> polar;
-			if (polar != '+' && polar != '-' && polar != 'Q')
+			if (polar != '+' && polar != '-' && toupper(polar) != 'Q')
 			{
 				cin.ignore();
 				cout << "INPUT ERROR! Enter '+', '-' or 'Q' ! ";
 			}
-		} while (polar != '+' && polar != '-' && polar != 'Q');
+		} while (polar != '+' && polar != '-' && toupper(polar) != 'Q');
 
 		if (polar == '+')
 		{
@@ -2427,7 +2429,7 @@ void Diodes_clamper()
 			}
 		}
 
-		else if (polar == 'Q')
+		else if (toupper(polar) == 'Q')
 		{
 			cout << "Return to simulation option...\n";
 			Sleep(1000);
