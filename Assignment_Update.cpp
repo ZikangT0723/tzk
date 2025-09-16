@@ -3306,42 +3306,40 @@ void Test1_quizz(int index)
 	{
 		cout << "You have submitted Test 1\n";
 		cout << "Result of Test 1: " << Student[index].result_Test1 << " \n";
-		cin.ignore();
-		waitEnter("return user menu");
-		return;
 	}
-	if (Test1Count == 0) {
+	else if (Test1Count == 0) {
 		cout << "There are no Question uploaded by Teacher." << endl;
+	}
+	else {
+
+		cout << "You only get ONE chance to answer. Are you ready?\n";
 		cin.ignore();
-		waitEnter("return user menu");
-		return;
-	}
-	cout << "You only get ONE chance to answer. Are you ready?\n";
-	cin.ignore();
-	waitEnter("START");
+		waitEnter("START");
 
-	shuffle(sequence);
+		shuffle(sequence);
 
-	for (int i = 0; i < MAX_Test1; i++) //i<15
-	{
-		if (!Quizz[sequence[i] - 1].question.empty() && (!Quizz[sequence[i] - 1].isDeleted)) {
-			cout << "Question " << Num++ << ": " << endl;
-			cout << Quizz[sequence[i] - 1].question << endl;
-			cout << "A: " << Quizz[sequence[i] - 1].objective_A << endl;
-			cout << "B: " << Quizz[sequence[i] - 1].objective_B << endl;
-			cout << "C: " << Quizz[sequence[i] - 1].objective_C << endl;
-			cout << "D: " << Quizz[sequence[i] - 1].objective_D << endl;
-			cout << "Enter your answer: ";
-			cin >> ans;
-			charValidation(&ans, 2);
-			score += Test1_checkAns(ans, Quizz[sequence[i] - 1].ans);
-			cout << endl;
+		for (int i = 0; i < MAX_Test1; i++) //i<15
+		{
+			if (!Quizz[sequence[i] - 1].question.empty() && (!Quizz[sequence[i] - 1].isDeleted)) {
+				cout << "Question " << Num++ << ": " << endl;
+				cout << Quizz[sequence[i] - 1].question << endl;
+				cout << "A: " << Quizz[sequence[i] - 1].objective_A << endl;
+				cout << "B: " << Quizz[sequence[i] - 1].objective_B << endl;
+				cout << "C: " << Quizz[sequence[i] - 1].objective_C << endl;
+				cout << "D: " << Quizz[sequence[i] - 1].objective_D << endl;
+				cout << "Enter your answer: ";
+				cin >> ans;
+				charValidation(&ans, 2);
+				score += Test1_checkAns(ans, Quizz[sequence[i] - 1].ans);
+				cout << endl;
+			}
 		}
+		Student[index].result_Test1 = (score / float(Test1Count)) * 7;
+		Student[index].attempt_Test1 = true;
+		cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << endl;
+		saveUserdata();
 	}
-	Student[index].result_Test1 = (score / float(Test1Count)) * 7;
-	Student[index].attempt_Test1 = true;
-	cout << "End of Quizz. Your total score is " << score << " Out of " << Num - 1 << endl;
-	saveUserdata();
+
 	cin.ignore();
 	waitEnter("return user menu");
 }
@@ -4111,3 +4109,4 @@ void waitEnter(string action)
 	getline(cin, dummy);
 
 }
+
