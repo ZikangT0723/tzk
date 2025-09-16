@@ -1011,13 +1011,18 @@ void checksubmit(float* answer, int i) {
 		if ((checkans[i] - (checkans[i] * 5 / 100)) >= *(answer + i) || *(answer + i) >= (checkans[i] + (checkans[i] * 5 / 100))) {
 			cout << "Your answer " << answer[i] << " is wrong!\n";
 			cout << "The correct answer is: " << checkans[i] << endl;
-
+		}
+		else {
+			cout << "Your answer " << answer[i] << " is correct!\n";
 		}
 	}
 	else {
 		if ((checkans[i] + (checkans[i] * 5 / 100)) >= *(answer + i) || *(answer + i) >= (checkans[i] - (checkans[i] * 5 / 100))) {
 			cout << "Your answer " << answer[i] << " is wrong!\n";
 			cout << "The correct answer is: " << checkans[i] << endl;
+		}
+		else {
+			cout << "Your answer " << answer[i] << " is correct!\n";
 		}
 	}
 }
