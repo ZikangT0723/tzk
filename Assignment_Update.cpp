@@ -356,7 +356,6 @@ void userMenu(int index) {
 	while (true) {
 		system("cls");
 		cout << "User Menu\n";
-		//cout << "=========\n";
 		userInfo(index);
 		cout << "1. Test 1\n";
 		cout << "2. Test 2 \n";
@@ -398,18 +397,12 @@ void userMenu(int index) {
 }
 
 void userInfo(int index) {
-	for (int width = 0; width <= 78; width++) {
-		cout << "-";
-	}
-	cout << "\n";
+	cout << string(78, '-') << endl;
 	cout << setw(3) << "Name: " << left << setw(20) << Student[index].Name <<
 		" | Student ID: " << setw(7) << Student[index].ID <<
 		" | Test 1: " << fixed << setprecision(2) << Student[index].result_Test1 <<
 		" | Test 2: " << Student[index].result_Test2 << endl;
-	for (int width = 0; width <= 78; width++) {
-		cout << "-";
-	}
-	cout << "\n";
+	cout << string(78, '-') << endl;
 }
 
 // ********** Host LOGIN and MENU  ********** by Daniel
