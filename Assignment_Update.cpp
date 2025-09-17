@@ -3406,9 +3406,10 @@ void Test1List()
 			cin >> option;
 			if (cin.fail()) {
 				cin.clear();
-				cin.ignore();
+				cin.ignore(100,'\n');
 				system("cls");
-				cout << "Invalid input, Please try again." << endl;
+				cout << "Invalid input.Please try again.\n\n";
+				option = -1;
 			}
 			else if (option == 0) break;
 			else if (option > 0 && option <= Test1Count)
@@ -3502,7 +3503,7 @@ void editQuizz(int number)
 {
 	char option;
 	Test1 EditQuizz;
-
+	bool validInput = true;
 	EditQuizz = Quizz[number - 1]; //temporary storage
 	while (true) {
 		system("cls");
@@ -3522,10 +3523,15 @@ void editQuizz(int number)
 			<< "5. Option D\n"
 			<< "6. Correct answer\n"
 			<< "7. Delete\n"
-			<< "8. Cancel\n"
-			<< "Enter (1-8):";
+			<< "8. Cancel\n";
+		if (!validInput)
+		{
+			cout << "\nInvalid input! Please enter a number 1~8.";
+			validInput = true;
+		}
+		cout << "\nEnter (1-8):";
 		cin >> option;
-		cin.ignore();
+		cin.ignore(100,'\n');
 		if (option == '7')
 		{
 			deleteQuizz(number - 1);
@@ -3574,8 +3580,8 @@ void editQuizz(int number)
 				break;
 
 			default:
-				cout << "\nInvalid option, please Enter (1-8)...";
-				Sleep(1000);
+				validInput = false;
+				continue;
 			}
 			Quizz[number - 1] = EditQuizz;
 			Quizz[number - 1].isDeleted = false;
@@ -4110,4 +4116,5 @@ void waitEnter(string action)
 	getline(cin, dummy);
 
 }
+
 
