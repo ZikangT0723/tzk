@@ -536,7 +536,7 @@ void Test2_quizz(float* answer, int index) {
 	if (Student[index].attempt_Test2)
 	{
 		cout << "You have submitted the Test 2.Total score = " << Student[index].result_Test2 << "/" << MAX_Test2 << endl;
-		cout << "Do you wanna review your quention?(Y/N):";
+		cout << "Do you want to review submitted answers?(Y/N):";
 		cin >> option;
 		charValidation(&option, 1);
 		if (option == 'Y')
