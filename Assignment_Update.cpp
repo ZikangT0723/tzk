@@ -3404,14 +3404,13 @@ void Test1List()
 
 			cout << "Enter the question you want to edit or other integer to create Quizz (0 to return):";
 			cin >> option;
-			if (cin.fail()) {
+			while (cin.fail()) {
 				cin.clear();
 				cin.ignore(100,'\n');
-				system("cls");
-				cout << "Invalid input.Please try again.\n\n";
-				option = -1;
+				cout << "Invalid input.Please try again.\nEnter your choice:";
+				cin >> option;
 			}
-			else if (option == 0) break;
+			if (option == 0) break;
 			else if (option > 0 && option <= Test1Count)
 				editQuizz(option);
 			else
@@ -4116,5 +4115,6 @@ void waitEnter(string action)
 	getline(cin, dummy);
 
 }
+
 
 
