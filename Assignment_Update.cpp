@@ -217,6 +217,7 @@ bool userLoginSurface(int* index) {
 			return false;
 
 		if (userCount < MAX_Students) {
+			cout << "\n\n\nRegister successful... \n";
 			*index = info;
 			return true;
 		}
