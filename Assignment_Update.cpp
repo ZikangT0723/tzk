@@ -3810,7 +3810,7 @@ void replyToComment() {
 
 			cout << "Reply added successfully.\n";
 			saveComments();
-			waitEnter("to continue");
+			waitEnter("continue");
 			system("cls");
 		}
 	}
@@ -4114,6 +4114,7 @@ void waitEnter(string action)
 	getline(cin, dummy);
 
 }
+
 
 
 
