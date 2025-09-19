@@ -994,7 +994,6 @@ void Test2_quizz(float* answer, int index) {
 		}
 	} while (record[i] != 999);
 	check(answer, Student[index].result_Test2);
-	cout << "Score updated:" << Student[index].result_Test2 << endl;
 	Student[index].attempt_Test2 = true;
 	cout << "You have submitted the Test 2. Your total score is " << Student[index].result_Test2 << " Out of " << MAX_Test2 << "." << endl;
 	saveUserdata();
@@ -1062,7 +1061,7 @@ void review(float* answer, int score) {
 	cout << "         o                  o \n";
 	cout << "         -       Vout       +\n";
 	cout << "                Figure 1\n\n";
-	cout << "Your answer is       : " << setw(5) << right << fixed << setprecision(2) << answer[0] << endl;
+	cout << "Your answer is       : " << setw(6) << right << fixed << setprecision(2) << answer[0] << endl;
 	cout << "The correct answer is: " << setw(5) << fixed << setprecision(2) << checkans[0] << right
 		<< setw(15) << "Score = " << checksection(answer, 0, 0) << endl << endl;
 	cout << "Quesiton 2: Given the following configuration shown in Figure 2, Vin = 10V, Vd = 0.7V, Vbias = 5V.\n ";
@@ -1239,9 +1238,9 @@ void review(float* answer, int score) {
 	cout << "Given: Rf =220000 ohms, Ri =10000 ohms ,Vin = 5.0 V, Aol = 200000 , Zin = 2000000 ohms, Zout = 75 ohms.\n";
 	cout << "Determine the closed-loop voltage gain,Acl, the input and output impedances of the amplifier.\n\n";
 	cout << "Your answer is       : " << setw(5) << answer[16] << setw(5) << right << ", " << setw(5) << right << answer[17]
-		<< ", " << setw(5) << right << answer[18] << endl;
+		<< setw(5) << right << ", " << setw(5) << right << answer[18] << endl;
 	cout << "The correct answer is: " << setw(5) << checkans[16] << setw(5) << right << ", " << setw(5) << right << checkans[17]
-		<< ", " << setw(5) << right << checkans[18] << right
+		<< setw(5) << right << ", " << setw(5) << right << checkans[18] << right
 		<< setw(15) << "Score = " << checksection(answer, 16, 18) << endl << endl;
 	cout << "Question 11: Inverting Amplifier,I.\n\n";
 	cout << "                                               \n";
@@ -3406,7 +3405,7 @@ void Test1List()
 			cin >> option;
 			while (cin.fail()) {
 				cin.clear();
-				cin.ignore(100,'\n');
+				cin.ignore(100, '\n');
 				cout << "Invalid input.Please try again.\nEnter your choice:";
 				cin >> option;
 			}
@@ -3530,7 +3529,7 @@ void editQuizz(int number)
 		}
 		cout << "\nEnter (1-8):";
 		cin >> option;
-		cin.ignore(100,'\n');
+		cin.ignore(100, '\n');
 		if (option == '7')
 		{
 			deleteQuizz(number - 1);
