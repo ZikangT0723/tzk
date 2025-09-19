@@ -4,6 +4,7 @@
 #include<iomanip>
 #include<fstream>
 #include<cctype>
+#include<ctime>
 #include<cstring> // for strcmp()
 #include<cstdlib> //for atoi()
 #include<windows.h> // for Sleep()
