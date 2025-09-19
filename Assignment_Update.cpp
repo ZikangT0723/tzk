@@ -1,4 +1,4 @@
-﻿#include<iostream>
+﻿#include<iostream> 
 #include<string>
 #include<cmath>
 #include<iomanip>
@@ -207,25 +207,25 @@ bool userLoginSurface(int* index) {
 			return true;
 		}
 		else {
+			Sleep(1000);
 			return false;
 		}
 	}
-	else if (option == '2') {
+	else {
+		if (userCount >= MAX_Students) {
+			cout << "The userlist is full. \n";
+			Sleep(1000);
+			return false;
+		}
 		info = userRegister();
 
 		if (info == -1)
 			return false;
 
-		if (userCount < MAX_Students) {
-			cout << "\n\n\nRegister successful... \n";
-			*index = info;
-			return true;
-		}
-
-		else {
-			cout << "The userlist is full." << endl;
-			return false;
-		}
+		cout << "\n\n\nRegister successful... \n";
+		*index = info;
+		return true;
+		
 	}
 }
 
@@ -4114,7 +4114,6 @@ void waitEnter(string action)
 	getline(cin, dummy);
 
 }
-
 
 
 
