@@ -1,4 +1,4 @@
-#include<iostream> 
+﻿#include<iostream> 
 #include<string>
 #include<cmath>
 #include<iomanip>
@@ -11,7 +11,7 @@
 using namespace std;
 // CONSTANT
 const int MAX_Test2 = 23;
-const float checkans[MAX_Test2] = 
+const float checkans[MAX_Test2] =
 { -11.3, 24.3, 4.3, -6.8, -36.8,
 5.16, 1.95, 32.40,28.80, -366.18,
 2.25, 1125, 8.9, -1.1, 12.7, 3.13,
@@ -2582,6 +2582,7 @@ void BJT_base()
 {
 	char calculate;
 	double VCC, IC_mA, RC, VCE;
+	cout << "BJT base biased configuration.\n\n";
 
 	cout << "                      VCC\n";
 	cout << "                       |\n";
@@ -2641,6 +2642,7 @@ void BJT_AC()
 {
 	char calculate;
 	double R1, R2, VB, VCC, RC, RE, betaAC, Rin_base, Rin_total, IE_mA, re, AV;
+	cout << "BJT AC configuration.\n\n";
 
 	cout << "                                         VCC\n";
 	cout << "                                          |\n";
@@ -3058,8 +3060,6 @@ void OpAmp_nonInvert()
 	cout << "                             |         \n";
 	cout << "                            GND        \n";
 	cout << "                                       \n";
-	cout << "Given:Vin = 5.0V, Rf = 220000 Ohm,Ri = 10000 Ohm and Aol = 200000 , Zin = 2000000 Ohm, Zout = 75 Ohm.\n";
-	cout << "Determine the cloosed-loop Voltage gain,Acl, the input and output impedances of the amplifier.\n";
 
 	while (true)
 	{
@@ -3171,8 +3171,6 @@ void OpAmp_voltageFollower()
 	cout << "                             |         \n";
 	cout << "                            GND        \n";
 	cout << "                                       \n";
-	cout << "Given: Rf =230000 Ohm, Ri =10000 Ohm , Aol = 200000 , Zin = 1000000 Ohm, Zout = 70 Ohm and B = 1.\n";
-	cout << "Determine the input and output impedances of the amplifier.\n";
 
 	while (true)
 	{
@@ -3245,8 +3243,6 @@ void OpAmp_Invert()
 	cout << "                |       |/                     \n";
 	cout << "               GND                             \n";
 	cout << "                                               \n";
-	cout << "Given: Rf =210000 Ohm, Ri =10000 Ohm.\n";
-	cout << "Determine the closed-loop Voltage gain,Acl and the input impedance of the amplifier.\n";
 
 	while (true)
 	{
@@ -4118,7 +4114,6 @@ void waitEnter(string action)
 	getline(cin, dummy);
 
 }
-
 
 
 
