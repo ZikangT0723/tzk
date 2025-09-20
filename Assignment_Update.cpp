@@ -3725,7 +3725,7 @@ void studentCommentMenu(int index)
 	} while (option != '0');
 
 }
-//create
+
 void createNotification() {
 	cout << "Create notification\n";
 	cout << "===================\n";
@@ -3820,7 +3820,7 @@ void replyToComment() {
 	}
 }
 
-//delete comment function
+
 void deleteComment() {
 	int index;
 	bool validInput = true;
@@ -4118,6 +4118,7 @@ void waitEnter(string action)
 	getline(cin, dummy);
 
 }
+
 
 
 
