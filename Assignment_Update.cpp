@@ -1,4 +1,4 @@
-﻿#include<iostream> 
+#include<iostream> 
 #include<string>
 #include<cmath>
 #include<iomanip>
@@ -11,8 +11,11 @@
 using namespace std;
 // CONSTANT
 const int MAX_Test2 = 23;
-const float checkans[MAX_Test2] = { -11.3, 24.3, 4.3, -6.8, -36.8, 5.16, 1.95, 32.40, 28.80, -366.18, 2.25, 1125, 8.9, -1.1, 12.7, 3.13, 23, 1.74, 8.62, -21,
-		10000, 200, 350 }; //Answer for quizz 2
+const float checkans[MAX_Test2] = 
+{ -11.3, 24.3, 4.3, -6.8, -36.8,
+5.16, 1.95, 32.40,28.80, -366.18,
+2.25, 1125, 8.9, -1.1, 12.7, 3.13,
+23, 1.74, 8.62, -21, 10000, 200, 350 }; //Answer for quizz 2
 const int MAX_Students = 100;
 const int MAX_Test1 = 15; //maximum number
 const int MAX_Comments = 100;
@@ -50,9 +53,9 @@ struct Comment
 	bool fromHost = false;
 };
 
-User Student[MAX_Students];
+User Student[MAX_Students]; //store 100 user data
 Test1 Quizz[MAX_Test1]; //store 15 test1 questions
-Comment comments[MAX_Comments];
+Comment comments[MAX_Comments];//store 100 comments
 
 //========== PROTOTYPE ==========
 
@@ -226,7 +229,7 @@ bool userLoginSurface(int* index) {
 		cout << "\n\n\nRegister successful... \n";
 		*index = info;
 		return true;
-		
+
 	}
 }
 
@@ -3294,7 +3297,7 @@ void OpAmp_Invert()
 // ********** TEST 1 QUIZZ  ********** by Daniel
 void Test1_quizz(int index)
 {
-	/* this function is to let user answer 10 question made
+	/* this function is to let user answer 15 question made
 	by host and each user the sequence will be shuffled*/
 
 	int sequence[MAX_Test1] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
