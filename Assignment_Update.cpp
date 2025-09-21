@@ -1,14 +1,30 @@
-﻿#include<iostream> 
+#include<iostream> 
 #include<string>
 #include<cmath>
 #include<iomanip>
 #include<fstream>
 #include<cctype>
-#include<ctime>
+#include<ctime> // for srand(time(NULL))
 #include<cstring> // for strcmp()
 #include<cstdlib> //for atoi()
 #include<windows.h> // for Sleep()
 using namespace std;
+
+/********************************************
+* Course selected in this project:          *
+* UGEA 1313 Basic Electronic                *
+*                                           *
+* Group members:                            *
+* Chuah Zi Nor (2303347)                    *
+* Daniel Chee (2405262)                     *
+* Pavan A/L T.Gopalakrishnan (2302427)      *
+* Teng Zi Kang (2404458)                    *
+* Truong Huyen Trang (2405477)              *
+*                                           *
+* Lecturer:                                 *
+* Ts. Dr. Toh Pek Lan                       *
+*********************************************/
+
 // CONSTANT
 const int MAX_Test2 = 23;
 const float checkans[MAX_Test2] =
@@ -490,7 +506,7 @@ void hostMenu()
 			break;
 		case '3':
 			hostCommentMenu();
-			break;//Trang
+			break;
 		case '4':
 			cout << "Exiting to Welcoming Surface..." << endl;
 			Sleep(1000);
@@ -502,7 +518,7 @@ void hostMenu()
 	} while (option != '4');
 }
 
-// USER LISt show in formatted by Zikang
+// USER LIST show in formatted by Zikang
 void userList() {
 	system("cls");
 	cout << "================================================\n";
@@ -1422,7 +1438,6 @@ void notes_Diode()
 	cout << "There are two types of clippers: series and shunt clippers." << endl;
 	cout << "Series clippers are connected in series with the load and provide an output when forward biased." << endl;
 
-	// ASCII diagrams kept exactly the same ?
 	cout << "\n        Positive clipper                                 Negative clipper           \n";
 	cout << "   ------------------------------                   ------------------------------    \n";
 	cout << "   |                            |                   |                            |    \n";
@@ -2059,8 +2074,8 @@ void notes_OA() {
 	system("cls");
 }
 
-//SIMULATORS FUNCTION by Pavan, ZiNor, Daniel and Trang
-void simulatorMenu()
+//****** SIMULATORS FUNCTION ****** by Pavan, ZiNor, Daniel and Trang
+void simulatorMenu() //by Daniel
 {
 	char opt_simulator[10];
 	bool validInput = true;
@@ -2135,7 +2150,7 @@ void simulatorMenu()
 }
 
 //Case 1 (for simulator)
-void Diodes_clipper()
+void Diodes_clipper() // by Pavan 
 {
 	float Vin, Vd, Vout;
 	char polar, opt_clipper;
@@ -2268,7 +2283,7 @@ void Diodes_clipper()
 	}
 }
 //Case 2 (for simulator)
-void Diodes_clamper()
+void Diodes_clamper() //by Zikang
 {
 	float Vin, Vc, Vd, Vbias, Vout;
 	char polar, opt_clamper;
@@ -2445,7 +2460,7 @@ void Diodes_clamper()
 	}
 }
 //Case 3 (for simulator)
-void BJT_Voltage_divider()
+void BJT_Voltage_divider() // by Zinor
 {
 	char calculate;
 	double RIN_base, betaDC, RE, R2, R2_total, R1, VCC, VB, IC_mA, RC, VCE;
@@ -2578,11 +2593,10 @@ void BJT_Voltage_divider()
 	}
 }
 //Case 4 (for simulator)
-void BJT_base()
+void BJT_base() // by Zinor
 {
 	char calculate;
 	double VCC, IC_mA, RC, VCE;
-	cout << "BJT base biased configuration.\n\n";
 
 	cout << "                      VCC\n";
 	cout << "                       |\n";
@@ -2638,11 +2652,10 @@ void BJT_base()
 	}
 }
 //Case 5 (for simulator)
-void BJT_AC()
+void BJT_AC() // by Zinor
 {
 	char calculate;
 	double R1, R2, VB, VCC, RC, RE, betaAC, Rin_base, Rin_total, IE_mA, re, AV;
-	cout << "BJT AC configuration.\n\n";
 
 	cout << "                                         VCC\n";
 	cout << "                                          |\n";
@@ -2795,7 +2808,7 @@ void BJT_AC()
 	}
 }
 //Case 6 (for simulator)
-void FET_DrainCurrent()
+void FET_DrainCurrent() // by Daniel
 {
 	char option;
 	float Idss, Vgs_off, Vgs, Id;
@@ -2886,7 +2899,7 @@ void FET_DrainCurrent()
 	}
 }
 //Case 7 (for simulator)
-void FET_jfet()
+void FET_jfet()// by Daniel
 {
 	char option;
 	float Id, Vdd, Rg, Rd, Rs;  //for jFET
@@ -2959,7 +2972,7 @@ void FET_jfet()
 	}
 }
 //Case 8 (for simulator)
-void FET_mosfet()
+void FET_mosfet() // by Daniel
 {
 	char option;
 	float Id, Vdd, R1, R2, R12, Rd, Vgs_th, K;  //for MOSFET
@@ -3037,7 +3050,7 @@ void FET_mosfet()
 	}
 }
 //Case 9 (for simulator)
-void OpAmp_nonInvert()
+void OpAmp_nonInvert() // by Trang
 {
 	double Rf_NI, Ri_NI, Aol, Zin_NI, Zout_NI, Acl_NI, B, Zin, Zout;
 	char opt;
@@ -3148,7 +3161,7 @@ void OpAmp_nonInvert()
 	}
 }
 //Case 10 (for simulator)
-void OpAmp_voltageFollower()
+void OpAmp_voltageFollower() // by Trang
 {
 	char opt;
 	double Aol, Zin_VF, Zout_VF, B, Zin, Zout;
@@ -3222,7 +3235,7 @@ void OpAmp_voltageFollower()
 	}
 }
 //Case 11 (for simulator)
-void OpAmp_Invert()
+void OpAmp_Invert() // by Trang
 {
 	char opt;
 	double Rf_I, Ri_I, Acl_I;
@@ -3293,7 +3306,7 @@ void OpAmp_Invert()
 // ********** TEST 1 QUIZZ  ********** by Daniel
 void Test1_quizz(int index)
 {
-	/* this function is to let user answer 15 question made
+	/* this function is to let user answer 10 question made
 	by host and each user the sequence will be shuffled*/
 
 	int sequence[MAX_Test1] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
@@ -3721,7 +3734,7 @@ void studentCommentMenu(int index)
 	} while (option != '0');
 
 }
-
+//create
 void createNotification() {
 	cout << "Create notification\n";
 	cout << "===================\n";
@@ -3816,7 +3829,7 @@ void replyToComment() {
 	}
 }
 
-
+//delete comment function
 void deleteComment() {
 	int index;
 	bool validInput = true;
